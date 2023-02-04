@@ -1,0 +1,8 @@
+[target.thumbv6m-none-eabi]
+runner = 'probe-run --chip stm32l053r8t6'
+
+[build]
+target = "thumbv6m-none-eabi"
+
+[env]
+DEFMT_LOG = "trace"
