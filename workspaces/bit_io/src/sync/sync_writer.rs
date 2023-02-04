@@ -1,9 +1,8 @@
 use crate::sync::SyncSequence;
-use crate::{PinWriter, Writer};
+use crate::Writer;
 
 use crate::error::WriterError;
 use crate::writer::WriterTiming;
-use embassy_stm32::gpio::Pin;
 
 pub struct SyncWriter<W: Writer> {
     writer: W,
@@ -21,6 +20,6 @@ impl<W: Writer> SyncWriter<W> {
     }
 
     pub fn get_timing(&self) -> &WriterTiming {
-        &self.writer.get_timing()
+        self.writer.get_timing()
     }
 }

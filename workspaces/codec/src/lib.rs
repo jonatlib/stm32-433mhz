@@ -4,7 +4,8 @@
 pub mod two_to_three;
 
 pub trait Codec
-where Self: Iterator<Item = u8>
+where
+    Self: Iterator<Item = u8>,
 {
     type Encoded: Iterator<Item = u8>;
 

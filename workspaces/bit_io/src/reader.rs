@@ -83,7 +83,7 @@ pub trait Reader {
             return Ok(false);
         }
 
-        return Err(ReadError::OutOfTiming);
+        Err(ReadError::OutOfTiming)
     }
 
     async fn read_bytes(&mut self, count: usize, buffer: &mut [u8]) -> Result<usize, ReadError> {
@@ -142,6 +142,7 @@ pub struct PinReader<'a, P: Pin, const INVERT: bool = false> {
 }
 
 impl<'a, P: Pin, const INVERT: bool> PinReader<'a, P, INVERT> {
+    #[allow(clippy::result_unit_err)]
     pub fn new(timing: ReaderTiming, pin: ExtiInput<'a, P>) -> Result<Self, ()> {
         Ok(Self { timing, pin })
     }

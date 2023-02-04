@@ -85,6 +85,7 @@ pub struct PinWriter<'a, P: Pin, const INVERT: bool = false> {
 }
 
 impl<'a, P: Pin, const INVERT: bool> PinWriter<'a, P, INVERT> {
+    #[allow(clippy::result_unit_err)]
     pub fn new(timing: WriterTiming, mut pin: Output<'a, P>) -> Result<Self, ()> {
         if INVERT {
             pin.set_high();

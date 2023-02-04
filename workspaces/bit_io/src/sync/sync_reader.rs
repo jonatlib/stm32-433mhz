@@ -1,9 +1,8 @@
 use crate::sync::SyncSequence;
-use crate::{PinReader, Reader};
+use crate::Reader;
 
 use crate::error::ReadError;
 use crate::reader::ReaderTiming;
-use embassy_stm32::gpio::Pin;
 
 pub struct SyncReader<R: Reader> {
     reader: R,
@@ -27,6 +26,6 @@ impl<R: Reader> SyncReader<R> {
     }
 
     pub fn get_timing(&self) -> &ReaderTiming {
-        &self.reader.get_timing()
+        self.reader.get_timing()
     }
 }

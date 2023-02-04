@@ -1,8 +1,7 @@
-use embassy_stm32::gpio::Pin;
 use embassy_time::{Duration, Timer};
 
 use crate::error::{ReadError, WriterError};
-use crate::{PinReader, PinWriter, Reader, Writer};
+use crate::{Reader, Writer};
 
 pub mod sync_reader;
 pub mod sync_writer;

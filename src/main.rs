@@ -2,7 +2,7 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-use bit_io::{PinReader, PinWriter, Reader, SyncReader, SyncSequence, SyncWriter, Writer};
+use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
@@ -13,13 +13,13 @@ use embassy_executor::Spawner;
 use embassy_stm32::exti::ExtiInput;
 use embassy_stm32::gpio::{Input, Level, Output, Pull, Speed};
 use embassy_stm32::peripherals::PC0;
-use embassy_stm32::rcc::{ClockSrc, PLLSource};
+use embassy_stm32::rcc::ClockSrc;
 use embassy_stm32::Config;
 use embassy_time::{Duration, Timer};
 
 #[embassy_executor::task]
 async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
-    let mut reader = PinReader::<_, false>::new(timing, button).expect("Could not create bit_io");
+    let reader = PinReader::<_, false>::new(timing, button).expect("Could not create bit_io");
     let mut reader = SyncReader::new(reader, sync, 4);
 
     loop {
@@ -48,8 +48,7 @@ async fn main(spawner: Spawner) {
     let writer_timing = WriterTiming::default();
 
     let led = Output::new(p.PA5, Level::Low, Speed::Low);
-    let mut writer =
-        PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
+    let writer = PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
 
     let mut writer = SyncWriter::new(writer, sync.clone());
 
@@ -67,8 +66,7 @@ async fn main(spawner: Spawner) {
 
     let data = [0xf0u8, 0x0f, 0xef, 0xba];
     loop {
-        // writer.write_byte(0xf0).await.unwrap();
-        writer.write_bytes(&data).await;
+        let _ = writer.write_bytes(&data).await;
         Timer::after(Duration::from_millis(2000)).await;
     }
 }
