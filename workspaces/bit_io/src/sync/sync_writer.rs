@@ -5,13 +5,13 @@ use crate::error::WriterError;
 use crate::writer::WriterTiming;
 use embassy_stm32::gpio::Pin;
 
-pub struct SyncWriter<'a, P: Pin, const INVERT: bool = false> {
-    writer: PinWriter<'a, P, INVERT>,
+pub struct SyncWriter<W: Writer> {
+    writer: W,
     sync: SyncSequence,
 }
 
-impl<'a, P: Pin, const INVERT: bool> SyncWriter<'a, P, INVERT> {
-    pub fn new(writer: PinWriter<'a, P, INVERT>, sync: SyncSequence) -> Self {
+impl<W: Writer> SyncWriter<W> {
+    pub fn new(writer: W, sync: SyncSequence) -> Self {
         Self { writer, sync }
     }
 

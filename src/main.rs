@@ -50,6 +50,7 @@ async fn main(spawner: Spawner) {
     let led = Output::new(p.PA5, Level::Low, Speed::Low);
     let mut writer =
         PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
+
     let mut writer = SyncWriter::new(writer, sync.clone());
 
     // Configure the button pin and obtain handler.

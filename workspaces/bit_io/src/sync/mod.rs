@@ -42,10 +42,7 @@ impl SyncSequence {
         Self::new(ones, ones / 2, ones / 4, ones / 6, number_of_bits, sequence)
     }
 
-    pub async fn write_sequence<'a, P: Pin, const INVERT: bool>(
-        &self,
-        writer: &mut PinWriter<'a, P, INVERT>,
-    ) -> Result<(), WriterError> {
+    pub async fn write_sequence<W: Writer>(&self, writer: &mut W) -> Result<(), WriterError> {
         for index in 0..self.number_of_bits {
             let mask = 1u32 << index;
             let bit = (self.sequence & mask) > 0;
@@ -60,10 +57,7 @@ impl SyncSequence {
         Ok(())
     }
 
-    pub async fn read_sequence<'a, P: Pin, const INVERT: bool>(
-        &self,
-        reader: &mut PinReader<'a, P, INVERT>,
-    ) -> Result<(), ReadError> {
+    pub async fn read_sequence<R: Reader>(&self, reader: &mut R) -> Result<(), ReadError> {
         let mut index = 0u8;
 
         loop {

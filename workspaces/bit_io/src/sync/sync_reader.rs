@@ -5,18 +5,14 @@ use crate::error::ReadError;
 use crate::reader::ReaderTiming;
 use embassy_stm32::gpio::Pin;
 
-pub struct SyncReader<'a, P: Pin, const INVERT: bool = false> {
-    reader: PinReader<'a, P, INVERT>,
+pub struct SyncReader<R: Reader> {
+    reader: R,
     sync: SyncSequence,
     number_of_bytes: usize,
 }
 
-impl<'a, P: Pin, const INVERT: bool> SyncReader<'a, P, INVERT> {
-    pub fn new(
-        mut reader: PinReader<'a, P, INVERT>,
-        sync: SyncSequence,
-        number_of_bytes: usize,
-    ) -> Self {
+impl<R: Reader> SyncReader<R> {
+    pub fn new(mut reader: R, sync: SyncSequence, number_of_bytes: usize) -> Self {
         reader.get_mut_timing().adjust_to_sync_marker(&sync);
         Self {
             sync,
