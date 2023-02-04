@@ -48,8 +48,8 @@ impl Default for ReaderTiming {
     }
 }
 
-impl From<WriterTiming> for ReaderTiming {
-    fn from(value: WriterTiming) -> Self {
+impl From<&WriterTiming> for ReaderTiming {
+    fn from(value: &WriterTiming) -> Self {
         Self::new(
             value.zeroes - Duration::from_micros(500),
             value.ones - Duration::from_micros(500),

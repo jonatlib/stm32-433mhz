@@ -18,9 +18,8 @@ use embassy_stm32::Config;
 use embassy_time::{Duration, Timer};
 
 #[embassy_executor::task]
-async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence) {
-    let mut reader = PinReader::<_, false>::new(ReaderTiming::default(), button)
-        .expect("Could not create bit_io");
+async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
+    let mut reader = PinReader::<_, false>::new(timing, button).expect("Could not create bit_io");
     let mut reader = SyncReader::new(reader, sync, 4);
 
     loop {
@@ -46,17 +45,24 @@ async fn main(spawner: Spawner) {
     let p = embassy_stm32::init(config);
 
     let sync = SyncSequence::default();
+    let writer_timing = WriterTiming::default();
 
     let led = Output::new(p.PA5, Level::Low, Speed::Low);
     let mut writer =
-        PinWriter::<_, false>::new(WriterTiming::default(), led).expect("Could not create bit_io");
+        PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
     let mut writer = SyncWriter::new(writer, sync.clone());
 
     // Configure the button pin and obtain handler.
     // On the Nucleo F091RC there is a button connected to pin PC13.
     let writer_pin = Input::new(p.PC0, Pull::None);
     let button = ExtiInput::new(writer_pin, p.EXTI0);
-    spawner.spawn(read_task(button, sync)).unwrap();
+    spawner
+        .spawn(read_task(
+            button,
+            sync,
+            ReaderTiming::from(writer.get_timing()),
+        ))
+        .unwrap();
 
     let data = [0xf0u8, 0x0f, 0xef, 0xba];
     loop {
