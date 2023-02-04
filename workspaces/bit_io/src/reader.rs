@@ -59,7 +59,7 @@ impl From<&WriterTiming> for ReaderTiming {
     }
 }
 
-pub trait Reader {
+pub trait Reader: crate::BaseReader {
     async fn read_timing(&mut self) -> Result<Duration, ReadError>;
     fn get_timing(&self) -> &ReaderTiming;
     fn get_mut_timing(&mut self) -> &mut ReaderTiming;
@@ -151,6 +151,12 @@ impl<'a, P: Pin, const INVERT: bool> PinReader<'a, P, INVERT> {
         futures::stream::unfold(self, |mut reader| async {
             reader.read_byte().await.ok().map(|v| (v, reader))
         })
+    }
+}
+
+impl<'a, P: Pin, const INVERT: bool> crate::BaseReader for PinReader<'a, P, INVERT> {
+    async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
+        self.read_bytes(buffer.len(), buffer).await
     }
 }
 

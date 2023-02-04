@@ -2,7 +2,7 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
+use bit_io::{BaseReader, BaseWriter, PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
@@ -29,7 +29,7 @@ async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: 
         // info!("---------------------------------------------------");
 
         let mut data: [u8; 4] = [0; 4];
-        let read_size = reader.read_bytes(&mut data).await;
+        let read_size = reader.read_bytes_buffer(&mut data).await;
         info!("---------------------------------------------------");
         info!("Read bytes = {:#04x}, size = {}", data, read_size);
         info!("---------------------------------------------------");
@@ -66,7 +66,7 @@ async fn main(spawner: Spawner) {
 
     let data = [0xf0u8, 0x0f, 0xef, 0xba];
     loop {
-        let _ = writer.write_bytes(&data).await;
+        let _ = writer.write_bytes_buffer(&data).await;
         Timer::after(Duration::from_millis(2000)).await;
     }
 }

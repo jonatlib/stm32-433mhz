@@ -20,12 +20,15 @@ impl<R: Reader> SyncReader<R> {
         }
     }
 
-    pub async fn read_bytes(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
-        self.sync.read_sequence(&mut self.reader).await?;
-        self.reader.read_bytes(self.number_of_bytes, buffer).await
-    }
-
     pub fn get_timing(&self) -> &ReaderTiming {
         self.reader.get_timing()
+    }
+}
+
+impl<R: Reader> crate::BaseReader for SyncReader<R> {
+    async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
+        // TODO check if buffer is smaller then read bytes
+        self.sync.read_sequence(&mut self.reader).await?;
+        self.reader.read_bytes(self.number_of_bytes, buffer).await
     }
 }

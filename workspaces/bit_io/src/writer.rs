@@ -39,7 +39,7 @@ impl Default for WriterTiming {
     }
 }
 
-pub trait Writer {
+pub trait Writer: crate::BaseWriter {
     async fn write_timing(&mut self, duration: Duration) -> Result<(), WriterError>;
     fn get_timing(&self) -> &WriterTiming;
 
@@ -94,6 +94,12 @@ impl<'a, P: Pin, const INVERT: bool> PinWriter<'a, P, INVERT> {
         }
 
         Ok(Self { timing, pin })
+    }
+}
+
+impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinWriter<'a, P, INVERT> {
+    async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
+        self.write_bytes(buffer).await
     }
 }
 
