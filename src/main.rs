@@ -16,6 +16,9 @@ use embassy_stm32::peripherals::PC0;
 use embassy_stm32::rcc::ClockSrc;
 use embassy_stm32::Config;
 use embassy_time::{Duration, Timer};
+use network::simple::sender::SimpleSender;
+use network::transport::TransportSender;
+use network::Address;
 
 #[embassy_executor::task]
 async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
@@ -46,27 +49,36 @@ async fn main(spawner: Spawner) {
 
     let sync = SyncSequence::default();
     let writer_timing = WriterTiming::default();
-
     let led = Output::new(p.PA5, Level::Low, Speed::Low);
-    let writer = PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
+    let pin_writer =
+        PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
+    let writer = SyncWriter::new(pin_writer, sync.clone());
 
-    let mut writer = SyncWriter::new(writer, sync.clone());
+    let mut simple_sender = SimpleSender::new_simple(Address::new(0x0f, 0x01), writer);
+    let mut transport = simple_sender.create_transport();
 
-    // Configure the button pin and obtain handler.
-    // On the Nucleo F091RC there is a button connected to pin PC13.
-    let writer_pin = Input::new(p.PC0, Pull::None);
-    let button = ExtiInput::new(writer_pin, p.EXTI0);
-    spawner
-        .spawn(read_task(
-            button,
-            sync,
-            ReaderTiming::from(writer.get_timing()),
-        ))
-        .unwrap();
-
-    let data = [0xf0u8, 0x0f, 0xef, 0xba];
     loop {
-        let _ = writer.write_bytes_buffer(&data).await;
+        let _ = transport
+            .send_bytes(&[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            .await;
         Timer::after(Duration::from_millis(2000)).await;
     }
+
+    // // Configure the button pin and obtain handler.
+    // // On the Nucleo F091RC there is a button connected to pin PC13.
+    // let writer_pin = Input::new(p.PC0, Pull::None);
+    // let button = ExtiInput::new(writer_pin, p.EXTI0);
+    // spawner
+    //     .spawn(read_task(
+    //         button,
+    //         sync,
+    //         ReaderTiming::from(writer.get_timing()),
+    //     ))
+    //     .unwrap();
+    //
+    // let data = [0xf0u8, 0x0f, 0xef, 0xba];
+    // loop {
+    //     let _ = writer.write_bytes_buffer(&data).await;
+    //     Timer::after(Duration::from_millis(2000)).await;
+    // }
 }

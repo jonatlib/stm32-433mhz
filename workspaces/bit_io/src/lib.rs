@@ -20,4 +20,8 @@ pub trait BaseReader {
 
 pub trait BaseWriter {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, error::WriterError>;
+    async fn write_bytes_iterator<I: Iterator<Item = u8>>(
+        &mut self,
+        data: I,
+    ) -> Result<usize, error::WriterError>;
 }

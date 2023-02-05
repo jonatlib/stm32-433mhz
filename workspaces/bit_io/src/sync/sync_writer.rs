@@ -24,4 +24,18 @@ impl<W: Writer> crate::BaseWriter for SyncWriter<W> {
         self.sync.write_sequence(&mut self.writer).await?;
         self.writer.write_bytes(buffer).await
     }
+
+    async fn write_bytes_iterator<I: Iterator<Item = u8>>(
+        &mut self,
+        data: I,
+    ) -> Result<usize, WriterError> {
+        self.sync.write_sequence(&mut self.writer).await?;
+
+        let mut bytes = 0usize;
+        for byte in data {
+            self.writer.write_byte(byte).await?;
+            bytes += 1;
+        }
+        Ok(bytes)
+    }
 }

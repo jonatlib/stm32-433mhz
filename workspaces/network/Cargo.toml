@@ -1,0 +1,16 @@
+[package]
+name = "network"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+codec = { path = "../codec" }
+bit_io = { path = "../bit_io" }
+
+bitfield-struct = "~0.3.2"
+postcard = { version = "~1.0.2", default-features = false, features = ["use-defmt"] }
+serde = { version = "~1.0.152", default-features = false }
+
+defmt = "~0.3.2"

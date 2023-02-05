@@ -54,7 +54,7 @@ pub trait Writer: crate::BaseWriter {
     }
 
     async fn write_byte(&mut self, value: u8) -> Result<(), WriterError> {
-        trace!("Writing byte = {:#04x}", value);
+        // trace!("Writing byte = {:#04x}", value);
         for index in 0..8u8 {
             let mask = 1u8 << index;
             let bit = (value & mask) > 0;
@@ -100,6 +100,18 @@ impl<'a, P: Pin, const INVERT: bool> PinWriter<'a, P, INVERT> {
 impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinWriter<'a, P, INVERT> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
         self.write_bytes(buffer).await
+    }
+
+    async fn write_bytes_iterator<I: Iterator<Item = u8>>(
+        &mut self,
+        data: I,
+    ) -> Result<usize, WriterError> {
+        let mut bytes = 0usize;
+        for byte in data {
+            self.write_byte(byte).await?;
+            bytes += 1;
+        }
+        Ok(bytes)
     }
 }
 

@@ -1,17 +1,31 @@
 #![no_std]
 #![feature(type_alias_impl_trait)]
 
-pub mod two_to_three;
+pub trait Codec {
+    type Encoded<'a>: Iterator<Item = u8> + 'a;
+    type Decoded<'a>: Iterator<Item = u8> + 'a;
 
-pub trait Codec
-where
-    Self: Iterator<Item = u8>,
-{
-    type Encoded: Iterator<Item = u8>;
-
-    fn encode(self) -> Self::Encoded;
+    fn encode<'a>(&self, payload: &'a [u8]) -> Self::Encoded<'a>;
+    fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a>;
 }
 
-pub fn example() -> u32 {
-    123
+pub struct Identity {}
+
+impl Default for Identity {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+impl Codec for Identity {
+    type Encoded<'a> = impl Iterator<Item = u8> + 'a;
+    type Decoded<'a> = impl Iterator<Item = u8> + 'a;
+
+    fn encode<'a>(&self, payload: &'a [u8]) -> Self::Encoded<'a> {
+        payload.into_iter().map(|v| *v)
+    }
+
+    fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a> {
+        payload.into_iter().map(|v| *v)
+    }
 }

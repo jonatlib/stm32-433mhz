@@ -5,12 +5,13 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["workspaces/codec", "workspaces/bit_io"]
+members = ["workspaces/codec", "workspaces/bit_io", "workspaces/network"]
 
 
 [dependencies]
 codec = { path = "workspaces/codec" }
 bit_io = { path = "workspaces/bit_io" }
+network = { path = "workspaces/network" }
 
 
 embassy-executor = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "integrated-timers"] }
