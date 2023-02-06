@@ -92,7 +92,7 @@ pub trait Reader: crate::BaseReader {
             match self.read_byte().await {
                 Ok(byte) => {
                     buffer[index] = byte;
-                    trace!("Received byte = {:#04x} on index = {}", byte, index);
+                    // trace!("Received byte = {:#04x} on index = {}", byte, index);
                     index += 1;
                 }
                 Err(e) => {
