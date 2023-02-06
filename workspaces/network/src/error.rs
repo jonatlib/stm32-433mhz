@@ -5,5 +5,9 @@ pub enum NetworkError {
     SenderWriterError(bit_io::error::WriterError),
     ReceiverReaderError(bit_io::error::ReadError),
 
-    ConstructingDataError,
+    DataConstructingError(DataConstructionError),
+}
+
+pub enum DataConstructionError {
+    FullWindow,
 }

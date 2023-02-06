@@ -1,4 +1,4 @@
-use crate::error::NetworkError;
+use crate::error::{DataConstructionError, NetworkError};
 use crate::packet::{Packet32, PacketKind};
 
 pub struct Window<const SIZE: usize> {
@@ -20,25 +20,38 @@ impl<const SIZE: usize> Window<SIZE> {
         if self.buffer.is_empty() {
             self.buffer
                 .push(packet)
-                .expect("We now the vector is empty");
+                .expect("We know the vector is empty");
+        } else {
+            let current_packet_sequence_number = packet.sequence_number();
+            let last_sequence_number = self
+                .buffer
+                .last()
+                .expect("We have at least one element.")
+                .sequence_number();
+
+            if last_sequence_number < current_packet_sequence_number {
+                self.buffer.push(packet).map_err(|_| {
+                    NetworkError::DataConstructingError(DataConstructionError::FullWindow)
+                })?;
+            } else {
+                let index = self
+                    .buffer
+                    .iter()
+                    .map(|packet| packet.sequence_number())
+                    .enumerate()
+                    .fold(0usize, |acc, (index, sequence_number)| {
+                        if current_packet_sequence_number > sequence_number {
+                            return index;
+                        }
+
+                        return acc;
+                    });
+
+                self.buffer.insert(index, packet).map_err(|_| {
+                    NetworkError::DataConstructingError(DataConstructionError::FullWindow)
+                })?;
+            }
         }
-
-        let current_packet_sequence_number = packet.sequence_number();
-        let index = self
-            .buffer
-            .iter()
-            .map(|packet| packet.sequence_number())
-            .filter(|sequence_number| )
-            .enumerate()
-            .fold(0usize, |acc, (index, sequence_number)| {
-                if sequence_number > current_packet_sequence_number {
-                    return index;
-                }
-
-                return acc;
-            });
-
-        todo!();
 
         if self.is_completely_received() {
             return Ok(Some(self.buffer.len()));
