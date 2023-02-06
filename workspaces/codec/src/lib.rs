@@ -7,6 +7,8 @@ pub trait Codec {
 
     fn encode<'a>(&self, payload: &'a [u8]) -> Self::Encoded<'a>;
     fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a>;
+
+    fn get_encode_size(payload_size: usize) -> usize;
 }
 
 pub struct Identity {}
@@ -27,5 +29,9 @@ impl Codec for Identity {
 
     fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a> {
         payload.into_iter().map(|v| *v)
+    }
+
+    fn get_encode_size(payload_size: usize) -> usize {
+        payload_size
     }
 }

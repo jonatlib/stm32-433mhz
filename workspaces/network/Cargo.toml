@@ -13,4 +13,6 @@ bitfield-struct = "~0.3.2"
 postcard = { version = "~1.0.2", default-features = false, features = ["use-defmt"] }
 serde = { version = "~1.0.152", default-features = false }
 
+heapless = "0.7.16"
+
 defmt = "~0.3.2"
