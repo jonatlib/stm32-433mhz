@@ -1,5 +1,3 @@
-use defmt::trace;
-
 use embassy_stm32::gpio::{Output, Pin};
 use embassy_time::{Duration, Timer};
 

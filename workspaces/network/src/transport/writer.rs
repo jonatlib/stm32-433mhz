@@ -5,7 +5,6 @@ use crate::packet_builder::PacketBuilder;
 use crate::transport::TransportSender;
 use crate::Address;
 
-use bit_io::error::WriterError;
 use bit_io::BaseWriter;
 use codec::Codec;
 
@@ -47,7 +46,7 @@ where
                 .writer
                 .write_bytes_iterator(encoded_data)
                 .await
-                .map_err(|e| NetworkError::SenderWriterError(e))?
+                .map_err(NetworkError::SenderWriterError)?
         }
 
         Ok(sent_bytes)

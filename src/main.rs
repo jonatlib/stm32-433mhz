@@ -2,7 +2,7 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-use bit_io::{BaseReader, BaseWriter, PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
+use bit_io::{BaseReader, PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
@@ -11,7 +11,7 @@ use bit_io::reader::ReaderTiming;
 use bit_io::writer::WriterTiming;
 use embassy_executor::Spawner;
 use embassy_stm32::exti::ExtiInput;
-use embassy_stm32::gpio::{Input, Level, Output, Pull, Speed};
+use embassy_stm32::gpio::{Level, Output, Speed};
 use embassy_stm32::peripherals::PC0;
 use embassy_stm32::rcc::ClockSrc;
 use embassy_stm32::Config;
@@ -19,6 +19,9 @@ use embassy_time::{Duration, Timer};
 use network::simple::sender::SimpleSender;
 use network::transport::TransportSender;
 use network::Address;
+
+mod hardware;
+mod transport;
 
 #[embassy_executor::task]
 async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
@@ -42,7 +45,7 @@ async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: 
 }
 
 #[embassy_executor::main]
-async fn main(spawner: Spawner) {
+async fn main(_spawner: Spawner) {
     let mut config = Config::default();
     config.rcc.mux = ClockSrc::HSI16;
     let p = embassy_stm32::init(config);

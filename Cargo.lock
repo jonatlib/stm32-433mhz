@@ -800,6 +800,7 @@ dependencies = [
  "bitfield-struct",
  "codec",
  "defmt",
+ "heapless",
  "postcard",
  "serde",
 ]

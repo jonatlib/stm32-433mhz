@@ -1,7 +1,7 @@
 use crate::transport::writer::TransportWriter;
 
 use crate::Address;
-use bit_io::{BaseWriter, PinWriter};
+use bit_io::BaseWriter;
 use codec::Codec;
 
 pub struct SimpleSender<W, C> {
