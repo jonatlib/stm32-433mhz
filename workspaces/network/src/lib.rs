@@ -11,14 +11,14 @@ pub mod transport;
 
 #[derive(Clone)]
 pub struct Address {
-    pub source_address: u8,
+    pub local_address: u8,
     pub destination_address: u8,
 }
 
 impl Address {
-    pub fn new(source_address: u8, destination_address: u8) -> Self {
+    pub fn new(local_address: u8, destination_address: u8) -> Self {
         Self {
-            source_address,
+            local_address,
             destination_address,
         }
     }

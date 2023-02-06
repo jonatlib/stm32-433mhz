@@ -61,6 +61,10 @@ where
 
             // And here is our packet (comment for readability)
             let packet: Packet32 = u32::from_be_bytes(packet_buffer).into();
+            if packet.destination_address() != self.address.local_address {
+                continue;
+            }
+
             let window_status = self.window.push_packet(packet)?;
             if let Some(size) = window_status {
                 self.window.write_buffer(buffer);

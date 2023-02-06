@@ -33,7 +33,7 @@ where
             Packet32::new()
                 .with_kind(PacketKind::SelfContained) // FIXME this is wrong
                 .with_sequence_number(0) // FIXME count sequence numbers (even outside of this builder)
-                .with_source_address(self.address.source_address)
+                .with_source_address(self.address.local_address)
                 .with_destination_address(self.address.destination_address)
                 .with_payload(payload)
                 .with_both_bytes_used(byte_1.is_some()),
