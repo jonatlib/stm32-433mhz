@@ -20,6 +20,9 @@ use network::simple::sender::SimpleSender;
 use network::transport::TransportSender;
 use network::Address;
 
+mod hardware;
+mod transport;
+
 #[embassy_executor::task]
 async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
     let reader = PinReader::<_, false>::new(timing, button).expect("Could not create bit_io");
