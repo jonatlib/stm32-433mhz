@@ -65,9 +65,15 @@ where
                 continue;
             }
 
+            // FIXME how long to wait for missing packets?
+            // FIXME maybe when received packet outside of sequence numbers?
+            // FIXME or do we need some stream id and when it change we strip this stream?
+
             let window_status = self.window.push_packet(packet)?;
             if let Some(size) = window_status {
-                self.window.write_buffer(buffer);
+                self.window
+                    .write_buffer(buffer)
+                    .expect("This should not happen as push is called just before.");
                 return Ok(size);
             }
         }
