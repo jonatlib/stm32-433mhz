@@ -17,6 +17,8 @@ impl<const SIZE: usize> Window<SIZE> {
     }
 
     pub fn push_packet(&mut self, packet: Packet32) -> Result<Option<usize>, NetworkError> {
+        // FIXME we can see single packet multiple times, then just ignore the retransmission.
+
         if self.buffer.is_empty() {
             self.buffer
                 .push(packet)

@@ -108,7 +108,15 @@ impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinWriter<'a, P, INVE
         for byte in data {
             self.write_byte(byte).await?;
             bytes += 1;
+
+            if let Some(between_bytes) = self.get_timing().between_bytes {
+                Timer::after(between_bytes).await;
+            }
         }
+
+        // Let some time between streams
+        Timer::after(self.get_timing().ones * 4).await;
+
         Ok(bytes)
     }
 }

@@ -1,3 +1,5 @@
+use embassy_time::Timer;
+
 use crate::sync::SyncSequence;
 use crate::Writer;
 
@@ -35,7 +37,15 @@ impl<W: Writer> crate::BaseWriter for SyncWriter<W> {
         for byte in data {
             self.writer.write_byte(byte).await?;
             bytes += 1;
+
+            if let Some(between_bytes) = self.get_timing().between_bytes {
+                Timer::after(between_bytes).await;
+            }
         }
+
+        // Let some time between streams
+        Timer::after(self.get_timing().ones * 4).await;
+
         Ok(bytes)
     }
 }

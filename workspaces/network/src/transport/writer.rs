@@ -36,6 +36,7 @@ where
 {
     async fn send_bytes(&mut self, payload: &[u8]) -> Result<usize, NetworkError> {
         let mut sent_bytes = 0usize;
+        // FIXME use proper sequence numbers!
         let packet_builder = PacketBuilder::new(&self.address, 1, payload.iter());
         // TODO support sending each packet multiple times if it get lost
         for packet in packet_builder {
