@@ -1,3 +1,6 @@
+use defmt::Format;
+
+#[derive(Format, Debug)]
 pub enum NetworkError {
     SenderEncodingError(postcard::Error),
     ReceiverEncodingError(postcard::Error),
@@ -8,6 +11,7 @@ pub enum NetworkError {
     DataConstructingError(DataConstructionError),
 }
 
+#[derive(Format, Debug)]
 pub enum DataConstructionError {
     FullWindow,
 }

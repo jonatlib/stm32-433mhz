@@ -36,7 +36,7 @@ where
 {
     async fn send_bytes(&mut self, payload: &[u8]) -> Result<usize, NetworkError> {
         let mut sent_bytes = 0usize;
-        let packet_builder = PacketBuilder::new(&self.address, payload.iter());
+        let packet_builder = PacketBuilder::new(&self.address, 1, payload.iter());
         // TODO support sending each packet multiple times if it get lost
         for packet in packet_builder {
             trace!("Sending packet = {:?}", packet);

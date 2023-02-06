@@ -22,6 +22,12 @@ impl<const SIZE: usize> Window<SIZE> {
                 .push(packet)
                 .expect("We know the vector is empty");
         } else {
+            // TODO maybe when receiving packet with SN so high it can't be in current sequence,
+            // TODO just return error
+
+            // FIXME sequence numbers should be extracted to struct so they can
+            // FIXME wrap around, use struct with cmp implemented
+            // FIXME if we implement From<u32> for that struct we can use it in packet
             let current_packet_sequence_number = packet.sequence_number();
             let last_sequence_number = self
                 .buffer
@@ -54,7 +60,7 @@ impl<const SIZE: usize> Window<SIZE> {
         }
 
         if self.is_completely_received() {
-            return Ok(Some(self.buffer.len()));
+            return Ok(Some(self.received_bytes()));
         }
 
         Ok(None)
@@ -75,6 +81,13 @@ impl<const SIZE: usize> Window<SIZE> {
         }
 
         Ok(())
+    }
+
+    fn received_bytes(&self) -> usize {
+        self.buffer
+            .iter()
+            .map(|v| if v.both_bytes_used() { 2 } else { 1 })
+            .sum()
     }
 
     fn is_completely_received(&self) -> bool {

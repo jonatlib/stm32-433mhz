@@ -2,7 +2,7 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-use bit_io::{BaseReader, PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
+use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
@@ -11,13 +11,14 @@ use bit_io::reader::ReaderTiming;
 use bit_io::writer::WriterTiming;
 use embassy_executor::Spawner;
 use embassy_stm32::exti::ExtiInput;
-use embassy_stm32::gpio::{Level, Output, Speed};
+use embassy_stm32::gpio::{Input, Level, Output, Pull, Speed};
 use embassy_stm32::peripherals::PC0;
 use embassy_stm32::rcc::ClockSrc;
 use embassy_stm32::Config;
 use embassy_time::{Duration, Timer};
+use network::simple::receiver::SimpleReceiver;
 use network::simple::sender::SimpleSender;
-use network::transport::TransportSender;
+use network::transport::{TransportReceiver, TransportSender};
 use network::Address;
 
 mod hardware;
@@ -26,26 +27,29 @@ mod transport;
 #[embassy_executor::task]
 async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
     let reader = PinReader::<_, false>::new(timing, button).expect("Could not create bit_io");
-    let mut reader = SyncReader::new(reader, sync, 4);
+    let reader = SyncReader::new(reader, sync, 4);
+
+    let mut simple_receiver = SimpleReceiver::new_simple(Address::new(0x01, 0x0f), reader);
+    let mut transport = simple_receiver.create_transport();
 
     loop {
-        // let byte = reader.read_byte().await;
-        // info!("---------------------------------------------------");
-        // info!("Read byte = {:#04x}", byte);
-        // info!("---------------------------------------------------");
+        let mut data = [0u8; 16];
+        let read_size = transport.receive_bytes(&mut data).await;
 
-        let mut data: [u8; 4] = [0; 4];
-        let read_size = reader.read_bytes_buffer(&mut data).await;
         info!("---------------------------------------------------");
-        info!("Read bytes = {:#04x}, size = {}", data, read_size);
+        info!(
+            "Read bytes = {:#04x}, size = {:?}",
+            &data[..read_size.as_ref().copied().unwrap_or(0)],
+            read_size
+        );
         info!("---------------------------------------------------");
 
-        Timer::after(Duration::from_millis(2000)).await;
+        Timer::after(Duration::from_millis(500)).await;
     }
 }
 
 #[embassy_executor::main]
-async fn main(_spawner: Spawner) {
+async fn main(spawner: Spawner) {
     let mut config = Config::default();
     config.rcc.mux = ClockSrc::HSI16;
     let p = embassy_stm32::init(config);
@@ -60,28 +64,29 @@ async fn main(_spawner: Spawner) {
     let mut simple_sender = SimpleSender::new_simple(Address::new(0x0f, 0x01), writer);
     let mut transport = simple_sender.create_transport();
 
+    ///////////////////
+    // Init reader
+
+    // Configure the button pin and obtain handler.
+    // On the Nucleo F091RC there is a button connected to pin PC13.
+    let writer_pin = Input::new(p.PC0, Pull::None);
+    let button = ExtiInput::new(writer_pin, p.EXTI0);
+    spawner
+        .spawn(read_task(
+            button,
+            sync,
+            ReaderTiming::default(),
+            // ReaderTiming::from(writer.get_timing()),
+        ))
+        .unwrap();
+
+    ///////////////////
+
+    Timer::after(Duration::from_millis(1000)).await;
     loop {
         let _ = transport
             .send_bytes(&[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
             .await;
-        Timer::after(Duration::from_millis(2000)).await;
+        Timer::after(Duration::from_millis(5000)).await;
     }
-
-    // // Configure the button pin and obtain handler.
-    // // On the Nucleo F091RC there is a button connected to pin PC13.
-    // let writer_pin = Input::new(p.PC0, Pull::None);
-    // let button = ExtiInput::new(writer_pin, p.EXTI0);
-    // spawner
-    //     .spawn(read_task(
-    //         button,
-    //         sync,
-    //         ReaderTiming::from(writer.get_timing()),
-    //     ))
-    //     .unwrap();
-    //
-    // let data = [0xf0u8, 0x0f, 0xef, 0xba];
-    // loop {
-    //     let _ = writer.write_bytes_buffer(&data).await;
-    //     Timer::after(Duration::from_millis(2000)).await;
-    // }
 }
