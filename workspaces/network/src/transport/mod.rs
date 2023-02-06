@@ -15,8 +15,7 @@ pub trait TransportReceiver {
         let mut buffer = [0u8; 16]; // Packet32 can hold only up to 16bytes
         let read_bytes = self.receive_bytes(&mut buffer).await?;
 
-        postcard::from_bytes(&buffer[..read_bytes])
-            .map_err(|e| NetworkError::ReceiverEncodingError(e))
+        postcard::from_bytes(&buffer[..read_bytes]).map_err(NetworkError::ReceiverEncodingError)
     }
 }
 
@@ -29,8 +28,7 @@ pub trait TransportSender {
     {
         let mut buffer = [0u8; 16]; // With Packet32 we can encode only up to 16bytes
 
-        postcard::to_slice(payload, &mut buffer)
-            .map_err(|e| NetworkError::SenderEncodingError(e))?;
+        postcard::to_slice(payload, &mut buffer).map_err(NetworkError::SenderEncodingError)?;
 
         self.send_bytes(&buffer).await
     }

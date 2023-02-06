@@ -1,7 +1,7 @@
 use crate::transport::reader::TransportReader;
 
 use crate::Address;
-use bit_io::{BaseReader, PinReader};
+use bit_io::BaseReader;
 use codec::Codec;
 
 pub struct SimpleReceiver<R, C> {

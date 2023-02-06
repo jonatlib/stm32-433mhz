@@ -44,7 +44,7 @@ impl<const SIZE: usize> Window<SIZE> {
                             return index;
                         }
 
-                        return acc;
+                        acc
                     });
 
                 self.buffer.insert(index, packet).map_err(|_| {
@@ -78,7 +78,7 @@ impl<const SIZE: usize> Window<SIZE> {
     }
 
     fn is_completely_received(&self) -> bool {
-        if self.buffer.len() < 1 {
+        if self.buffer.is_empty() {
             return false;
         }
 
@@ -86,30 +86,29 @@ impl<const SIZE: usize> Window<SIZE> {
             return true;
         }
 
-        if self.buffer.len() > 1 {
-            if matches!(self.buffer[0].kind(), PacketKind::Start)
-                && matches!(
-                    self.buffer
-                        .last()
-                        .expect("There should be at least one element.")
-                        .kind(),
-                    PacketKind::End
-                )
-            {
-                let expected_offset = self.buffer[0].sequence_number() as isize;
-                // We have first and last packet.
-                // Be we should also have the intermittent packets
-                return self
-                    .buffer
-                    .iter()
-                    .enumerate()
-                    .map(|(index, packet)| {
-                        // This offset should be constant if we have all packets
-                        // And also positive
-                        (packet.sequence_number() as isize - index as isize)
-                    })
-                    .all(|offset| offset > 0 && offset == expected_offset);
-            }
+        if self.buffer.len() > 1
+            && matches!(self.buffer[0].kind(), PacketKind::Start)
+            && matches!(
+                self.buffer
+                    .last()
+                    .expect("There should be at least one element.")
+                    .kind(),
+                PacketKind::End
+            )
+        {
+            let expected_offset = self.buffer[0].sequence_number() as isize;
+            // We have first and last packet.
+            // Be we should also have the intermittent packets
+            return self
+                .buffer
+                .iter()
+                .enumerate()
+                .map(|(index, packet)| {
+                    // This offset should be constant if we have all packets
+                    // And also positive
+                    packet.sequence_number() as isize - index as isize
+                })
+                .all(|offset| offset > 0 && offset == expected_offset);
         }
 
         false

@@ -50,7 +50,7 @@ where
                 .reader
                 .read_bytes_buffer(&mut reader_buffer[..read_size])
                 .await
-                .map_err(|e| NetworkError::ReceiverReaderError(e))?;
+                .map_err(NetworkError::ReceiverReaderError)?;
 
             // This should be then data worth of one packet only (4 bytes)
             let decoded_data = self.codec.decode(&reader_buffer[..received_size]);
