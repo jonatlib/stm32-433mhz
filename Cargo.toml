@@ -8,25 +8,33 @@ edition = "2021"
 members = ["workspaces/codec", "workspaces/bit_io", "workspaces/network"]
 
 
+[features]
+default = ["stm32l053r8"]
+stm32l053r8 = []
+
+
 [dependencies]
+# Our own dependency
 codec = { path = "workspaces/codec" }
 bit_io = { path = "workspaces/bit_io" }
 network = { path = "workspaces/network" }
 
-
+# Embasy
 embassy-executor = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "integrated-timers"] }
 embassy-sync = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt"] }
 embassy-time = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
 embassy-stm32 = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["nightly", "defmt", "memory-x", "stm32l053r8", "time-driver-any", "exti"] }
 
-defmt = "0.3"
-defmt-rtt = "0.4"
-
+# HW and HAL
 cortex-m = { version = "0.7.6", features = ["critical-section-single-core"] }
 cortex-m-rt = "0.7.0"
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 
+# HW logging
+defmt = "0.3"
+defmt-rtt = "0.4"
 
+# Async and libraries
 #embedded-hal = "0.2.6"
 #embedded-io = "0.4.0"
 futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
