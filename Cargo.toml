@@ -9,8 +9,8 @@ members = ["workspaces/codec", "workspaces/bit_io", "workspaces/network"]
 
 
 [features]
-default = ["stm32l053r8"]
-stm32l053r8 = []
+default = ["nucleo_stm32l053r8"]
+nucleo_stm32l053r8 = []
 
 
 [dependencies]
