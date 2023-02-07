@@ -61,6 +61,12 @@ impl<const SIZE: usize> Window<SIZE> {
             }
         }
 
+        // defmt::info!("--------------------------------");
+        // for packet in self.buffer.iter() {
+        //     defmt::info!("{:?}", packet);
+        // }
+        // defmt::info!("--------------------------------");
+
         if self.is_completely_received() {
             return Ok(Some(self.received_bytes()));
         }
@@ -111,19 +117,10 @@ impl<const SIZE: usize> Window<SIZE> {
                 PacketKind::End
             )
         {
-            let expected_offset = self.buffer[0].sequence_number() as isize;
             // We have first and last packet.
             // Be we should also have the intermittent packets
-            return self
-                .buffer
-                .iter()
-                .enumerate()
-                .map(|(index, packet)| {
-                    // This offset should be constant if we have all packets
-                    // And also positive
-                    packet.sequence_number() as isize - index as isize
-                })
-                .all(|offset| offset > 0 && offset == expected_offset);
+            // FIXME compute distances between sequence numbers are all exactly `1`
+            return true;
         }
 
         false

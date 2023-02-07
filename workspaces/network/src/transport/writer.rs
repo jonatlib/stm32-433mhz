@@ -5,11 +5,13 @@ use crate::packet_builder::PacketBuilder;
 use crate::transport::TransportSender;
 use crate::Address;
 
+use crate::sequence_number::SequenceNumber;
 use bit_io::BaseWriter;
 use codec::Codec;
 
 pub struct TransportWriter<'a, W, C> {
     address: Address,
+    sequence_number: SequenceNumber<8>,
 
     codec: &'a C,
     writer: &'a mut W,
@@ -23,6 +25,7 @@ where
     pub fn new(address: Address, codec: &'a C, writer: &'a mut W) -> Self {
         Self {
             address,
+            sequence_number: SequenceNumber::new(0),
             codec,
             writer,
         }
@@ -36,8 +39,10 @@ where
 {
     async fn send_bytes(&mut self, payload: &[u8]) -> Result<usize, NetworkError> {
         let mut sent_bytes = 0usize;
-        // FIXME use proper sequence numbers!
-        let packet_builder = PacketBuilder::new(&self.address, 1, payload.iter());
+
+        let packet_builder =
+            PacketBuilder::new(&self.address, &mut self.sequence_number, payload.iter());
+
         // TODO support sending each packet multiple times if it get lost
         for packet in packet_builder {
             trace!("Sending packet = {:?}", packet);

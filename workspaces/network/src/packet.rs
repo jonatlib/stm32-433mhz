@@ -1,5 +1,7 @@
 use bitfield_struct::bitfield;
 
+use crate::sequence_number::SequenceNumber;
+
 #[derive(Debug, Eq, PartialEq, Clone, defmt::Format)]
 #[repr(u8)]
 pub enum PacketKind {
@@ -33,7 +35,7 @@ pub struct Packet32 {
     #[bits(2)]
     pub kind: PacketKind,
     #[bits(3)] // Up to 8 packets
-    pub sequence_number: u8,
+    pub sequence_number: SequenceNumber<8>,
 
     #[bits(5)] // Up to 32 devices
     pub source_address: u8,
