@@ -2,28 +2,19 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
-use hardware::HardwareSetup;
-
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
 
-use bit_io::reader::ReaderTiming;
-use bit_io::writer::WriterTiming;
 use embassy_executor::Spawner;
-use embassy_stm32::exti::ExtiInput;
-use embassy_stm32::gpio::{Input, Level, Output, Pull, Speed};
-use embassy_stm32::peripherals::PC0;
-use embassy_stm32::rcc::ClockSrc;
-use embassy_stm32::Config;
 use embassy_time::{Duration, Timer};
-use network::simple::receiver::SimpleReceiver;
-use network::simple::sender::SimpleSender;
-use network::transport::{TransportReceiver, TransportSender};
-use network::Address;
 
 mod hardware;
 mod transport;
+
+use hardware::HardwareSetup;
+
+use network::transport::{TransportReceiver, TransportSender};
+use network::Address;
 
 #[embassy_executor::task]
 async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
