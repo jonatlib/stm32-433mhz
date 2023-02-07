@@ -39,7 +39,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         let byte_0 = *self.prev_element?;
-        let byte_1 = self.payload.next().map(|v| *v);
+        let byte_1 = self.payload.next().copied();
         let byte_2 = self.payload.next();
 
         self.prev_element = byte_2;
@@ -49,15 +49,13 @@ where
 
         let kind = if self.self_contained {
             PacketKind::SelfContained
+        } else if self.first_element {
+            self.first_element = false;
+            PacketKind::Start
+        } else if byte_2.is_some() {
+            PacketKind::Continue
         } else {
-            if self.first_element {
-                self.first_element = false;
-                PacketKind::Start
-            } else if byte_2.is_some() {
-                PacketKind::Continue
-            } else {
-                PacketKind::End
-            }
+            PacketKind::End
         };
 
         // TODO some modulo

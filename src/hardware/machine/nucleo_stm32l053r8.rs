@@ -1,5 +1,6 @@
 use embassy_stm32::exti::ExtiInput;
 use embassy_stm32::gpio::{Input, Level, Output, Pull, Speed};
+use embassy_stm32::peripherals::EXTI0;
 use embassy_stm32::rcc::ClockSrc;
 use embassy_stm32::{Config, Peripherals};
 
@@ -12,7 +13,7 @@ pub struct Hardware {
 
 impl HardwareSetup for Hardware {
     fn setup_hardware(input_config: Option<Config>) -> Self {
-        let mut config = input_config.unwrap_or_else(|| Default::default());
+        let mut config = input_config.unwrap_or_default();
 
         // Enable higher clock source
         config.rcc.mux = ClockSrc::HSI16;
@@ -31,12 +32,14 @@ impl HardwareSetup for Hardware {
     }
 
     fn create_radio_receiving_input(&mut self) -> ExtiInput<RadioReceiverPin> {
-        let receiving_input = Input::new(&mut self.peripherals.PC0, Pull::None);
-        ExtiInput::new(receiving_input, &mut self.peripherals.EXTI0)
+        unsafe {
+            let receiving_input = Input::new(io::RadioReceiverPin::steal(), Pull::None);
+            ExtiInput::new(receiving_input, EXTI0::steal())
+        }
     }
 
     fn create_radio_sending_output(&mut self) -> Output<RadioSenderPin> {
-        Output::new(&mut self.peripherals.PA5, Level::Low, Speed::Low)
+        unsafe { Output::new(io::RadioSenderPin::steal(), Level::Low, Speed::Low) }
     }
 }
 

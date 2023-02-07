@@ -3,6 +3,7 @@
 #![feature(type_alias_impl_trait)]
 
 use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
+use hardware::HardwareSetup;
 
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
@@ -25,11 +26,7 @@ mod hardware;
 mod transport;
 
 #[embassy_executor::task]
-async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: ReaderTiming) {
-    let reader = PinReader::<_, false>::new(timing, button).expect("Could not create bit_io");
-    let reader = SyncReader::new(reader, sync, 4);
-
-    let mut simple_receiver = SimpleReceiver::new_simple(Address::new(0x01, 0x0f), reader);
+async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
     let mut transport = simple_receiver.create_transport();
 
     loop {
@@ -50,35 +47,18 @@ async fn read_task(button: ExtiInput<'static, PC0>, sync: SyncSequence, timing: 
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
-    let mut config = Config::default();
-    config.rcc.mux = ClockSrc::HSI16;
-    let p = embassy_stm32::init(config);
+    let mut hardware = hardware::Hardware::setup_hardware(None);
 
-    let sync = SyncSequence::default();
-    let writer_timing = WriterTiming::default();
-    let led = Output::new(p.PA5, Level::Low, Speed::Low);
-    let pin_writer =
-        PinWriter::<_, false>::new(writer_timing, led).expect("Could not create bit_io");
-    let writer = SyncWriter::new(pin_writer, sync.clone());
-
-    let mut simple_sender = SimpleSender::new_simple(Address::new(0x0f, 0x01), writer);
+    let sender_address = Address::new(0x0f, 0x01);
+    let mut simple_sender = transport::create_transport_sender(&mut hardware, sender_address);
     let mut transport = simple_sender.create_transport();
 
     ///////////////////
     // Init reader
 
-    // Configure the button pin and obtain handler.
-    // On the Nucleo F091RC there is a button connected to pin PC13.
-    let writer_pin = Input::new(p.PC0, Pull::None);
-    let button = ExtiInput::new(writer_pin, p.EXTI0);
-    spawner
-        .spawn(read_task(
-            button,
-            sync,
-            ReaderTiming::default(),
-            // ReaderTiming::from(writer.get_timing()),
-        ))
-        .unwrap();
+    let receiver_address = Address::new(0x01, 0x0f);
+    let simple_receiver = transport::create_transport_receiver(&mut hardware, receiver_address);
+    spawner.spawn(read_task(simple_receiver)).unwrap();
 
     ///////////////////
 
