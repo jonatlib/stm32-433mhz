@@ -24,4 +24,10 @@ pub trait BaseWriter {
         &mut self,
         data: I,
     ) -> Result<usize, error::WriterError>;
+
+    // TODO these methods could be used on devices
+    // TODO which have reader and writer at the same time
+    // TODO to do a really basic collision avoidance
+    fn pause_transmission(&mut self) {}
+    fn resume_transmission(&mut self) {}
 }

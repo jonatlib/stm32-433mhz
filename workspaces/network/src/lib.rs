@@ -1,6 +1,6 @@
 #![no_std]
 #![allow(incomplete_features)]
-#![feature(async_fn_in_trait, type_alias_impl_trait)]
+#![feature(async_fn_in_trait, type_alias_impl_trait, const_trait_impl)]
 
 mod packet;
 mod packet_builder;

@@ -4,7 +4,7 @@ use crate::transport::window::Window;
 use crate::transport::TransportReceiver;
 use crate::Address;
 use bit_io::BaseReader;
-use codec::Codec;
+use codec::{Codec, CodecSize};
 
 pub struct TransportReader<'a, R, C> {
     address: Address,
@@ -33,7 +33,7 @@ where
 impl<'a, R, C> TransportReceiver for TransportReader<'a, R, C>
 where
     R: BaseReader,
-    C: Codec,
+    C: Codec + ~const CodecSize,
 {
     async fn receive_bytes(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
         self.window.clear();
@@ -44,7 +44,16 @@ where
             // But in sender we encode and send each packet one by one
             // This way we should be receiving only 4 bytes before encoding.
             // So the number of received bytes is basically how much bytes is needed to encode 4 bytes
-            let mut reader_buffer = [0u8; 16]; // TODO how big this buffer should be?
+            // TODO how big this buffer should be?
+            let mut reader_buffer = [0u8; 16];
+            // TODO remove this check once lines below can compile
+            if C::get_encode_const_size(4) > 16 {
+                panic!("Can't hold all data from codec while decoding!");
+            }
+
+            // TODO this is currently not doable in Rust
+            // let mut reader_buffer = [0u8; C::get_encode_const_size()];
+
             let read_size = C::get_encode_size(4);
             let received_size = self
                 .reader
@@ -54,7 +63,7 @@ where
 
             // This should be then data worth of one packet only (4 bytes)
             let decoded_data = self.codec.decode(&reader_buffer[..received_size]);
-            let mut packet_buffer = [0u8; 4];
+            let mut packet_buffer = [0u8; 4]; // One packet is 32bit = 4bytes
             for (index, byte) in decoded_data.enumerate() {
                 packet_buffer[index] = byte;
             }
