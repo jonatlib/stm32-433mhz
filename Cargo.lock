@@ -1142,6 +1142,7 @@ dependencies = [
  "futures",
  "network",
  "panic-probe",
+ "serde",
  "static_cell",
 ]
 
