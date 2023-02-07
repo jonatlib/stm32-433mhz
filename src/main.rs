@@ -7,14 +7,17 @@ use {defmt_rtt as _, panic_probe as _};
 
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
+use static_cell::StaticCell;
 
 mod hardware;
 mod transport;
 
-use hardware::HardwareSetup;
+use hardware::{Hardware, HardwareSetup};
 
 use network::transport::{TransportReceiver, TransportSender};
 use network::Address;
+
+static HARDWARE: StaticCell<Hardware> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
@@ -37,18 +40,18 @@ async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
 }
 
 #[embassy_executor::main]
-async fn main(spawner: Spawner) {
-    let mut hardware = hardware::Hardware::setup_hardware(None);
+async fn main(spawner: Spawner) -> ! {
+    let hardware: &'static mut Hardware = HARDWARE.init(Hardware::setup_hardware(None));
 
     let sender_address = Address::new(0x0f, 0x01);
-    let mut simple_sender = transport::create_transport_sender(&mut hardware, sender_address);
+    let mut simple_sender = transport::create_transport_sender(hardware, sender_address);
     let mut transport = simple_sender.create_transport();
 
     ///////////////////
     // Init reader
 
     let receiver_address = Address::new(0x01, 0x0f);
-    let simple_receiver = transport::create_transport_receiver(&mut hardware, receiver_address);
+    let simple_receiver = transport::create_transport_receiver(hardware, receiver_address);
     spawner.spawn(read_task(simple_receiver)).unwrap();
 
     ///////////////////

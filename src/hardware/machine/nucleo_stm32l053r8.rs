@@ -31,14 +31,14 @@ impl HardwareSetup for Hardware {
         &self.peripherals
     }
 
-    fn create_radio_receiving_input(&mut self) -> ExtiInput<RadioReceiverPin> {
+    fn create_radio_receiving_input(&self) -> ExtiInput<RadioReceiverPin> {
         unsafe {
             let receiving_input = Input::new(io::RadioReceiverPin::steal(), Pull::None);
             ExtiInput::new(receiving_input, EXTI0::steal())
         }
     }
 
-    fn create_radio_sending_output(&mut self) -> Output<RadioSenderPin> {
+    fn create_radio_sending_output(&self) -> Output<RadioSenderPin> {
         unsafe { Output::new(io::RadioSenderPin::steal(), Level::Low, Speed::Low) }
     }
 }

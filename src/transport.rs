@@ -32,7 +32,7 @@ pub type SenderFactory<'a> =
 pub type ReceiverFactory<'a> =
     SimpleReceiver<SyncReader<PinReader<'a, io::RadioReceiverPin, false>>, Identity>;
 
-pub fn create_transport_sender(hw: &mut impl HardwareSetup, address: Address) -> SenderFactory {
+pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> SenderFactory {
     let output = hw.create_radio_sending_output();
 
     let pin_writer = PinWriter::<_, false>::new(get_writer_timing(), output)
@@ -42,7 +42,7 @@ pub fn create_transport_sender(hw: &mut impl HardwareSetup, address: Address) ->
     SimpleSender::new(address, sync_writer, create_codec())
 }
 
-pub fn create_transport_receiver(hw: &mut impl HardwareSetup, address: Address) -> ReceiverFactory {
+pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> ReceiverFactory {
     let input = hw.create_radio_receiving_input();
 
     let pin_reader =

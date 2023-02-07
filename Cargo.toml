@@ -35,11 +35,9 @@ defmt = "0.3"
 defmt-rtt = "0.4"
 
 # Async and libraries
-#embedded-hal = "0.2.6"
-#embedded-io = "0.4.0"
 futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
 #heapless = { version = "0.7.5", default-features = false }
-#static_cell = "1.0"
+static_cell = "~1.0.0"
 
 
 [profile.dev.package.bit_io]

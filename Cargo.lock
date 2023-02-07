@@ -1142,6 +1142,7 @@ dependencies = [
  "futures",
  "network",
  "panic-probe",
+ "static_cell",
 ]
 
 [[package]]

@@ -13,6 +13,6 @@ pub trait HardwareSetup {
     fn get_mut_peripherals(&mut self) -> &mut Peripherals;
     fn get_peripherals(&mut self) -> &Peripherals;
 
-    fn create_radio_receiving_input(&mut self) -> ExtiInput<io::RadioReceiverPin>;
-    fn create_radio_sending_output(&mut self) -> Output<io::RadioSenderPin>;
+    fn create_radio_receiving_input(&self) -> ExtiInput<io::RadioReceiverPin>;
+    fn create_radio_sending_output(&self) -> Output<io::RadioSenderPin>;
 }
