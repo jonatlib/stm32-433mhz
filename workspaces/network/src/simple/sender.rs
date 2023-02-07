@@ -24,7 +24,8 @@ where
     }
 
     pub fn create_transport(&mut self) -> TransportWriter<W, C> {
-        TransportWriter::new(self.address.clone(), &self.codec, &mut self.writer)
+        // FIXME enable resend once supported properly in receiving WINDOW
+        TransportWriter::new(self.address.clone(), 1, &self.codec, &mut self.writer)
     }
 }
 

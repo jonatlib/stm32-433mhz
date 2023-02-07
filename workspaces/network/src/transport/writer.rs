@@ -12,6 +12,7 @@ use codec::Codec;
 pub struct TransportWriter<'a, W, C> {
     address: Address,
     sequence_number: SequenceNumber<8>,
+    resend: u8,
 
     codec: &'a C,
     writer: &'a mut W,
@@ -22,10 +23,11 @@ where
     W: BaseWriter,
     C: Codec,
 {
-    pub fn new(address: Address, codec: &'a C, writer: &'a mut W) -> Self {
+    pub fn new(address: Address, resend: u8, codec: &'a C, writer: &'a mut W) -> Self {
         Self {
             address,
             sequence_number: SequenceNumber::new(0),
+            resend,
             codec,
             writer,
         }
@@ -43,16 +45,18 @@ where
         let packet_builder =
             PacketBuilder::new(&self.address, &mut self.sequence_number, payload.iter());
 
-        // TODO support sending each packet multiple times if it get lost
         for packet in packet_builder {
             trace!("Sending packet = {:?}", packet);
             let data = Into::<u32>::into(packet).to_be_bytes();
-            let encoded_data = self.codec.encode(&data);
-            sent_bytes += self
-                .writer
-                .write_bytes_iterator(encoded_data)
-                .await
-                .map_err(NetworkError::SenderWriterError)?
+            for _ in 0..self.resend {
+                // TODO don't re-encode the same data multiple times
+                let encoded_data = self.codec.encode(&data);
+                sent_bytes += self
+                    .writer
+                    .write_bytes_iterator(encoded_data)
+                    .await
+                    .map_err(NetworkError::SenderWriterError)?
+            }
         }
 
         Ok(sent_bytes)
