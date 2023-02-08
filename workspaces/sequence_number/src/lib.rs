@@ -1,3 +1,5 @@
+#![no_std]
+
 use core::cmp::Ordering;
 use core::fmt::{Debug, Formatter};
 

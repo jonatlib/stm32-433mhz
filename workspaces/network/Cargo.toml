@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 codec = { path = "../codec" }
 bit_io = { path = "../bit_io" }
+sequence_number = { path = "../sequence_number" }
 
 bitfield-struct = "~0.3.2"
 postcard = { version = "~1.0.2", default-features = false, features = ["use-defmt"] }

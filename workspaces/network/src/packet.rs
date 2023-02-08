@@ -1,6 +1,6 @@
 use bitfield_struct::bitfield;
 
-use crate::sequence_number::SequenceNumber;
+use sequence_number::SequenceNumber;
 
 #[derive(Debug, Eq, PartialEq, Clone, defmt::Format)]
 #[repr(u8)]

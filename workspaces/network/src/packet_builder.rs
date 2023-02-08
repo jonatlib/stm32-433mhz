@@ -1,5 +1,6 @@
+use sequence_number::SequenceNumber;
+
 use crate::packet::{Packet32, PacketKind};
-use crate::sequence_number::SequenceNumber;
 use crate::Address;
 
 pub struct PacketBuilder<'a, I> {

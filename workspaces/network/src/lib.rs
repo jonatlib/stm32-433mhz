@@ -4,7 +4,6 @@
 
 mod packet;
 mod packet_builder;
-mod sequence_number;
 
 pub mod error;
 pub mod simple;

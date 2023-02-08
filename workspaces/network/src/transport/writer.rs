@@ -5,9 +5,9 @@ use crate::packet_builder::PacketBuilder;
 use crate::transport::TransportSender;
 use crate::Address;
 
-use crate::sequence_number::SequenceNumber;
 use bit_io::BaseWriter;
 use codec::Codec;
+use sequence_number::SequenceNumber;
 
 pub struct TransportWriter<'a, W, C> {
     address: Address,
