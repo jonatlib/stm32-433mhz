@@ -96,8 +96,18 @@ impl<const MODULO: u8> Eq for SequenceNumber<MODULO> {}
 impl<const MODULO: u8> PartialOrd for SequenceNumber<MODULO> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self == other {
-            Some(Ordering::Equal)
-        } else if self.positive_distance(other) > self.negative_distance(other) {
+            return Some(Ordering::Equal);
+        }
+
+        let positive = self.positive_distance(other);
+        let negative = self.negative_distance(other);
+
+        // FIXME is this ok?
+        if positive == 1 && negative > 1 {
+            return Some(Ordering::Less);
+        }
+
+        if positive > negative {
             Some(Ordering::Greater)
         } else {
             Some(Ordering::Less)
