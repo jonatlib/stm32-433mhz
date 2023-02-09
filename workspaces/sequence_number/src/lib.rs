@@ -49,6 +49,25 @@ impl<const MODULO: u8> SequenceNumber<MODULO> {
         other.positive_distance(self)
     }
 
+    pub fn is_sorted_asc(&self, sequence: &[Self]) -> bool {
+        if sequence.is_empty() {
+            return true;
+        }
+
+        let mut iterator = sequence.iter();
+        let mut prev_element = iterator.next().expect("The sequence is not empty");
+
+        for element in iterator {
+            if element.compare(prev_element, self).is_lt() {
+                return false;
+            }
+
+            prev_element = element;
+        }
+
+        true
+    }
+
     pub fn get_insertion_order_ascending(
         &self,
         sequence: &[Self],
@@ -300,12 +319,14 @@ mod test {
 
         let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
         assert_ne!(result, expected);
+        assert!(!base.is_sorted_asc(&data[..]));
 
         // FIXME is this the correct way? With sorting?
         data.sort_by(|a, b| a.compare(b, &base));
 
         let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
         assert_eq!(result, expected);
+        assert!(base.is_sorted_asc(&data[..]));
     }
 
     #[test]
