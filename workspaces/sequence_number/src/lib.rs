@@ -49,9 +49,66 @@ impl<const MODULO: u8> SequenceNumber<MODULO> {
         other.positive_distance(self)
     }
 
-    pub fn min_distance(&self, other: &Self) -> u8 {
-        self.positive_distance(other)
-            .min(self.negative_distance(other))
+    pub fn get_insertion_order_ascending(
+        &self,
+        sequence: &[Self],
+        first_element: Option<&Self>,
+    ) -> Option<usize> {
+        if sequence.is_empty() {
+            return Some(0);
+        }
+
+        for (index, item) in sequence.iter().enumerate() {
+            if self == item {
+                return None;
+            }
+
+            if let Some(cmp) = self.partial_compare(item, first_element) {
+                if cmp.is_le() {
+                    return Some(index);
+                }
+            }
+        }
+
+        Some(sequence.len())
+    }
+
+    pub fn partial_compare(&self, other: &Self, first_element: Option<&Self>) -> Option<Ordering> {
+        if self == other {
+            return Some(Ordering::Equal);
+        }
+
+        if let Some(base) = first_element {
+            let self_from_base = base.positive_distance(self);
+            let other_from_base = base.positive_distance(other);
+
+            if self_from_base > other_from_base {
+                Some(Ordering::Greater)
+            } else {
+                Some(Ordering::Less)
+            }
+        } else {
+            // FIXME i don't know about this branch?
+            // FIXME It will compare only numbers mod/2 apart
+            let positive = self.positive_distance(other);
+            let negative = self.negative_distance(other);
+
+            // Without any fix point we can't compare these two values
+            if positive > MODULO / 2 {
+                return None;
+            }
+
+            if positive > negative {
+                Some(Ordering::Greater)
+            } else {
+                Some(Ordering::Less)
+            }
+        }
+    }
+
+    pub fn compare(&self, other: &Self, first_element: &Self) -> Ordering {
+        self.partial_compare(other, Some(first_element))
+            .expect("When first element is passed this should never happen")
     }
 }
 
@@ -93,32 +150,10 @@ impl<const MODULO: u8> PartialEq for SequenceNumber<MODULO> {
 
 impl<const MODULO: u8> Eq for SequenceNumber<MODULO> {}
 
+// FIXME is this good idea to implement it with some base? Or None base? Or?
 impl<const MODULO: u8> PartialOrd for SequenceNumber<MODULO> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self == other {
-            return Some(Ordering::Equal);
-        }
-
-        let positive = self.positive_distance(other);
-        let negative = self.negative_distance(other);
-
-        // FIXME is this ok?
-        if self.value() == MODULO - 1 && positive == 1 && negative > 1 {
-            return Some(Ordering::Less);
-        }
-
-        if positive > negative {
-            Some(Ordering::Greater)
-        } else {
-            Some(Ordering::Less)
-        }
-    }
-}
-
-impl<const MODULO: u8> Ord for SequenceNumber<MODULO> {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other)
-            .expect("Ordering should always exists.")
+        self.partial_compare(other, None)
     }
 }
 
@@ -133,11 +168,15 @@ mod test {
     type SN = SequenceNumber<8>;
 
     /// Since there is asymmetry in cmp we have to use bubble sort to get correct order
-    fn bubble_sort<T: Ord>(arr: &mut [T]) {
+    fn bubble_sort(arr: &mut [SN], base_element: Option<u8>) {
         for i in 0..arr.len() {
             for j in 0..arr.len() - 1 - i {
-                if arr[j] > arr[j + 1] {
-                    arr.swap(j, j + 1);
+                if let Some(cmp) =
+                    arr[j].partial_compare(&arr[j + 1], base_element.map(|v| v.into()).as_ref())
+                {
+                    if cmp.is_gt() {
+                        arr.swap(j, j + 1);
+                    }
                 }
             }
         }
@@ -149,7 +188,7 @@ mod test {
         let b = SN::new(5);
 
         assert!(a < b);
-        assert!(b > a);
+        // assert!(b > a); // This can't be tested without `base`
 
         let a = SN::new(8);
         let b = SN::new(0);
@@ -175,18 +214,15 @@ mod test {
             "From 7mod8 to 0mod8 backwards it is 7steps back."
         );
 
-        assert!(a_0 > a_7);
-        assert!(a_7 > a_6);
-        // assert!(a_6 > a_1);
-        // assert!(a_6 > a_0);
-        // assert!(a_1 > a_0);
-        // assert!(a_7 > a_1);
+        assert!(a_0.compare(&a_7, &5u8.into()).is_gt());
+        assert!(a_6 < a_7);
+        assert!(a_0 < a_1);
     }
 
     #[test]
     fn test_ordering_simple() {
         let mut numbers: Vec<_> = (0..8u8).into_iter().map(SN::new).collect();
-        numbers.sort();
+        bubble_sort(&mut numbers, None);
         let result: Vec<u8> = numbers.iter().map(|v| v.value()).collect();
         assert_eq!(result, vec![0, 1, 2, 3, 4, 5, 6, 7]);
     }
@@ -197,10 +233,10 @@ mod test {
             .into_iter()
             .map(SN::new)
             .collect();
-        bubble_sort(&mut numbers);
+        bubble_sort(&mut numbers, Some(0)); // We use bubble sort to go through each element
         let result: Vec<u8> = numbers.iter().map(|v| v.value()).collect();
 
-        assert_eq!(result, vec![2, 5, 7, 1, 3, 4, 6, 0]);
+        assert_eq!(result, vec![0, 1, 2, 3, 4, 5, 6, 7]);
     }
 
     #[test]
@@ -209,9 +245,67 @@ mod test {
             .into_iter()
             .map(SN::new)
             .collect();
-        numbers.sort();
+        bubble_sort(&mut numbers, Some(5));
         let result: Vec<u8> = numbers.iter().map(|v| v.value()).collect();
-        assert_eq!(result, vec![3, 4, 5, 6, 7, 0, 1, 2]);
+        assert_eq!(result, vec![5, 6, 7, 0, 1, 2, 3, 4]);
+    }
+
+    #[test]
+    fn test_insertion_ordering() {
+        let insertion_order: Vec<_> = vec![5, 6, 3, 4, 7, 0, 2, 1]
+            .into_iter()
+            .map(SN::new)
+            .collect();
+        let expected = vec![5, 6, 7, 0, 1, 2, 3, 4];
+
+        let mut data: Vec<SN> = Vec::new();
+        for insert in insertion_order.into_iter() {
+            let index = insert.get_insertion_order_ascending(&data[..], Some(&5u8.into()));
+            data.insert(
+                index.expect("This should be always a value in this test"),
+                insert,
+            );
+        }
+
+        let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_insertion_ordering_random() {
+        let base = SN::new(5);
+        let insertion_order: Vec<_> = vec![6, 3, 5, 4, 7, 0, 2, 1]
+            .into_iter()
+            .map(SN::new)
+            .collect();
+        let expected = vec![5, 6, 7, 0, 1, 2, 3, 4];
+
+        let mut data: Vec<SN> = Vec::new();
+        let mut seen_base = false;
+
+        for insert in insertion_order.into_iter() {
+            if insert == base {
+                seen_base = true;
+            }
+
+            let index = insert.get_insertion_order_ascending(
+                &data[..],
+                if seen_base { Some(&base) } else { None },
+            );
+            data.insert(
+                index.expect("This should be always a value in this test"),
+                insert,
+            );
+        }
+
+        let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
+        assert_ne!(result, expected);
+
+        // FIXME is this the correct way? With sorting?
+        data.sort_by(|a, b| a.compare(b, &base));
+
+        let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
+        assert_eq!(result, expected);
     }
 
     #[test]
