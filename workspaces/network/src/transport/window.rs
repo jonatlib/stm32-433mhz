@@ -19,45 +19,35 @@ impl<const SIZE: usize> Window<SIZE> {
     pub fn push_packet(&mut self, packet: Packet32) -> Result<Option<usize>, NetworkError> {
         // FIXME we can see single packet multiple times, then just ignore the retransmission.
 
-        if self.buffer.is_empty() {
-            self.buffer
-                .push(packet)
-                .expect("We know the vector is empty");
+        if self.buffer.is_empty() || matches!(packet.kind(), PacketKind::End) {
+            self.buffer.push(packet).map_err(|_| {
+                NetworkError::DataConstructingError(DataConstructionError::FullWindow)
+            })?;
+        } else if matches!(packet.kind(), PacketKind::Start) {
+            self.buffer.insert(0, packet).map_err(|_| {
+                NetworkError::DataConstructingError(DataConstructionError::FullWindow)
+            })?;
         } else {
             // TODO maybe when receiving packet with SN so high it can't be in current sequence,
             // TODO just return error
 
-            // FIXME sequence numbers should be extracted to struct so they can
-            // FIXME wrap around, use struct with cmp implemented
-            // FIXME if we implement From<u32> for that struct we can use it in packet
-            let current_packet_sequence_number = packet.sequence_number();
-            let last_sequence_number = self
-                .buffer
-                .last()
-                .expect("We have at least one element.")
-                .sequence_number();
+            let base = if matches!(self.buffer[0].kind(), PacketKind::Start) {
+                Some(self.buffer[0].sequence_number())
+            } else {
+                None
+            };
 
-            if last_sequence_number < current_packet_sequence_number {
-                self.buffer.push(packet).map_err(|_| {
+            let sequence_numbers = self.buffer.iter().map(|v| v.sequence_number());
+            let index = packet
+                .sequence_number()
+                .get_insertion_order_ascending(sequence_numbers, base.as_ref());
+
+            if let Some(i) = index {
+                self.buffer.insert(i, packet).map_err(|_| {
                     NetworkError::DataConstructingError(DataConstructionError::FullWindow)
                 })?;
             } else {
-                let index = self
-                    .buffer
-                    .iter()
-                    .map(|packet| packet.sequence_number())
-                    .enumerate()
-                    .fold(0usize, |acc, (index, sequence_number)| {
-                        if current_packet_sequence_number > sequence_number {
-                            return index;
-                        }
-
-                        acc
-                    });
-
-                self.buffer.insert(index, packet).map_err(|_| {
-                    NetworkError::DataConstructingError(DataConstructionError::FullWindow)
-                })?;
+                // TODO received same packet again
             }
         }
 

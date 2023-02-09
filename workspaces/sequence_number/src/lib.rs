@@ -8,6 +8,12 @@ pub struct SequenceNumber<const MODULO: u8> {
     value: u8,
 }
 
+impl<const MODULO: u8> AsRef<SequenceNumber<MODULO>> for SequenceNumber<MODULO> {
+    fn as_ref(&self) -> &SequenceNumber<MODULO> {
+        &self
+    }
+}
+
 impl<const MODULO: u8> SequenceNumber<MODULO> {
     pub fn new(value: u8) -> Self {
         Self {
@@ -68,16 +74,16 @@ impl<const MODULO: u8> SequenceNumber<MODULO> {
         true
     }
 
-    pub fn get_insertion_order_ascending(
+    pub fn get_insertion_order_ascending<'a>(
         &self,
-        sequence: &[Self],
+        sequence: impl Iterator<Item = impl AsRef<Self>>,
         first_element: Option<&Self>,
     ) -> Option<usize> {
-        if sequence.is_empty() {
-            return Some(0);
-        }
+        let mut last_index = 0;
+        for (index, item) in sequence.enumerate() {
+            last_index = index + 1;
 
-        for (index, item) in sequence.iter().enumerate() {
+            let item = item.as_ref();
             if self == item {
                 return None;
             }
@@ -89,7 +95,7 @@ impl<const MODULO: u8> SequenceNumber<MODULO> {
             }
         }
 
-        Some(sequence.len())
+        Some(last_index)
     }
 
     pub fn partial_compare(&self, other: &Self, first_element: Option<&Self>) -> Option<Ordering> {
@@ -279,7 +285,7 @@ mod test {
 
         let mut data: Vec<SN> = Vec::new();
         for insert in insertion_order.into_iter() {
-            let index = insert.get_insertion_order_ascending(&data[..], Some(&5u8.into()));
+            let index = insert.get_insertion_order_ascending(data.iter(), Some(&5u8.into()));
             data.insert(
                 index.expect("This should be always a value in this test"),
                 insert,
@@ -308,7 +314,7 @@ mod test {
             }
 
             let index = insert.get_insertion_order_ascending(
-                &data[..],
+                data.iter(),
                 if seen_base { Some(&base) } else { None },
             );
             data.insert(
