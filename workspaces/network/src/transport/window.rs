@@ -1,14 +1,17 @@
 use crate::error::{DataConstructionError, NetworkError};
 use crate::packet::{Packet32, PacketKind};
+use sequence_number::SequenceNumber;
 
 pub struct Window<const SIZE: usize> {
     buffer: heapless::Vec<Packet32, SIZE>,
+    base_received: bool,
 }
 
 impl<const SIZE: usize> Window<SIZE> {
     pub fn new() -> Self {
         Self {
             buffer: heapless::Vec::new(),
+            base_received: false,
         }
     }
 
@@ -17,7 +20,7 @@ impl<const SIZE: usize> Window<SIZE> {
     }
 
     pub fn push_packet(&mut self, packet: Packet32) -> Result<Option<usize>, NetworkError> {
-        // FIXME we can see single packet multiple times, then just ignore the retransmission.
+        // FIXME when to return Error earlier then when the buffer is full?
 
         if self.buffer.is_empty() || matches!(packet.kind(), PacketKind::End) {
             self.buffer.push(packet).map_err(|_| {
@@ -28,14 +31,23 @@ impl<const SIZE: usize> Window<SIZE> {
                 NetworkError::DataConstructingError(DataConstructionError::FullWindow)
             })?;
         } else {
-            // TODO maybe when receiving packet with SN so high it can't be in current sequence,
-            // TODO just return error
+            let base = self.get_base_sequence_number();
 
-            let base = if matches!(self.buffer[0].kind(), PacketKind::Start) {
-                Some(self.buffer[0].sequence_number())
-            } else {
-                None
-            };
+            // Base received for the first time
+            // Check if have packet sorted correctly
+            if !self.base_received {
+                if let Some(ref base_sequence_number) = base {
+                    if !base_sequence_number
+                        .is_sorted_asc(self.buffer.iter().map(|v| v.sequence_number()))
+                    {
+                        self.buffer.sort_unstable_by(|a, b| {
+                            a.sequence_number()
+                                .compare(&b.sequence_number(), &base_sequence_number)
+                        });
+                    }
+                    self.base_received = true;
+                }
+            }
 
             let sequence_numbers = self.buffer.iter().map(|v| v.sequence_number());
             let index = packet
@@ -81,6 +93,14 @@ impl<const SIZE: usize> Window<SIZE> {
         Ok(())
     }
 
+    fn get_base_sequence_number(&self) -> Option<SequenceNumber<8>> {
+        if matches!(self.buffer[0].kind(), PacketKind::Start) {
+            Some(self.buffer[0].sequence_number())
+        } else {
+            None
+        }
+    }
+
     fn received_bytes(&self) -> usize {
         self.buffer
             .iter()
@@ -109,8 +129,20 @@ impl<const SIZE: usize> Window<SIZE> {
         {
             // We have first and last packet.
             // Be we should also have the intermittent packets
-            // FIXME compute distances between sequence numbers are all exactly `1`
-            return true;
+            let mut sequence_numbers = self.buffer.iter();
+            let mut prev_sequence_number = sequence_numbers
+                .next()
+                .expect("There is at least one packet")
+                .sequence_number();
+
+            return sequence_numbers
+                .map(|v| v.sequence_number())
+                .map(|v: SequenceNumber<8>| -> u8 {
+                    let distance = prev_sequence_number.positive_distance(&v);
+                    prev_sequence_number = v;
+                    distance
+                })
+                .all(|v| v == 1);
         }
 
         false

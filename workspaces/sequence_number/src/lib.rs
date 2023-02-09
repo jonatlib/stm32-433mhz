@@ -55,16 +55,15 @@ impl<const MODULO: u8> SequenceNumber<MODULO> {
         other.positive_distance(self)
     }
 
-    pub fn is_sorted_asc(&self, sequence: &[Self]) -> bool {
-        if sequence.is_empty() {
-            return true;
-        }
+    pub fn is_sorted_asc(&self, mut sequence: impl Iterator<Item = impl AsRef<Self>>) -> bool {
+        let mut prev_element = sequence.next().expect("The sequence is not empty");
 
-        let mut iterator = sequence.iter();
-        let mut prev_element = iterator.next().expect("The sequence is not empty");
-
-        for element in iterator {
-            if element.compare(prev_element, self).is_lt() {
+        for element in sequence {
+            if element
+                .as_ref()
+                .compare(prev_element.as_ref(), self)
+                .is_lt()
+            {
                 return false;
             }
 
@@ -325,14 +324,14 @@ mod test {
 
         let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
         assert_ne!(result, expected);
-        assert!(!base.is_sorted_asc(&data[..]));
+        assert!(!base.is_sorted_asc(data.iter()));
 
         // FIXME is this the correct way? With sorting?
         data.sort_by(|a, b| a.compare(b, &base));
 
         let result: Vec<u8> = data.iter().map(|v| v.value()).collect();
         assert_eq!(result, expected);
-        assert!(base.is_sorted_asc(&data[..]));
+        assert!(base.is_sorted_asc(data.iter()));
     }
 
     #[test]
