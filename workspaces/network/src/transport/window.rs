@@ -22,14 +22,16 @@ impl<const SIZE: usize> Window<SIZE> {
     pub fn push_packet(&mut self, packet: Packet32) -> Result<Option<usize>, NetworkError> {
         // FIXME when to return Error earlier then when the buffer is full?
 
-        if self.buffer.is_empty() || matches!(packet.kind(), PacketKind::End) {
+        if self.buffer.is_empty() {
+            // TODO? || matches!(packet.kind(), PacketKind::End)
             self.buffer.push(packet).map_err(|_| {
                 NetworkError::DataConstructingError(DataConstructionError::FullWindow)
             })?;
-        } else if matches!(packet.kind(), PacketKind::Start) {
-            self.buffer.insert(0, packet).map_err(|_| {
-                NetworkError::DataConstructingError(DataConstructionError::FullWindow)
-            })?;
+            // TODO?
+            // } else if matches!(packet.kind(), PacketKind::Start) {
+            //     self.buffer.insert(0, packet).map_err(|_| {
+            //         NetworkError::DataConstructingError(DataConstructionError::FullWindow)
+            //     })?;
         } else {
             let base = self.get_base_sequence_number();
 
