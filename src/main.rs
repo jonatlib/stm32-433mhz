@@ -25,16 +25,9 @@ async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
     let mut transport = simple_receiver.create_transport();
 
     loop {
-        // let mut data = [0u8; 16];
-        // let read_size = transport.receive_bytes(&mut data).await;
         let data: Result<payload::SensorPayload, _> = transport.receive_struct().await;
         info!("---------------------------------------------------");
         info!("Read data = {:?}", data);
-        // info!(
-        //     "Read bytes = {:#04x}, size = {:?}",
-        //     &data[..read_size.as_ref().copied().unwrap_or(0)],
-        //     read_size
-        // );
         info!("---------------------------------------------------");
 
         Timer::after(Duration::from_millis(500)).await;
@@ -70,10 +63,7 @@ async fn main(spawner: Spawner) -> ! {
         humidity: 30,
     };
     loop {
-        let _ = transport
-            // .send_bytes(&[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            .send_struct(&data)
-            .await;
+        let _ = transport.send_struct(&data).await;
         Timer::after(Duration::from_millis(5000)).await;
     }
 }
