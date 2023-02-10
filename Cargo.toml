@@ -41,18 +41,33 @@ static_cell = "~1.0.0"
 serde = { version = "~1.0.152", default-features = false, features = ["derive"] }
 
 
+[profile.dev.package."*"]
+opt-level = "s"
+[profile.release.package."*"]
+opt-level = "s"
+
+[profile.dev.package.cortex-m-rt]
+opt-level = 0
 [profile.dev.package.bit_io]
 opt-level = 3
 [profile.release.package.bit_io]
+opt-level = 3
+[profile.dev.package.sequence_number]
+opt-level = 3
+[profile.release.package.sequence_number]
+opt-level = 3
+[profile.dev.package.network]
+opt-level = 3
+[profile.release.package.network]
 opt-level = 3
 
 
 [profile.dev]
 panic = "abort"
-codegen-units = 1
-incremental = false
+codegen-units = 4
+incremental = true
 lto = true
-opt-level = "z"
+opt-level = "s"
 
 
 [profile.release]
@@ -60,4 +75,4 @@ panic = "abort"
 codegen-units = 1
 incremental = false
 lto = true
-opt-level = "z"
+opt-level = "s"
