@@ -1,4 +1,5 @@
 use crate::hardware::{io, HardwareSetup};
+use embassy_time::Duration;
 
 use bit_io::reader::ReaderTiming;
 use bit_io::writer::WriterTiming;
@@ -12,15 +13,25 @@ use network::simple::receiver::SimpleReceiver;
 use network::Address;
 
 fn get_sync_sequence() -> SyncSequence {
-    SyncSequence::default()
+    SyncSequence::new_simple(Duration::from_micros(1500), 4, 0b1011)
 }
 
 fn get_writer_timing() -> WriterTiming {
-    WriterTiming::default()
+    WriterTiming::new(
+        Duration::from_micros(500),
+        Duration::from_micros(800),
+        Duration::from_micros(300),
+        None,
+    )
 }
 
 fn get_reader_timing() -> ReaderTiming {
-    (&get_writer_timing()).into()
+    ReaderTiming::new(
+        Duration::from_micros(450),
+        Duration::from_micros(750),
+        Duration::from_micros(400),
+        Duration::from_micros(1000),
+    )
 }
 
 fn create_codec() -> Identity {

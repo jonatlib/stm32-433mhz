@@ -24,7 +24,7 @@ where
     }
 
     pub fn create_transport(&mut self) -> TransportWriter<W, C> {
-        TransportWriter::new(self.address.clone(), 2, &self.codec, &mut self.writer)
+        TransportWriter::new(self.address.clone(), 3, &self.codec, &mut self.writer)
     }
 }
 
