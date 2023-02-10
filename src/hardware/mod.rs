@@ -15,4 +15,6 @@ pub trait HardwareSetup {
 
     fn create_radio_receiving_input(&self) -> ExtiInput<io::RadioReceiverPin>;
     fn create_radio_sending_output(&self) -> Output<io::RadioSenderPin>;
+
+    fn create_i2c(&self) -> io::I2c;
 }
