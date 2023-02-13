@@ -32,7 +32,7 @@
     (path "/9c894778-166f-4de3-959c-ace11ceeac49/ef05f5d4-ec6a-4157-ba22-e69a2151ac2a"
       (reference "#PWR?") (unit 1) (value "+3.3V") (footprint "")
     )
-    (path "/9c894778-166f-4de3-959c-ace11ceeac49/b684f68b-0d98-43b6-b962-3fdeb81b8baf"
+    (path "/9c894778-166f-4de3-959c-ace11ceeac49/5bb63beb-f19c-4d40-8ee5-bd32deae0cc4"
       (reference "U?") (unit 1) (value "STM32G070KBT6") (footprint "LQFP-32")
     )
   )
