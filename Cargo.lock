@@ -832,6 +832,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6f61fba1741ea2b3d6a1e3178721804bb716a68a6aeba1149b5d52e3d464ea66"
 
 [[package]]
+name = "onewire"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73be67dc9e140c0963625510b4a09c07edf2c07c9dab53134d863e4d302c9ea1"
+dependencies = [
+ "byteorder",
+ "embedded-hal 0.2.7",
+]
+
+[[package]]
 name = "os_str_bytes"
 version = "6.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1149,6 +1159,7 @@ dependencies = [
  "embassy-time",
  "futures",
  "network",
+ "onewire",
  "panic-probe",
  "serde",
  "static_cell",

@@ -19,7 +19,7 @@ codec = { path = "workspaces/codec" }
 bit_io = { path = "workspaces/bit_io" }
 network = { path = "workspaces/network" }
 
-# Embasy
+# Embasy HAL Runtime
 embassy-executor = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "integrated-timers"] }
 embassy-sync = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt"] }
 embassy-time = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
@@ -33,6 +33,12 @@ panic-probe = { version = "0.3", features = ["print-defmt"] }
 # HW logging
 defmt = "0.3"
 defmt-rtt = "0.4"
+
+# Sensorts and outside HW libraries
+onewire = "~0.3.13"
+#bme280 = "~0.4.4" # Issue with embedded-hal version
+#bme280-multibus = { version = "~0.2.2", features = ["async"] } # Async is not a feature?
+#bme280-rs = { version = "0.1.0", features = ["async"] } # Async?
 
 # Async and libraries
 futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
