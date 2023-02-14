@@ -1,4 +1,4 @@
-(kicad_sch (version 20211123) (generator eeschema)
+(kicad_sch (version 20230121) (generator eeschema)
 
   (uuid cc56704c-71b4-401e-bec6-203f83946289)
 
@@ -9,31 +9,23 @@
 
 
   (sheet (at 39.37 31.75) (size 33.02 25.4) (fields_autoplaced)
-    (stroke (width 0.1524) (type solid) (color 0 0 0 0))
+    (stroke (width 0.1524) (type solid))
     (fill (color 0 0 0 0.0000))
     (uuid 9c894778-166f-4de3-959c-ace11ceeac49)
-    (property "Sheet name" "stm32_core" (id 0) (at 39.37 31.0384 0)
+    (property "Sheetname" "stm32_core" (at 39.37 31.0384 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
-    (property "Sheet file" "stm32_core.kicad_sch" (id 1) (at 39.37 57.7346 0)
+    (property "Sheetfile" "stm32_core.kicad_sch" (at 39.37 57.7346 0)
       (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "stm32"
+        (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "2"))
+      )
     )
   )
 
   (sheet_instances
     (path "/" (page "1"))
-    (path "/9c894778-166f-4de3-959c-ace11ceeac49" (page "2"))
-  )
-
-  (symbol_instances
-    (path "/9c894778-166f-4de3-959c-ace11ceeac49/6ffaf4d2-84ae-49da-99af-f19eadcc7714"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
-    )
-    (path "/9c894778-166f-4de3-959c-ace11ceeac49/ef05f5d4-ec6a-4157-ba22-e69a2151ac2a"
-      (reference "#PWR?") (unit 1) (value "+3.3V") (footprint "")
-    )
-    (path "/9c894778-166f-4de3-959c-ace11ceeac49/5bb63beb-f19c-4d40-8ee5-bd32deae0cc4"
-      (reference "U?") (unit 1) (value "STM32G070KBT6") (footprint "LQFP-32")
-    )
   )
 )
