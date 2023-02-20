@@ -1,5 +1,6 @@
 use crate::transport::reader::TransportReader;
 
+use crate::simple::codec::{create_codec, CodecFactoryType};
 use crate::Address;
 use bit_io::BaseReader;
 use codec::Codec;
@@ -28,7 +29,7 @@ where
     }
 }
 
-impl<R> SimpleReceiver<R, codec::Identity>
+impl<R> SimpleReceiver<R, CodecFactoryType>
 where
     R: BaseReader,
 {
@@ -36,7 +37,7 @@ where
         Self {
             address,
             reader,
-            codec: codec::Identity::default(),
+            codec: create_codec(),
         }
     }
 }

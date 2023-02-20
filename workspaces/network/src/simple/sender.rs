@@ -1,5 +1,6 @@
 use crate::transport::writer::TransportWriter;
 
+use crate::simple::codec::{create_codec, CodecFactoryType};
 use crate::Address;
 use bit_io::BaseWriter;
 use codec::Codec;
@@ -28,7 +29,7 @@ where
     }
 }
 
-impl<W> SimpleSender<W, codec::Identity>
+impl<W> SimpleSender<W, CodecFactoryType>
 where
     W: BaseWriter,
 {
@@ -36,7 +37,7 @@ where
         Self {
             address,
             writer,
-            codec: codec::Identity::default(),
+            codec: create_codec(),
         }
     }
 }
