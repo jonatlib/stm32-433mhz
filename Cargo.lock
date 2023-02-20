@@ -186,6 +186,7 @@ checksum = "67ba02a97a2bd10f4b59b25c7973101c79642302776489e030cd13cdab09ed15"
 name = "codec"
 version = "0.1.0"
 dependencies = [
+ "lzss",
  "reed-solomon",
 ]
 
@@ -760,6 +761,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "lzss"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44b632c99585e63422ea9f54d84e4731562eb3424056084211d7eb60cca74092"
+dependencies = [
+ "void",
 ]
 
 [[package]]

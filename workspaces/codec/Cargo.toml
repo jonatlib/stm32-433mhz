@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 reed-solomon = "~0.2.1"
+lzss = { version = "~0.9.0", default-features = false }
 
 #[profile.dev]
 #panic = "abort"

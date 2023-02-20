@@ -1,6 +1,10 @@
 #![no_std]
 #![feature(type_alias_impl_trait, const_trait_impl)]
 
+pub mod four_to_six;
+pub mod lzss;
+pub mod reed_solomon;
+
 #[const_trait]
 pub trait CodecSize {
     // TODO this method should return number bigger or equal to runtime size version of this function
