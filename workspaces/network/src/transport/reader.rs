@@ -34,6 +34,7 @@ impl<'a, R, C> TransportReceiver for TransportReader<'a, R, C>
 where
     R: BaseReader,
     C: Codec + ~const CodecSize,
+    [(); C::get_encode_const_size(4)]: Sized,
 {
     async fn receive_bytes(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
         self.window.clear();
@@ -44,15 +45,7 @@ where
             // But in sender we encode and send each packet one by one
             // This way we should be receiving only 4 bytes before encoding.
             // So the number of received bytes is basically how much bytes is needed to encode 4 bytes
-            // TODO how big this buffer should be?
-            let mut reader_buffer = [0u8; 16];
-            // TODO remove this check once lines below can compile
-            if C::get_encode_const_size(4) > 16 {
-                panic!("Can't hold all data from codec while decoding!");
-            }
-
-            // TODO this is currently not doable in Rust
-            // let mut reader_buffer = [0u8; C::get_encode_const_size()];
+            let mut reader_buffer = [0u8; C::get_encode_const_size(4)];
 
             let read_size = C::get_encode_size(4);
             let received_size = self
