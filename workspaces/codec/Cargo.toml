@@ -6,11 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Codecs
 reed-solomon = "~0.2.1"
 lzss = { version = "~0.9.0", default-features = false }
 
-#[profile.dev]
-#panic = "abort"
-#
-#[profile.release]
-#panic = "abort"
+# Helper libraries
+heapless = { version = "~0.7.16", default-features = false }

@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(type_alias_impl_trait, const_trait_impl)]
+#![feature(type_alias_impl_trait, const_trait_impl, generic_const_exprs)]
 
 pub mod four_to_six;
 pub mod lzss;
