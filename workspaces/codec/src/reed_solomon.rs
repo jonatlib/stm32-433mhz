@@ -1,4 +1,4 @@
-use crate::{Codec, CodecSize};
+use crate::{Codec, CodecError, CodecSize};
 
 use reed_solomon::{Decoder, Encoder};
 
@@ -33,22 +33,24 @@ where
     type Encoded<'a> = impl Iterator<Item = u8> + 'a;
     type Decoded<'a> = impl Iterator<Item = u8> + 'a;
 
-    fn encode<'a>(&self, payload: &'a [u8]) -> Self::Encoded<'a> {
+    fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError> {
         let encoded: heapless::Vec<_, { Self::get_encode_const_size(ENCODE_BUFFER_SIZE) }> =
             self.encoder.encode(payload).into_iter().copied().collect();
 
-        encoded.into_iter()
+        Ok(encoded.into_iter())
     }
 
-    fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a> {
-        //FIXME decode (maybe even encode) can return an error
-        let decode_buffer = self.decoder.correct(payload, None).expect("TODO");
+    fn decode<'a>(&self, payload: &'a [u8]) -> Result<Self::Decoded<'a>, CodecError> {
+        let decode_buffer = self
+            .decoder
+            .correct(payload, None)
+            .map_err(|_| CodecError::DecodeError)?;
         let mut decoded: heapless::Vec<_, { Self::DECODE_BUFFER_SIZE }> =
             decode_buffer.into_iter().copied().collect();
         decoded
             .resize(decoded.len() - ECC_LEN, 0)
             .expect("This should not fail");
-        decoded.into_iter()
+        Ok(decoded.into_iter())
     }
 
     fn get_encode_size(payload_size: usize) -> usize {

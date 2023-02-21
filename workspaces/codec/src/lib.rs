@@ -8,10 +8,18 @@
 #[macro_use]
 extern crate std;
 
+use defmt::Format;
+
 pub mod chain;
 pub mod four_to_six;
 pub mod lzss;
 pub mod reed_solomon;
+
+#[derive(Format, Debug)]
+pub enum CodecError {
+    EncodeError,
+    DecodeError,
+}
 
 #[const_trait]
 pub trait CodecSize {
@@ -23,8 +31,8 @@ pub trait Codec: CodecSize {
     type Encoded<'a>: Iterator<Item = u8> + 'a;
     type Decoded<'a>: Iterator<Item = u8> + 'a;
 
-    fn encode<'a>(&self, payload: &'a [u8]) -> Self::Encoded<'a>;
-    fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a>;
+    fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError>;
+    fn decode<'a>(&self, payload: &'a [u8]) -> Result<Self::Decoded<'a>, CodecError>;
 
     fn get_encode_size(payload_size: usize) -> usize;
 }
@@ -36,12 +44,12 @@ impl Codec for Identity {
     type Encoded<'a> = impl Iterator<Item = u8> + 'a;
     type Decoded<'a> = impl Iterator<Item = u8> + 'a;
 
-    fn encode<'a>(&self, payload: &'a [u8]) -> Self::Encoded<'a> {
-        payload.iter().copied()
+    fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError> {
+        Ok(payload.iter().copied())
     }
 
-    fn decode<'a>(&self, payload: &'a [u8]) -> Self::Decoded<'a> {
-        payload.iter().copied()
+    fn decode<'a>(&self, payload: &'a [u8]) -> Result<Self::Decoded<'a>, CodecError> {
+        Ok(payload.iter().copied())
     }
 
     fn get_encode_size(payload_size: usize) -> usize {

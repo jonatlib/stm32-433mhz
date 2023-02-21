@@ -50,7 +50,11 @@ where
             let data = Into::<u32>::into(packet).to_be_bytes();
             for _ in 0..self.resend {
                 // TODO don't re-encode the same data multiple times
-                let encoded_data = self.codec.encode(&data);
+                // When encoder raise an error we should just stop, as the same data won't be sent at all
+                let encoded_data = self
+                    .codec
+                    .encode(&data)
+                    .map_err(|e| NetworkError::CodecError(e))?;
                 sent_bytes += self
                     .writer
                     .write_bytes_iterator(encoded_data)

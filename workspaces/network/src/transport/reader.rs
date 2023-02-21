@@ -55,7 +55,14 @@ where
                 .map_err(NetworkError::ReceiverReaderError)?;
 
             // This should be then data worth of one packet only (4 bytes)
-            let decoded_data = self.codec.decode(&reader_buffer[..received_size]);
+            let decoded_data_result = self.codec.decode(&reader_buffer[..received_size]);
+            // FIXME what about decode errors?
+            //   We can receive packet multiple times even when the first
+            //   transmission is broken
+            if decoded_data_result.is_err() {
+                continue;
+            }
+            let decoded_data = decoded_data_result.expect("This cant be error after the if");
             let mut packet_buffer = [0u8; 4]; // One packet is 32bit = 4bytes
             for (index, byte) in decoded_data.enumerate() {
                 packet_buffer[index] = byte;
