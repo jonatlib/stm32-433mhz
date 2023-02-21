@@ -4,23 +4,24 @@ type BaseCompression<const EI: usize, const EJ: usize> =
     lzss::Lzss<EI, EJ, 0x20, { 1 << EI }, { 2 << EI }>;
 
 const EI: usize = 6;
+#[allow(dead_code)] // FIXME once the fixme with const is resolved remove this
 const COMPRESSION_BUFFER_SIZE: usize = 2 << EI;
+#[allow(dead_code)] // FIXME once the fixme with const is resolved remove this
 const DECOMPRESSION_BUFFER_SIZE: usize = 1 << EI;
 type Compression = BaseCompression<EI, 3>;
 
 #[derive(Default)]
 pub struct LzssCompression {}
 
-impl Codec for LzssCompression
-where
-    [(); COMPRESSION_BUFFER_SIZE]: Sized,
-{
+impl Codec for LzssCompression {
     type Encoded<'a> = impl Iterator<Item = u8> + 'a;
     type Decoded<'a> = impl Iterator<Item = u8> + 'a;
 
     fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError> {
-        let mut compressed: heapless::Vec<_, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
-        let mut compression_result = Compression::compress_stack(
+        // FIXME dont know why that const generic is not resolved.
+        // let mut compressed: heapless::Vec<_, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+        let mut compressed: heapless::Vec<_, 128> = heapless::Vec::new();
+        let compression_result = Compression::compress_stack(
             lzss::SliceReader::new(&payload[..]),
             lzss::SliceWriter::new(&mut compressed[..]),
         )
@@ -34,7 +35,20 @@ where
     }
 
     fn decode<'a>(&self, payload: &'a [u8]) -> Result<Self::Decoded<'a>, CodecError> {
-        Ok(payload.iter().copied())
+        // FIXME dont know why that const generic is not resolved.
+        // let mut decompressed: heapless::Vec<_, { DECOMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+        let mut decompressed: heapless::Vec<_, 64> = heapless::Vec::new();
+        let decompression_result = Compression::decompress_stack(
+            lzss::SliceReader::new(payload),
+            lzss::SliceWriter::new(&mut decompressed[..]),
+        )
+        .map_err(|_| CodecError::DecodeError)?;
+
+        decompressed
+            .resize(decompression_result, 0)
+            .expect("Shrinking should not be a problem");
+
+        Ok(decompressed.into_iter())
     }
 
     fn get_encode_size(payload_size: usize) -> usize {
@@ -81,5 +95,35 @@ mod test {
         assert!(decompression_result.is_ok());
         let read_bytes = decompression_result.expect("This cant be error");
         assert_eq!(&decompressed[..read_bytes], &payload[..]);
+    }
+
+    #[test]
+    fn test_compression_same_as_codec() {
+        let payload = vec![1u8, 2, 3];
+        let mut compressed: heapless::Vec<u8, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+
+        let compression_result = Compression::compress_stack(
+            lzss::SliceReader::new(&payload[..]),
+            lzss::SliceWriter::new(&mut compressed),
+        );
+        println!("{:?}", compression_result);
+    }
+
+    #[test]
+    fn test_encode_decode() {
+        let codec = LzssCompression::default();
+        let payload = vec![1u8, 2, 3];
+
+        let encoded: Vec<_> = codec
+            .encode(&payload[..])
+            .expect("There should be no error")
+            .collect();
+        assert_ne!(encoded, payload);
+
+        let decoded: Vec<_> = codec
+            .decode(&encoded[..])
+            .expect("There should be no error")
+            .collect();
+        assert_eq!(payload, decoded);
     }
 }
