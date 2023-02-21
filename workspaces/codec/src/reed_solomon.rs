@@ -80,4 +80,19 @@ mod test {
         let decoded: Vec<_> = codec.decode(&encoded[..]).collect();
         assert_eq!(payload, decoded);
     }
+
+    #[test]
+    fn test_bit_flip() {
+        let codec = ReedSolomon::<4, 4>::default();
+        let payload = vec![1u8, 2, 3, 4];
+
+        let mut encoded: Vec<_> = codec.encode(&payload[..]).collect();
+        assert_ne!(encoded, payload);
+
+        encoded[0] = 3;
+        encoded[3] = 3;
+
+        let decoded: Vec<_> = codec.decode(&encoded[..]).collect();
+        assert_eq!(payload, decoded);
+    }
 }
