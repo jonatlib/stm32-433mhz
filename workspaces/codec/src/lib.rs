@@ -1,5 +1,12 @@
 #![no_std]
-#![feature(type_alias_impl_trait, const_trait_impl, generic_const_exprs)]
+#![feature(type_alias_impl_trait, const_trait_impl)]
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
+
+// Enable testing on local machine
+#[cfg(test)]
+#[macro_use]
+extern crate std;
 
 pub mod four_to_six;
 pub mod lzss;
