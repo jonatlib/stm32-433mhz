@@ -76,10 +76,16 @@ mod test {
         let codec = ReedSolomon::<4, 4>::default();
         let payload = vec![1u8, 2, 3];
 
-        let encoded: Vec<_> = codec.encode(&payload[..]).collect();
+        let encoded: Vec<_> = codec
+            .encode(&payload[..])
+            .expect("There should be no error")
+            .collect();
         assert_ne!(encoded, payload);
 
-        let decoded: Vec<_> = codec.decode(&encoded[..]).collect();
+        let decoded: Vec<_> = codec
+            .decode(&encoded[..])
+            .expect("There should be no error")
+            .collect();
         assert_eq!(payload, decoded);
     }
 
@@ -88,13 +94,19 @@ mod test {
         let codec = ReedSolomon::<4, 4>::default();
         let payload = vec![1u8, 2, 3, 4];
 
-        let mut encoded: Vec<_> = codec.encode(&payload[..]).collect();
+        let mut encoded: Vec<_> = codec
+            .encode(&payload[..])
+            .expect("There should be no error")
+            .collect();
         assert_ne!(encoded, payload);
 
         encoded[0] = 3;
         encoded[3] = 3;
 
-        let decoded: Vec<_> = codec.decode(&encoded[..]).collect();
+        let decoded: Vec<_> = codec
+            .decode(&encoded[..])
+            .expect("There should be no error")
+            .collect();
         assert_eq!(payload, decoded);
     }
 }
