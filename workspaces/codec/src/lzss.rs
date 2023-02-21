@@ -18,37 +18,35 @@ impl Codec for LzssCompression {
     type Decoded<'a> = impl Iterator<Item = u8> + 'a;
 
     fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError> {
-        // FIXME dont know why that const generic is not resolved.
-        // let mut compressed: heapless::Vec<_, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
-        let mut compressed: heapless::Vec<_, 128> = heapless::Vec::new();
+        let mut compressed = [0u8; { COMPRESSION_BUFFER_SIZE }];
         let compression_result = Compression::compress_stack(
             lzss::SliceReader::new(&payload[..]),
             lzss::SliceWriter::new(&mut compressed[..]),
         )
         .map_err(|_| CodecError::EncodeError)?;
 
-        compressed
-            .resize(compression_result, 0)
-            .expect("Shrinking should not be a problem");
+        // FIXME dont know why that const generic is not resolved.
+        // let mut compressed: heapless::Vec<_, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+        let output: heapless::Vec<_, 128> =
+            heapless::Vec::from_iter(compressed[..compression_result].iter().copied());
 
-        Ok(compressed.into_iter())
+        Ok(output.into_iter())
     }
 
     fn decode<'a>(&self, payload: &'a [u8]) -> Result<Self::Decoded<'a>, CodecError> {
-        // FIXME dont know why that const generic is not resolved.
-        // let mut decompressed: heapless::Vec<_, { DECOMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
-        let mut decompressed: heapless::Vec<_, 64> = heapless::Vec::new();
+        let mut decompressed = [0u8; { DECOMPRESSION_BUFFER_SIZE }];
         let decompression_result = Compression::decompress_stack(
             lzss::SliceReader::new(payload),
             lzss::SliceWriter::new(&mut decompressed[..]),
         )
         .map_err(|_| CodecError::DecodeError)?;
 
-        decompressed
-            .resize(decompression_result, 0)
-            .expect("Shrinking should not be a problem");
+        // FIXME dont know why that const generic is not resolved.
+        // let mut decompressed: heapless::Vec<_, { DECOMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+        let output: heapless::Vec<_, 64> =
+            heapless::Vec::from_iter(decompressed[..decompression_result].iter().copied());
 
-        Ok(decompressed.into_iter())
+        Ok(output.into_iter())
     }
 
     fn get_encode_size(payload_size: usize) -> usize {
@@ -100,13 +98,14 @@ mod test {
     #[test]
     fn test_compression_same_as_codec() {
         let payload = vec![1u8, 2, 3];
-        let mut compressed: heapless::Vec<u8, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+        let mut compressed = [0u8; { DECOMPRESSION_BUFFER_SIZE }];
 
         let compression_result = Compression::compress_stack(
             lzss::SliceReader::new(&payload[..]),
             lzss::SliceWriter::new(&mut compressed),
         );
-        println!("{:?}", compression_result);
+
+        assert!(compression_result.is_ok())
     }
 
     #[test]
