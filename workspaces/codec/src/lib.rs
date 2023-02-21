@@ -8,6 +8,7 @@
 #[macro_use]
 extern crate std;
 
+pub mod chain;
 pub mod four_to_six;
 pub mod lzss;
 pub mod reed_solomon;
