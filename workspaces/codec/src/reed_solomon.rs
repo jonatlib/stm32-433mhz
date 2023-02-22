@@ -54,7 +54,7 @@ where
     }
 
     fn get_encode_size(payload_size: usize) -> usize {
-        payload_size + ECC_LEN
+        Self::get_encode_const_size(payload_size)
     }
 }
 

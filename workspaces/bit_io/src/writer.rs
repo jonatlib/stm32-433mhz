@@ -52,7 +52,7 @@ pub trait Writer: crate::BaseWriter {
     }
 
     async fn write_byte(&mut self, value: u8) -> Result<(), WriterError> {
-        // trace!("Writing byte = {:#04x}", value);
+        // defmt::trace!("Writing byte = {:#04x}", value);
         for index in 0..8u8 {
             let mask = 1u8 << index;
             let bit = (value & mask) > 0;

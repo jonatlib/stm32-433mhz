@@ -67,6 +67,7 @@ where
                 // TODO don't re-encode the same data multiple times
                 // When encoder raise an error we should just stop, as the same data won't be sent at all
                 let encoded_data = self.codec.encode(&data).map_err(NetworkError::CodecError)?;
+                // FIXME we compute same packet multiple times in retransmision
                 sent_bytes += self
                     .writer
                     .write_bytes_iterator(encoded_data)

@@ -6,6 +6,7 @@ use bit_io::writer::WriterTiming;
 use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 use codec::chain::Chain;
 use codec::four_to_six::FourToSixBits;
+use codec::Identity;
 
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;
@@ -37,8 +38,13 @@ fn get_reader_timing() -> ReaderTiming {
     )
 }
 
-type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<8>, 4>;
-type CompressionType = LzssCompression;
+// type CodecType = FourToSixBits<10>; // FIXME wtf this is not 4?
+type CodecType = ReedSolomon<4, 4>;
+// type CodecType = Identity;
+// type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<20>, 4>; // FIXME FourToSixBits buffer weird
+
+// type CompressionType = LzssCompression;
+type CompressionType = Identity;
 
 fn create_codec() -> CodecType {
     CodecType::default()

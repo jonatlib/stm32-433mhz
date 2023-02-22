@@ -29,6 +29,7 @@ impl<R: Reader> crate::BaseReader for SyncReader<R> {
     async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
         // TODO check if buffer is smaller then read bytes
         self.sync.read_sequence(&mut self.reader).await?;
-        self.reader.read_bytes(self.number_of_bytes, buffer).await
+        // FIXME check original line here...
+        self.reader.read_bytes(buffer.len(), buffer).await
     }
 }

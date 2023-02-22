@@ -44,6 +44,7 @@ where
         self.window.clear();
 
         loop {
+            // FIXME Beware encoded can be longer than 4bytes
             // Maximum received size should be up to 4bytes per packet and up to 8packets
             // so maximum is 32bytes.
             // But in sender we encode and send each packet one by one

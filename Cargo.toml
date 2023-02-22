@@ -74,6 +74,7 @@ codegen-units = 4
 incremental = true
 lto = true
 opt-level = "s"
+debug = 2 # To get more debug info
 
 
 [profile.release]
