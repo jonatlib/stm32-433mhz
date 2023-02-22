@@ -34,14 +34,20 @@ fn get_reader_timing() -> ReaderTiming {
     )
 }
 
-fn create_codec() -> Identity {
-    Identity::default()
+type CodecType = Identity;
+type CompressionType = Identity;
+
+fn create_codec() -> CodecType {
+    CodecType::default()
+}
+fn create_compression() -> CompressionType {
+    CompressionType::default()
 }
 
 pub type SenderFactory<'a> =
-    SimpleSender<SyncWriter<PinWriter<'a, io::RadioSenderPin, false>>, Identity>;
+    SimpleSender<SyncWriter<PinWriter<'a, io::RadioSenderPin, false>>, CodecType, CompressionType>;
 pub type ReceiverFactory<'a> =
-    SimpleReceiver<SyncReader<PinReader<'a, io::RadioReceiverPin, false>>, Identity>;
+    SimpleReceiver<SyncReader<PinReader<'a, io::RadioReceiverPin, false>>, CodecType>;
 
 pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> SenderFactory {
     let output = hw.create_radio_sending_output();
@@ -50,7 +56,7 @@ pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> Sen
         .expect("Could not create PinWriter");
     let sync_writer = SyncWriter::new(pin_writer, get_sync_sequence());
 
-    SimpleSender::new(address, sync_writer, create_codec())
+    SimpleSender::new(address, sync_writer, create_codec(), create_compression())
 }
 
 pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> ReceiverFactory {
