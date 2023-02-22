@@ -6,34 +6,38 @@ use crate::Address;
 use bit_io::BaseReader;
 use codec::{Codec, CodecSize};
 
-pub struct TransportReader<'a, R, C> {
+pub struct TransportReader<'a, R, C, P> {
     address: Address,
     window: Window<8>,
 
     codec: &'a C,
+    compression: &'a P,
     reader: &'a mut R,
 }
 
-impl<'a, R, C> TransportReader<'a, R, C>
+impl<'a, R, C, P> TransportReader<'a, R, C, P>
 where
     R: BaseReader,
     C: Codec,
+    P: Codec,
 {
-    pub fn new(address: Address, codec: &'a C, reader: &'a mut R) -> Self {
+    pub fn new(address: Address, codec: &'a C, compression: &'a P, reader: &'a mut R) -> Self {
         Self {
             address,
             window: Window::new(),
 
             codec,
+            compression,
             reader,
         }
     }
 }
 
-impl<'a, R, C> TransportReceiver for TransportReader<'a, R, C>
+impl<'a, R, C, P> TransportReceiver for TransportReader<'a, R, C, P>
 where
     R: BaseReader,
     C: Codec + ~const CodecSize,
+    P: Codec + ~const CodecSize,
     [(); C::get_encode_const_size(4)]: Sized,
 {
     async fn receive_bytes(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
@@ -80,10 +84,23 @@ where
 
             let window_status = self.window.push_packet(packet)?;
             if let Some(size) = window_status {
+                let mut compressed_buffer = [0u8; 16]; // Packet can hold up to 16bytes
                 self.window
-                    .write_buffer(buffer)
+                    .write_buffer(&mut compressed_buffer)
                     .expect("This should not happen as push is called just before.");
-                return Ok(size);
+
+                let decompressed = self
+                    .compression
+                    .decode(&compressed_buffer[..size])
+                    .map_err(NetworkError::CodecError)?;
+
+                let mut decompress_size = 0usize;
+                for (index, byte) in decompressed.enumerate() {
+                    buffer[index] = byte;
+                    decompress_size += 1;
+                }
+
+                return Ok(decompress_size);
             }
         }
     }

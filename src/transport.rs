@@ -47,8 +47,11 @@ fn create_compression() -> CompressionType {
 
 pub type SenderFactory<'a> =
     SimpleSender<SyncWriter<PinWriter<'a, io::RadioSenderPin, false>>, CodecType, CompressionType>;
-pub type ReceiverFactory<'a> =
-    SimpleReceiver<SyncReader<PinReader<'a, io::RadioReceiverPin, false>>, CodecType>;
+pub type ReceiverFactory<'a> = SimpleReceiver<
+    SyncReader<PinReader<'a, io::RadioReceiverPin, false>>,
+    CodecType,
+    CompressionType,
+>;
 
 pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> SenderFactory {
     let output = hw.create_radio_sending_output();
@@ -68,5 +71,5 @@ pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> R
     // 4-bytes to send single packet of 32bits
     let sync_reader = SyncReader::new(pin_reader, get_sync_sequence(), 4);
 
-    SimpleReceiver::new(address, sync_reader, create_codec())
+    SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 }
