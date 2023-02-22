@@ -10,7 +10,7 @@ extern crate std;
 
 use defmt::Format;
 
-// pub mod chain; // TODO, don't know what to do with this
+pub mod chain; // TODO, don't know what to do with this
 pub mod four_to_six;
 pub mod lzss;
 pub mod reed_solomon;
