@@ -5,7 +5,8 @@ use bit_io::reader::ReaderTiming;
 use bit_io::writer::WriterTiming;
 use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
-use codec::Identity;
+use codec::lzss::LzssCompression;
+use codec::reed_solomon::ReedSolomon;
 
 use network::simple::sender::SimpleSender;
 
@@ -34,8 +35,8 @@ fn get_reader_timing() -> ReaderTiming {
     )
 }
 
-type CodecType = Identity;
-type CompressionType = Identity;
+type CodecType = ReedSolomon<4, 4>;
+type CompressionType = LzssCompression;
 
 fn create_codec() -> CodecType {
     CodecType::default()
