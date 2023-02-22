@@ -4,6 +4,8 @@ use embassy_time::Duration;
 use bit_io::reader::ReaderTiming;
 use bit_io::writer::WriterTiming;
 use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
+use codec::chain::Chain;
+use codec::four_to_six::FourToSixBits;
 
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;
@@ -35,7 +37,7 @@ fn get_reader_timing() -> ReaderTiming {
     )
 }
 
-type CodecType = ReedSolomon<4, 4>;
+type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<8>, 4>;
 type CompressionType = LzssCompression;
 
 fn create_codec() -> CodecType {
