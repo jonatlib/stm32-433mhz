@@ -51,10 +51,7 @@ where
             for _ in 0..self.resend {
                 // TODO don't re-encode the same data multiple times
                 // When encoder raise an error we should just stop, as the same data won't be sent at all
-                let encoded_data = self
-                    .codec
-                    .encode(&data)
-                    .map_err(|e| NetworkError::CodecError(e))?;
+                let encoded_data = self.codec.encode(&data).map_err(NetworkError::CodecError)?;
                 sent_bytes += self
                     .writer
                     .write_bytes_iterator(encoded_data)

@@ -35,7 +35,7 @@ where
 
     fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError> {
         let encoded: heapless::Vec<_, { Self::get_encode_const_size(ENCODE_BUFFER_SIZE) }> =
-            self.encoder.encode(payload).into_iter().copied().collect();
+            self.encoder.encode(payload).iter().copied().collect();
 
         Ok(encoded.into_iter())
     }
@@ -46,7 +46,7 @@ where
             .correct(payload, None)
             .map_err(|_| CodecError::DecodeError)?;
         let mut decoded: heapless::Vec<_, { Self::DECODE_BUFFER_SIZE }> =
-            decode_buffer.into_iter().copied().collect();
+            decode_buffer.iter().copied().collect();
         decoded
             .resize(decoded.len() - ECC_LEN, 0)
             .expect("This should not fail");

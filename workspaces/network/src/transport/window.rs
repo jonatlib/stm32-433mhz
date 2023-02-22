@@ -44,7 +44,7 @@ impl<const SIZE: usize> Window<SIZE> {
                     {
                         self.buffer.sort_unstable_by(|a, b| {
                             a.sequence_number()
-                                .compare(&b.sequence_number(), &base_sequence_number)
+                                .compare(&b.sequence_number(), base_sequence_number)
                         });
                     }
                     self.base_received = true;

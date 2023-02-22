@@ -10,7 +10,7 @@ pub struct SequenceNumber<const MODULO: u8> {
 
 impl<const MODULO: u8> AsRef<SequenceNumber<MODULO>> for SequenceNumber<MODULO> {
     fn as_ref(&self) -> &SequenceNumber<MODULO> {
-        &self
+        self
     }
 }
 
@@ -73,7 +73,7 @@ impl<const MODULO: u8> SequenceNumber<MODULO> {
         true
     }
 
-    pub fn get_insertion_order_ascending<'a>(
+    pub fn get_insertion_order_ascending(
         &self,
         sequence: impl Iterator<Item = impl AsRef<Self>>,
         first_element: Option<&Self>,

@@ -20,13 +20,13 @@ impl Codec for LzssCompression {
     fn encode<'a>(&self, payload: &'a [u8]) -> Result<Self::Encoded<'a>, CodecError> {
         let mut compressed = [0u8; { COMPRESSION_BUFFER_SIZE }];
         let compression_result = Compression::compress_stack(
-            lzss::SliceReader::new(&payload[..]),
+            lzss::SliceReader::new(payload),
             lzss::SliceWriter::new(&mut compressed[..]),
         )
         .map_err(|_| CodecError::EncodeError)?;
 
         // FIXME dont know why that const generic is not resolved.
-        // let mut compressed: heapless::Vec<_, { COMPRESSION_BUFFER_SIZE }> = heapless::Vec::new();
+        // let output: heapless::Vec<_, COMPRESSION_BUFFER_SIZE> =
         let output: heapless::Vec<_, 128> =
             heapless::Vec::from_iter(compressed[..compression_result].iter().copied());
 
