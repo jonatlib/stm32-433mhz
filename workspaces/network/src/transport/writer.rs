@@ -9,41 +9,56 @@ use bit_io::BaseWriter;
 use codec::Codec;
 use sequence_number::SequenceNumber;
 
-pub struct TransportWriter<'a, W, C> {
+pub struct TransportWriter<'a, W, C, P> {
     address: Address,
     sequence_number: SequenceNumber<8>,
     resend: u8,
 
+    compression: &'a P,
     codec: &'a C,
     writer: &'a mut W,
 }
 
-impl<'a, W, C> TransportWriter<'a, W, C>
+impl<'a, W, C, P> TransportWriter<'a, W, C, P>
 where
     W: BaseWriter,
     C: Codec,
+    P: Codec,
 {
-    pub fn new(address: Address, resend: u8, codec: &'a C, writer: &'a mut W) -> Self {
+    pub fn new(
+        address: Address,
+        resend: u8,
+        codec: &'a C,
+        compression: &'a P,
+        writer: &'a mut W,
+    ) -> Self {
         Self {
             address,
             sequence_number: SequenceNumber::new(0),
             resend,
+            compression,
             codec,
             writer,
         }
     }
 }
 
-impl<'a, W, C> TransportSender for TransportWriter<'a, W, C>
+impl<'a, W, C, P> TransportSender for TransportWriter<'a, W, C, P>
 where
     W: BaseWriter,
     C: Codec,
+    P: Codec,
 {
     async fn send_bytes(&mut self, payload: &[u8]) -> Result<usize, NetworkError> {
         let mut sent_bytes = 0usize;
 
-        let packet_builder =
-            PacketBuilder::new(&self.address, &mut self.sequence_number, payload.iter());
+        let packet_builder = PacketBuilder::new(
+            &self.address,
+            &mut self.sequence_number,
+            self.compression
+                .encode(payload)
+                .map_err(NetworkError::CodecError)?,
+        );
 
         for packet in packet_builder {
             trace!("Sending packet = {:?}", packet);
