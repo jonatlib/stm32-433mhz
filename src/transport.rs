@@ -43,8 +43,8 @@ type CodecType = ReedSolomon<4, 4>;
 // type CodecType = Identity;
 // type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<20>, 4>; // FIXME FourToSixBits buffer weird
 
-// type CompressionType = LzssCompression;
-type CompressionType = Identity;
+type CompressionType = LzssCompression;
+// type CompressionType = Identity;
 
 fn create_codec() -> CodecType {
     CodecType::default()

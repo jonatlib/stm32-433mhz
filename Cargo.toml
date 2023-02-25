@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["workspaces/codec", "workspaces/bit_io", "workspaces/network", "workspaces/sequence_number"]
+members = ["workspaces/codec", "workspaces/bit_io", "workspaces/network", "workspaces/sequence_number", "workspaces/external_memory"]
 
 
 [features]
@@ -18,6 +18,7 @@ nucleo_stm32l053r8 = []
 codec = { path = "workspaces/codec" }
 bit_io = { path = "workspaces/bit_io" }
 network = { path = "workspaces/network" }
+external_memory = { path = "workspaces/external_memory" }
 
 # Embasy HAL Runtime
 embassy-executor = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "integrated-timers"] }
