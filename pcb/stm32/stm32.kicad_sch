@@ -8,6 +8,73 @@
   )
 
 
+  (sheet (at 106.68 33.02) (size 19.05 11.43) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 10666af3-dfc7-46de-8942-14bdd4d81ac1)
+    (property "Sheetname" "sensors_onewire" (at 106.68 32.3084 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "sensors_onewire.kicad_sch" (at 106.68 45.0346 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "stm32"
+        (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "3"))
+      )
+    )
+  )
+
+  (sheet (at 85.09 99.06) (size 25.4 20.32) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 2f9a377a-ab8f-4f3f-978d-a700fa170109)
+    (property "Sheetname" "sensors_i2c" (at 85.09 98.3484 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "sensors_i2c.kicad_sch" (at 85.09 119.9646 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "stm32"
+        (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "5"))
+      )
+    )
+  )
+
+  (sheet (at 152.4 43.18) (size 29.21 26.67) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 373d422b-50db-40b1-b72f-ec977be46bcc)
+    (property "Sheetname" "wireless" (at 152.4 42.4684 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "wireless.kicad_sch" (at 152.4 70.4346 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "stm32"
+        (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "7"))
+      )
+    )
+  )
+
+  (sheet (at 106.68 62.23) (size 22.86 20.32) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 8878edf1-eecf-4d8b-8425-07bf183b31b3)
+    (property "Sheetname" "power_supply" (at 106.68 61.5184 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "power_supply.kicad_sch" (at 106.68 83.1346 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "stm32"
+        (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "4"))
+      )
+    )
+  )
 
   (sheet (at 48.26 31.75) (size 26.67 49.53) (fields_autoplaced)
     (stroke (width 0.1524) (type solid))
@@ -98,6 +165,23 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "2"))
+      )
+    )
+  )
+
+  (sheet (at 130.81 100.33) (size 21.59 19.05) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid c2b25c97-20cd-4e05-b700-7413317b2ccc)
+    (property "Sheetname" "components_spi" (at 130.81 99.6184 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "components_spi.kicad_sch" (at 130.81 119.9646 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "stm32"
+        (path "/cc56704c-71b4-401e-bec6-203f83946289" (page "6"))
       )
     )
   )

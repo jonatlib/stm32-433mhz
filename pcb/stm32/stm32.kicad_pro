@@ -340,6 +340,26 @@
     [
       "9c894778-166f-4de3-959c-ace11ceeac49",
       "stm32_core"
+    ],
+    [
+      "10666af3-dfc7-46de-8942-14bdd4d81ac1",
+      "sensors_onewire"
+    ],
+    [
+      "8878edf1-eecf-4d8b-8425-07bf183b31b3",
+      "power_supply"
+    ],
+    [
+      "2f9a377a-ab8f-4f3f-978d-a700fa170109",
+      "sensors_i2c"
+    ],
+    [
+      "c2b25c97-20cd-4e05-b700-7413317b2ccc",
+      "components_spi"
+    ],
+    [
+      "373d422b-50db-40b1-b72f-ec977be46bcc",
+      "wireless"
     ]
   ],
   "text_variables": {}
