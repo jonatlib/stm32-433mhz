@@ -571,6 +571,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "external_memory"
+version = "0.1.0"
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1179,6 +1183,7 @@ dependencies = [
  "embassy-stm32",
  "embassy-sync",
  "embassy-time",
+ "external_memory",
  "futures",
  "network",
  "onewire",
