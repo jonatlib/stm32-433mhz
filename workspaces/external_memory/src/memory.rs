@@ -93,3 +93,25 @@ where
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_dummy_memory() {
+        let mut memory = DummyMemory::new([0u8; 32]);
+
+        let read_value = memory.read(0x00).unwrap();
+        assert_eq!(*read_value, 0);
+        let read_value = memory.read(0x10).unwrap();
+        assert_eq!(*read_value, 0);
+
+        memory.write(0x10, &25).unwrap();
+
+        let read_value = memory.read(0x00).unwrap();
+        assert_eq!(*read_value, 0);
+        let read_value = memory.read(0x10).unwrap();
+        assert_eq!(*read_value, 25);
+    }
+}
