@@ -168,6 +168,8 @@ mod test {
         let boxed = SuperBox::new(123456u32, allocator).unwrap();
 
         assert_eq!(boxed.to_owned().unwrap(), 123456u32);
+
+        println!("{:?}", allocator.collapse().collapse())
     }
 
     #[test]

@@ -76,6 +76,10 @@ where
             memory: RefCell::new(memory),
         }
     }
+
+    pub fn collapse(self) -> M {
+        self.memory
+    }
 }
 
 impl<M> Allocator for DummyAllocator<M>

@@ -64,6 +64,10 @@ where
     pub fn new(memory: M) -> Self {
         Self { memory }
     }
+
+    pub fn collapse(self) -> M {
+        self.memory
+    }
 }
 
 impl<M> Memory for DummyMemory<M>
