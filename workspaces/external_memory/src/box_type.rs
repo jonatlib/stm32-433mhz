@@ -129,6 +129,28 @@ mod test {
     use std::boxed::Box;
 
     #[test]
+    fn test_memory_footprint() {
+        let memory = std::mem::size_of::<DummyMemory<[u8; 1]>>();
+        let allocator = std::mem::size_of::<DummyAllocator<DummyMemory<[u8; 1]>>>();
+        let our_box_1 = std::mem::size_of::<SuperBox<u8>>();
+        let our_box_4 = std::mem::size_of::<SuperBox<u32>>();
+        let our_box_128 = std::mem::size_of::<SuperBox<[u8; 128]>>();
+
+        // println!("{}", memory);
+        // println!("{}", allocator);
+        // println!("{}", our_box_1);
+        // println!("{}", our_box_4);
+        // println!("{}", our_box_128);
+
+        // These values will be platform dependant, we just test it is constant
+        assert_eq!(memory, 1);
+        assert_eq!(allocator, 16);
+        assert_eq!(our_box_1, 32);
+        assert_eq!(our_box_4, 32);
+        assert_eq!(our_box_128, 32);
+    }
+
+    #[test]
     fn test_one_byte_type() {
         let memory = DummyMemory::new([0u8; 32]);
         let allocator = Box::leak(Box::new(DummyAllocator::new(memory)));
@@ -146,5 +168,39 @@ mod test {
         let boxed = SuperBox::new(123456u32, allocator).unwrap();
 
         assert_eq!(boxed.to_owned().unwrap(), 123456u32);
+    }
+
+    #[test]
+    fn test_complex_type() {
+        let memory = DummyMemory::new([0u8; 128]);
+        let allocator = Box::leak(Box::new(DummyAllocator::new(memory)));
+
+        struct Nested {
+            value_1: i64,
+            value_2: i128,
+        };
+
+        struct Testing {
+            value_1: i64,
+            value_2: i128,
+            nested: Nested,
+        };
+
+        let value = Testing {
+            value_1: -123456,
+            value_2: 123456,
+            nested: Nested {
+                value_1: 123456,
+                value_2: -123456,
+            },
+        };
+        let boxed = SuperBox::new(value, allocator).unwrap();
+        let borrowed = boxed.borrow();
+
+        assert_eq!(borrowed.value_1, -123456);
+        assert_eq!(borrowed.value_2, 123456);
+
+        assert_eq!(borrowed.nested.value_1, 123456);
+        assert_eq!(borrowed.nested.value_2, -123456);
     }
 }

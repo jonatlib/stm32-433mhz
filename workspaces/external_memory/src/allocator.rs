@@ -11,7 +11,10 @@ pub enum AllocatorError {
 
 impl From<MemoryError> for AllocatorError {
     fn from(value: MemoryError) -> Self {
-        todo!()
+        match value {
+            MemoryError::OutOfBound => Self::OOM,
+            memory_error => Self::MemoryError(memory_error),
+        }
     }
 }
 
