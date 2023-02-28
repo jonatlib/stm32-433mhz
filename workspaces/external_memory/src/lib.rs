@@ -8,6 +8,6 @@
 #[macro_use]
 extern crate std;
 
-// pub mod allocator;
-// pub mod box_type;
+pub mod allocator;
+pub mod box_type;
 pub mod memory;

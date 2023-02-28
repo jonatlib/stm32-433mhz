@@ -57,29 +57,24 @@ impl Drop for AllocationHandler {
     }
 }
 
-pub struct DummyAllocator<'a, M, E> {
+pub struct DummyAllocator<M> {
     memory: RefCell<M>,
-
-    _phantom: PhantomData<&'a E>,
 }
 
-impl<'a, M, E> DummyAllocator<'a, M, E>
+impl<M> DummyAllocator<M>
 where
-    M: Memory<'a, E>,
-    E: Clone + Borrow<u8> + 'a,
+    M: Memory,
 {
     pub fn new(memory: M) -> Self {
         Self {
             memory: RefCell::new(memory),
-            _phantom: Default::default(),
         }
     }
 }
 
-impl<'a, M, E> Allocator for DummyAllocator<'a, M, E>
+impl<M> Allocator for DummyAllocator<M>
 where
-    M: Memory<'a, E>,
-    E: Clone + Borrow<u8> + 'a,
+    M: Memory,
 {
     fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError> {
         // FIXME this is wrong...
@@ -111,24 +106,11 @@ where
         handler: &AllocationHandler,
         data: &[u8],
     ) -> Result<usize, AllocatorError> {
-        todo!()
-
-        // let addresses = handler.start_address..(handler.start_address + handler.size);
-        //
-        // let mut mut_memory = self.memory.borrow_mut();
-        // for (index, a) in addresses.enumerate() {
-        //     // FIXME not working
-        //     // mut_memory.write(a, &data[index])?;
-        // }
-        //
-        // // FIXME
-        // Ok(0)
-
-        // FIXME fix this typing
-        // Ok(self
-        //     .memory
-        //     .borrow_mut()
-        //     .write_slice(addresses, data.into_iter())?)
+        let addresses = handler.start_address..(handler.start_address + handler.size);
+        Ok(self
+            .memory
+            .borrow_mut()
+            .write_slice(addresses, data.into_iter())?)
     }
 }
 
