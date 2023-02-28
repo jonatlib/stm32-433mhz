@@ -35,10 +35,15 @@ where
         todo!()
     }
 
-    fn write_slice<I, E>(&mut self, address: Range<usize>, value: I) -> Result<usize, MemoryError>
+    fn write_slice<'i, I, E>(
+        &mut self,
+        address: Range<usize>,
+        value: I,
+    ) -> Result<usize, MemoryError>
     where
-        I: Iterator<Item = E>,
-        E: Borrow<UNIT>,
+        I: Iterator<Item = &'i E>,
+        UNIT: Borrow<E> + 'i,
+        E: 'i,
     {
         todo!()
     }

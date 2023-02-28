@@ -1,5 +1,7 @@
 use crate::memory::{Address, Memory, MemoryError, Size};
+use core::borrow::Borrow;
 use core::cell::RefCell;
+use core::marker::PhantomData;
 
 #[derive(Debug)]
 pub enum AllocatorError {
@@ -55,24 +57,29 @@ impl Drop for AllocationHandler {
     }
 }
 
-pub struct DummyAllocator<M> {
+pub struct DummyAllocator<'a, M, E> {
     memory: RefCell<M>,
+
+    _phantom: PhantomData<&'a E>,
 }
 
-impl<M> DummyAllocator<M>
+impl<'a, M, E> DummyAllocator<'a, M, E>
 where
-    M: for<'a> Memory<'a, &'a u8>,
+    M: Memory<'a, E>,
+    E: Borrow<u8> + 'a,
 {
     pub fn new(memory: M) -> Self {
         Self {
             memory: RefCell::new(memory),
+            _phantom: Default::default(),
         }
     }
 }
 
-impl<M> Allocator for DummyAllocator<M>
+impl<'a, M, E> Allocator for DummyAllocator<'a, M, E>
 where
-    M: for<'a> Memory<'a, &'a u8>,
+    M: Memory<'a, E>,
+    E: Borrow<u8> + 'a,
 {
     fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError> {
         todo!()
@@ -90,7 +97,7 @@ where
         let index = 0;
         let addresses = handler.start_address..(handler.start_address + handler.size);
         for (index, data) in self.memory.borrow().read_slice(addresses)?.enumerate() {
-            buffer[index] = *data;
+            buffer[index] = *data.borrow();
         }
         Ok(index)
     }
