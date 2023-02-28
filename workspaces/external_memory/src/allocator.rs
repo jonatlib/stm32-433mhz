@@ -16,7 +16,7 @@ impl From<MemoryError> for AllocatorError {
 }
 
 pub trait Allocator {
-    fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError>;
+    fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError>;
     fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError>;
 
     fn read_bytes(
@@ -81,12 +81,20 @@ where
     M: Memory<'a, E>,
     E: Borrow<u8> + 'a,
 {
-    fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError> {
-        todo!()
+    fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError> {
+        // FIXME this is wrong...
+        Ok(AllocationHandler {
+            size,
+            start_address: 0,
+
+            handle: self,
+        })
     }
 
     fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError> {
-        todo!("free not implemented yet")
+        // FIXME
+        // todo!("free not implemented yet")
+        Ok(())
     }
 
     fn read_bytes(
@@ -121,9 +129,25 @@ mod test {
     use super::*;
     use crate::memory::{DummyMemory, Memory};
 
+    use std::boxed::Box;
+
     #[test]
     fn test_dummy_allocator() {
         let memory = DummyMemory::new([0u8; 32]);
-        let allocator = DummyAllocator::new(memory);
+        let allocator = Box::leak(Box::new(DummyAllocator::new(memory)));
+        // TODO maybe dont rely on 'static?
+        // let allocator = DummyAllocator::new(memory);
+
+        let handler = allocator.allocate(8).unwrap();
+        let mut read_buffer = [0u8; 8];
+        let expected_buffer = [0u8; 8];
+        let write_buffer = [0u8, 1, 2, 3, 4, 5, 6, 7];
+
+        handler.read_bytes(&mut read_buffer).unwrap();
+        assert_eq!(read_buffer, expected_buffer);
+
+        handler.write_bytes(&write_buffer).unwrap();
+        handler.read_bytes(&mut read_buffer).unwrap();
+        assert_eq!(read_buffer, write_buffer);
     }
 }

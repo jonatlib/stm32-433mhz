@@ -1,5 +1,6 @@
 use core::borrow::{Borrow, BorrowMut};
 use core::marker::PhantomData;
+use core::ops::Deref;
 use core::ops::Range;
 
 pub type Address = usize;
@@ -16,23 +17,29 @@ pub enum MemoryError {
 
 pub trait Memory<'a, UNIT>
 where
-    UNIT: Sized + Borrow<u8> + 'a,
+    UNIT: Sized + Clone + Borrow<u8> + 'a,
     Self: 'a,
 {
-    type ReadIterator: Iterator<Item = UNIT> + 'a;
-
     fn read(&'a self, address: Address) -> Result<UNIT, MemoryError>;
     fn write(&mut self, address: Address, value: UNIT) -> Result<(), MemoryError>;
 
-    fn read_page(&'a self, start: Address) -> Result<Self::ReadIterator, MemoryError>;
+    fn read_page(&self, start: Address, buffer: &mut [UNIT]) -> Result<usize, MemoryError>;
 
     fn write_page<I>(&mut self, start: Address, value: I) -> Result<(), MemoryError>
     where
         I: Iterator<Item = UNIT>;
 
-    fn read_slice(&self, address: Range<usize>) -> Result<Self::ReadIterator, MemoryError> {
-        // address.into_iter().map(|a| self.read(a))
-        todo!()
+    fn read_slice(
+        &'a self,
+        address: Range<usize>,
+        buffer: &mut [UNIT],
+    ) -> Result<usize, MemoryError> {
+        for index in address {
+            buffer[index] = self.read(index)?;
+        }
+
+        // FIXME
+        Ok(0)
     }
 
     fn write_slice<'i, I, E>(
@@ -42,10 +49,14 @@ where
     ) -> Result<usize, MemoryError>
     where
         I: Iterator<Item = &'i E>,
-        UNIT: Borrow<E> + 'i,
-        E: 'i,
+        E: Borrow<UNIT> + 'i,
     {
-        todo!()
+        for (address, data) in address.zip(value) {
+            self.write(address, data.borrow().clone())?;
+        }
+
+        // FIXME
+        Ok(0)
     }
 }
 
@@ -67,8 +78,6 @@ where
     Self: 'a,
     M: Borrow<[u8]> + BorrowMut<[u8]> + 'a,
 {
-    type ReadIterator = core::iter::Once<&'a u8>;
-
     fn read(&self, address: Address) -> Result<&'_ u8, MemoryError> {
         self.memory
             .borrow()
@@ -86,18 +95,15 @@ where
         Ok(())
     }
 
-    fn read_page(&'a self, start: Address) -> Result<Self::ReadIterator, MemoryError> {
-        Ok(core::iter::once(self.read(start)?))
+    fn read_page(&self, start: Address, buffer: &mut [&'a u8]) -> Result<usize, MemoryError> {
+        todo!()
     }
 
     fn write_page<I>(&mut self, start: Address, value: I) -> Result<(), MemoryError>
     where
         I: Iterator<Item = &'a u8>,
     {
-        for (index, data) in value.enumerate() {
-            self.write(start + index, data)?;
-        }
-        Ok(())
+        todo!()
     }
 }
 
