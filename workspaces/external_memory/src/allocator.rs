@@ -66,7 +66,7 @@ pub struct DummyAllocator<'a, M, E> {
 impl<'a, M, E> DummyAllocator<'a, M, E>
 where
     M: Memory<'a, E>,
-    E: Borrow<u8> + 'a,
+    E: Clone + Borrow<u8> + 'a,
 {
     pub fn new(memory: M) -> Self {
         Self {
@@ -79,7 +79,7 @@ where
 impl<'a, M, E> Allocator for DummyAllocator<'a, M, E>
 where
     M: Memory<'a, E>,
-    E: Borrow<u8> + 'a,
+    E: Clone + Borrow<u8> + 'a,
 {
     fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError> {
         // FIXME this is wrong...
@@ -102,12 +102,8 @@ where
         handler: &AllocationHandler,
         buffer: &mut [u8],
     ) -> Result<usize, AllocatorError> {
-        let index = 0;
         let addresses = handler.start_address..(handler.start_address + handler.size);
-        for (index, data) in self.memory.borrow().read_slice(addresses)?.enumerate() {
-            buffer[index] = *data.borrow();
-        }
-        Ok(index)
+        Ok(self.memory.borrow().read_slice(addresses, buffer)?)
     }
 
     fn write_bytes(
@@ -115,12 +111,24 @@ where
         handler: &AllocationHandler,
         data: &[u8],
     ) -> Result<usize, AllocatorError> {
-        let index = 0;
-        let addresses = handler.start_address..(handler.start_address + handler.size);
-        Ok(self
-            .memory
-            .borrow_mut()
-            .write_slice(addresses, data.into_iter())?)
+        todo!()
+
+        // let addresses = handler.start_address..(handler.start_address + handler.size);
+        //
+        // let mut mut_memory = self.memory.borrow_mut();
+        // for (index, a) in addresses.enumerate() {
+        //     // FIXME not working
+        //     // mut_memory.write(a, &data[index])?;
+        // }
+        //
+        // // FIXME
+        // Ok(0)
+
+        // FIXME fix this typing
+        // Ok(self
+        //     .memory
+        //     .borrow_mut()
+        //     .write_slice(addresses, data.into_iter())?)
     }
 }
 
