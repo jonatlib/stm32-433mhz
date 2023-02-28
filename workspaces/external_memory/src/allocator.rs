@@ -103,7 +103,7 @@ where
     }
 
     fn total_memory(&self) -> usize {
-        self.memory.available_memory()
+        self.memory.borrow().available_memory()
     }
 
     fn available_memory(&self) -> usize {
