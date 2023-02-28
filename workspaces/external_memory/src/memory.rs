@@ -1,6 +1,6 @@
 use core::borrow::{Borrow, BorrowMut};
 use core::marker::PhantomData;
-use core::ops::Deref;
+use core::ops::Range;
 
 pub type Address = usize;
 
@@ -30,13 +30,15 @@ where
     where
         I: Iterator<Item = UNIT>;
 
-    fn read_slice(&self, address: &[Address]) -> Result<Self::ReadIterator, MemoryError> {
+    fn read_slice(&self, address: Range<usize>) -> Result<Self::ReadIterator, MemoryError> {
+        // address.into_iter().map(|a| self.read(a))
         todo!()
     }
 
-    fn write_slice<I>(&mut self, address: &[Address], value: I) -> Result<(), MemoryError>
+    fn write_slice<I, E>(&mut self, address: Range<usize>, value: I) -> Result<usize, MemoryError>
     where
-        I: Iterator<Item = UNIT>,
+        I: Iterator<Item = E>,
+        E: Borrow<UNIT>,
     {
         todo!()
     }

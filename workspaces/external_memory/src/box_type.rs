@@ -35,8 +35,8 @@ where
     /// Or instead use `Self::as_ref`
     pub fn update(&mut self, mut value: T) -> Result<(), AllocatorError> {
         //  TODO see comments in `to_owned`
-        let value_ptr = &mut value as *mut _ as *mut [u8; { core::mem::size_of::<T>() }];
-        let value_bytes: [u8; { core::mem::size_of::<T>() }] = unsafe { value_ptr.read() };
+        let value_ptr = &mut value as *mut _ as *mut [u8; core::mem::size_of::<T>()];
+        let value_bytes: [u8; core::mem::size_of::<T>()] = unsafe { value_ptr.read() };
         core::mem::forget(value);
 
         self.handler.write_bytes(&value_bytes)?;
