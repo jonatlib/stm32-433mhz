@@ -99,7 +99,7 @@ where
     }
 
     fn total_memory(&self) -> usize {
-        0
+        self.memory.available_memory()
     }
 
     fn available_memory(&self) -> usize {
