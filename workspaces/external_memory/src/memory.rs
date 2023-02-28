@@ -26,6 +26,10 @@ pub trait Memory {
         I: Iterator<Item = E>,
         E: Borrow<u8>;
 
+    fn available_memory(&self) -> usize;
+    fn page_size(&self) -> usize;
+    fn available_pages(&self) -> usize;
+
     fn read_slice(&self, address: Range<usize>, buffer: &mut [u8]) -> Result<usize, MemoryError> {
         for index in address {
             buffer[index] = self.read(index)?;
@@ -94,6 +98,18 @@ where
         E: Borrow<u8>,
     {
         todo!()
+    }
+
+    fn available_memory(&self) -> usize {
+        0
+    }
+
+    fn page_size(&self) -> usize {
+        0
+    }
+
+    fn available_pages(&self) -> usize {
+        0
     }
 }
 

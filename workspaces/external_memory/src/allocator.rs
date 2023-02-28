@@ -22,6 +22,9 @@ pub trait Allocator {
     fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError>;
     fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError>;
 
+    fn total_memory(&self) -> usize;
+    fn available_memory(&self) -> usize;
+
     fn read_bytes(
         &self,
         handler: &AllocationHandler,
@@ -93,6 +96,14 @@ where
         // FIXME
         // todo!("free not implemented yet")
         Ok(())
+    }
+
+    fn total_memory(&self) -> usize {
+        0
+    }
+
+    fn available_memory(&self) -> usize {
+        0
     }
 
     fn read_bytes(
