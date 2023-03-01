@@ -4,14 +4,14 @@ use core::ops::Deref;
 
 pub mod box_ref;
 
-pub struct ColdBox<'a, T: Sized> {
+pub struct ColdBox<'a, T> {
     handler: AllocationHandler<'a>,
     _phantom: PhantomData<T>,
 }
 
-impl<'a, T: Sized> ColdBox<'a, T>
+impl<'a, T> ColdBox<'a, T>
 where
-    [(); core::mem::size_of::<T>()]: Sized,
+    [(); core::mem::size_of::<T>()]:,
 {
     pub fn new<A>(value: T, allocator: &'a A) -> Result<Self, AllocatorError>
     where
@@ -88,9 +88,9 @@ where
     }
 }
 
-impl<'a, T: Sized, const SIZE: usize> ColdBox<'a, [T; SIZE]>
+impl<'a, T, const SIZE: usize> ColdBox<'a, [T; SIZE]>
 where
-    [(); core::mem::size_of::<T>()]: Sized,
+    [(); core::mem::size_of::<T>()]:,
 {
     pub fn get(&self, index: usize) -> Result<T, AllocatorError> {
         todo!()
@@ -103,12 +103,12 @@ where
     // FIXME borrowing
 }
 
-pub struct SuperBoxRef<'a, T: Sized> {
+pub struct SuperBoxRef<'a, T> {
     value: T,
     handle: &'a ColdBox<'a, T>,
 }
 
-pub struct SuperBoxRefMut<'a, T: Sized>
+pub struct SuperBoxRefMut<'a, T>
 where
     [(); core::mem::size_of::<T>()]:,
 {
@@ -116,7 +116,7 @@ where
     handle: &'a mut ColdBox<'a, T>,
 }
 
-impl<'a, T: Sized> Deref for SuperBoxRef<'a, T> {
+impl<'a, T> Deref for SuperBoxRef<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -124,7 +124,7 @@ impl<'a, T: Sized> Deref for SuperBoxRef<'a, T> {
     }
 }
 
-impl<'a, T: Sized> Drop for SuperBoxRefMut<'a, T>
+impl<'a, T> Drop for SuperBoxRefMut<'a, T>
 where
     [(); core::mem::size_of::<T>()]:,
 {
