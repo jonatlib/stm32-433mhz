@@ -38,6 +38,7 @@ pub trait Memory {
     }
 
     fn read_slice(&self, address: Range<usize>, buffer: &mut [u8]) -> Result<usize, MemoryError> {
+        debug_assert_eq!(address.len(), buffer.len());
         for (index, address) in address.enumerate() {
             buffer[index] = self.read(address)?;
         }

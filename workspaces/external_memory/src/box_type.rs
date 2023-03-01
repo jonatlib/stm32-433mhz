@@ -1,5 +1,6 @@
 use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
-use box_ref::{SuperBoxRef, SuperBoxRefMut};
+use crate::box_type::box_ref::ColdBoxArrayRef;
+use box_ref::{ColdBoxRef, ColdBoxRefMut};
 use core::marker::PhantomData;
 use core::ops::Deref;
 
@@ -31,7 +32,7 @@ where
 
     pub fn to_owned(&self) -> Result<T, AllocatorError> {
         let mut buffer = [0u8; { core::mem::size_of::<T>() }];
-        let read_size = self.handler.read_bytes(&mut buffer)?;
+        let read_size = self.handler.read_all_bytes(&mut buffer)?;
 
         // FIXME dont disable this
         // debug_assert_eq!(read_size, buffer.len());
@@ -58,7 +59,7 @@ where
         let value_bytes: [u8; core::mem::size_of::<T>()] = unsafe { value_ptr.read() };
         core::mem::forget(value);
 
-        self.handler.write_bytes(&value_bytes)?;
+        self.handler.write_all_bytes(&value_bytes)?;
 
         Ok(())
     }
@@ -69,29 +70,29 @@ where
     T: Sized,
     [(); core::mem::size_of::<T>()]:,
 {
-    pub fn try_borrow(&'a self) -> Result<SuperBoxRef<'a, T>, AllocatorError> {
+    pub fn try_borrow(&'a self) -> Result<ColdBoxRef<'a, T>, AllocatorError> {
         let value = self.to_owned()?;
 
-        Ok(SuperBoxRef {
+        Ok(ColdBoxRef {
             value,
             handle: self,
         })
     }
 
-    pub fn try_borrow_mut(&'a mut self) -> Result<SuperBoxRefMut<'a, T>, AllocatorError> {
+    pub fn try_borrow_mut(&'a mut self) -> Result<ColdBoxRefMut<'a, T>, AllocatorError> {
         let value = self.to_owned()?;
 
-        Ok(SuperBoxRefMut {
+        Ok(ColdBoxRefMut {
             value,
             handle: self,
         })
     }
 
-    pub fn borrow(&'a self) -> SuperBoxRef<'a, T> {
+    pub fn borrow(&'a self) -> ColdBoxRef<'a, T> {
         self.try_borrow().expect("Failed to read memory")
     }
 
-    pub fn borrow_mut(&'a mut self) -> SuperBoxRefMut<'a, T> {
+    pub fn borrow_mut(&'a mut self) -> ColdBoxRefMut<'a, T> {
         self.try_borrow_mut().expect("Failed to read memory")
     }
 }
@@ -101,6 +102,22 @@ where
     [(); core::mem::size_of::<T>()]:,
 {
     pub fn get(&self, index: usize) -> Result<T, AllocatorError> {
+        let mut buffer = [0u8; { core::mem::size_of::<T>() }];
+        let read_size = self.handler.read_all_bytes(&mut buffer)?;
+
+        // FIXME dont disable this
+        // debug_assert_eq!(read_size, buffer.len());
+
+        // TODO this would be nice but not doable now because of
+        //  https://github.com/rust-lang/rust/issues/61956
+        // core::mem::transmute(buffer)
+
+        // From https://github.com/rust-lang/rust/issues/61956
+        let ptr = &mut buffer as *mut _ as *mut T;
+        let result = unsafe { ptr.read() };
+        core::mem::forget(buffer);
+        // Ok(result)
+
         todo!()
     }
 
@@ -108,7 +125,30 @@ where
         todo!()
     }
 
-    // FIXME borrowing
+    pub fn len(&self) -> usize {
+        SIZE
+    }
+
+    pub fn try_borrow_array(&'a self) -> Result<ColdBoxArrayRef<'a, T, SIZE>, AllocatorError> {
+        Ok(ColdBoxArrayRef { handle: self })
+    }
+
+    // pub fn try_borrow_mut_array(&'a mut self) -> Result<ColdBoxRefMut<'a, T>, AllocatorError> {
+    //     let value = self.to_owned()?;
+    //
+    //     Ok(ColdBoxRefMut {
+    //         value,
+    //         handle: self,
+    //     })
+    // }
+
+    pub fn borrow_array(&'a self) -> ColdBoxArrayRef<'a, T, SIZE> {
+        self.try_borrow_array().expect("Failed to read memory")
+    }
+
+    // pub fn borrow_mut_array(&'a mut self) -> ColdBoxRefMut<'a, T> {
+    //     self.try_borrow_mut().expect("Failed to read memory")
+    // }
 }
 
 #[cfg(test)]
@@ -238,5 +278,17 @@ mod test {
 
         assert_eq!(borrowed.nested.value_1, 123456);
         assert_eq!(borrowed.nested.value_2, -123456);
+    }
+
+    #[test]
+    fn test_arrays() {
+        let memory = DummyMemory::new([0u8; 32]);
+        let allocator = DummyAllocator::new(memory);
+
+        {
+            let boxed = ColdBox::new([1u8, 2, 3, 4], &allocator).unwrap();
+        }
+
+        // println!("{:?}", allocator.collapse().collapse())
     }
 }

@@ -2,12 +2,12 @@ use crate::box_type::ColdBox;
 
 use core::ops::Deref;
 
-pub struct SuperBoxRef<'a, T> {
+pub struct ColdBoxRef<'a, T> {
     pub(super) value: T,
     pub(super) handle: &'a ColdBox<'a, T>,
 }
 
-pub struct SuperBoxRefMut<'a, T>
+pub struct ColdBoxRefMut<'a, T>
 where
     [(); core::mem::size_of::<T>()]:,
 {
@@ -15,7 +15,11 @@ where
     pub(super) handle: &'a mut ColdBox<'a, T>,
 }
 
-impl<'a, T> Deref for SuperBoxRef<'a, T> {
+pub struct ColdBoxArrayRef<'a, T, const SIZE: usize> {
+    pub(super) handle: &'a ColdBox<'a, [T; SIZE]>,
+}
+
+impl<'a, T> Deref for ColdBoxRef<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -23,7 +27,7 @@ impl<'a, T> Deref for SuperBoxRef<'a, T> {
     }
 }
 
-impl<'a, T> Drop for SuperBoxRefMut<'a, T>
+impl<'a, T> Drop for ColdBoxRefMut<'a, T>
 where
     [(); core::mem::size_of::<T>()]:,
 {

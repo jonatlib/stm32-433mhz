@@ -26,15 +26,30 @@ pub trait Allocator {
     fn total_memory(&self) -> usize;
     fn available_memory(&self) -> usize;
 
+    // TODO isn't this MMU? Also is allocator without MMU even useful?
+    fn read_all_bytes(
+        &self,
+        handler: &AllocationHandler,
+        buffer: &mut [u8],
+    ) -> Result<usize, AllocatorError>;
+
+    fn write_all_bytes(
+        &self,
+        handler: &AllocationHandler,
+        data: &[u8],
+    ) -> Result<usize, AllocatorError>;
+
     fn read_bytes(
         &self,
         handler: &AllocationHandler,
+        offset_address: Address,
         buffer: &mut [u8],
     ) -> Result<usize, AllocatorError>;
 
     fn write_bytes(
         &self,
         handler: &AllocationHandler,
+        offset_address: Address,
         data: &[u8],
     ) -> Result<usize, AllocatorError>;
 }
@@ -47,12 +62,28 @@ pub struct AllocationHandler<'a> {
 }
 
 impl<'a> AllocationHandler<'a> {
-    pub fn read_bytes(&self, buffer: &mut [u8]) -> Result<usize, AllocatorError> {
-        self.handle.read_bytes(self, buffer)
+    pub fn read_all_bytes(&self, buffer: &mut [u8]) -> Result<usize, AllocatorError> {
+        self.handle.read_all_bytes(self, buffer)
     }
 
-    pub fn write_bytes(&self, data: &[u8]) -> Result<usize, AllocatorError> {
-        self.handle.write_bytes(self, data)
+    pub fn write_all_bytes(&self, data: &[u8]) -> Result<usize, AllocatorError> {
+        self.handle.write_all_bytes(self, data)
+    }
+
+    pub fn read_bytes(
+        &self,
+        offset_address: Address,
+        buffer: &mut [u8],
+    ) -> Result<usize, AllocatorError> {
+        self.handle.read_bytes(self, offset_address, buffer)
+    }
+
+    pub fn write_bytes(
+        &self,
+        offset_address: Address,
+        data: &[u8],
+    ) -> Result<usize, AllocatorError> {
+        self.handle.write_bytes(self, offset_address, data)
     }
 }
 
@@ -116,7 +147,7 @@ where
         self.total_memory() - self.index.borrow().deref()
     }
 
-    fn read_bytes(
+    fn read_all_bytes(
         &self,
         handler: &AllocationHandler,
         buffer: &mut [u8],
@@ -125,12 +156,43 @@ where
         Ok(self.memory.borrow().read_slice(addresses, buffer)?)
     }
 
-    fn write_bytes(
+    fn write_all_bytes(
         &self,
         handler: &AllocationHandler,
         data: &[u8],
     ) -> Result<usize, AllocatorError> {
         let addresses = handler.start_address..(handler.start_address + handler.size);
+        Ok(self
+            .memory
+            .borrow_mut()
+            .write_slice(addresses, data.into_iter())?)
+    }
+
+    fn read_bytes(
+        &self,
+        handler: &AllocationHandler,
+        offset_address: Address,
+        buffer: &mut [u8],
+    ) -> Result<usize, AllocatorError> {
+        let start_address = handler.start_address + offset_address;
+        let stop_address = start_address + buffer.len();
+
+        // TODO address checking
+        let addresses = start_address..stop_address;
+        Ok(self.memory.borrow().read_slice(addresses, buffer)?)
+    }
+
+    fn write_bytes(
+        &self,
+        handler: &AllocationHandler,
+        offset_address: Address,
+        data: &[u8],
+    ) -> Result<usize, AllocatorError> {
+        let start_address = handler.start_address + offset_address;
+        let stop_address = start_address + data.len();
+
+        // TODO address checking
+        let addresses = start_address..stop_address;
         Ok(self
             .memory
             .borrow_mut()
@@ -157,11 +219,11 @@ mod test {
         let expected_buffer = [0u8; 8];
         let write_buffer = [0u8, 1, 2, 3, 4, 5, 6, 7];
 
-        handler.read_bytes(&mut read_buffer).unwrap();
+        handler.read_all_bytes(&mut read_buffer).unwrap();
         assert_eq!(read_buffer, expected_buffer);
 
-        handler.write_bytes(&write_buffer).unwrap();
-        handler.read_bytes(&mut read_buffer).unwrap();
+        handler.write_all_bytes(&write_buffer).unwrap();
+        handler.read_all_bytes(&mut read_buffer).unwrap();
         assert_eq!(read_buffer, write_buffer);
     }
 }
