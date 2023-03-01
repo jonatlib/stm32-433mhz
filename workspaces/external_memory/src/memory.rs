@@ -13,6 +13,7 @@ pub enum MemoryError {
     ReadError,
     WriteError,
     OutOfBound,
+    Timeout,
 }
 
 pub trait Memory {
@@ -31,8 +32,8 @@ pub trait Memory {
     fn available_pages(&self) -> usize;
 
     fn read_slice(&self, address: Range<usize>, buffer: &mut [u8]) -> Result<usize, MemoryError> {
-        for index in address {
-            buffer[index] = self.read(index)?;
+        for (index, address) in address.enumerate() {
+            buffer[index] = self.read(address)?;
         }
 
         // FIXME

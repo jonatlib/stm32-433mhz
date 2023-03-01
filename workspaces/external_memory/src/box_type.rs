@@ -2,16 +2,16 @@ use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
 use core::marker::PhantomData;
 use core::ops::Deref;
 
-pub struct SuperBox<T: Sized> {
-    handler: AllocationHandler,
+pub struct SuperBox<'a, T: Sized> {
+    handler: AllocationHandler<'a>,
     _phantom: PhantomData<T>,
 }
 
-impl<T: Sized> SuperBox<T>
+impl<'a, T: Sized> SuperBox<'a, T>
 where
     [(); core::mem::size_of::<T>()]: Sized,
 {
-    pub fn new<A>(value: T, allocator: &'static mut A) -> Result<Self, AllocatorError>
+    pub fn new<A>(value: T, allocator: &'a A) -> Result<Self, AllocatorError>
     where
         A: Allocator,
     {
@@ -59,7 +59,7 @@ where
         Ok(())
     }
 
-    pub fn try_borrow(&self) -> Result<SuperBoxRef<'_, T>, AllocatorError> {
+    pub fn try_borrow(&'a self) -> Result<SuperBoxRef<'a, T>, AllocatorError> {
         let value = self.to_owned()?;
 
         Ok(SuperBoxRef {
@@ -68,7 +68,7 @@ where
         })
     }
 
-    pub fn try_borrow_mut(&mut self) -> Result<SuperBoxRefMut<'_, T>, AllocatorError> {
+    pub fn try_borrow_mut(&'a mut self) -> Result<SuperBoxRefMut<'a, T>, AllocatorError> {
         let value = self.to_owned()?;
 
         Ok(SuperBoxRefMut {
@@ -77,18 +77,18 @@ where
         })
     }
 
-    pub fn borrow(&self) -> SuperBoxRef<'_, T> {
+    pub fn borrow(&'a self) -> SuperBoxRef<'a, T> {
         self.try_borrow().expect("Failed to read memory")
     }
 
-    pub fn borrow_mut(&mut self) -> SuperBoxRefMut<'_, T> {
+    pub fn borrow_mut(&'a mut self) -> SuperBoxRefMut<'a, T> {
         self.try_borrow_mut().expect("Failed to read memory")
     }
 }
 
 pub struct SuperBoxRef<'a, T: Sized> {
     value: T,
-    handle: &'a SuperBox<T>,
+    handle: &'a SuperBox<'a, T>,
 }
 
 pub struct SuperBoxRefMut<'a, T: Sized>
@@ -96,7 +96,7 @@ where
     [(); core::mem::size_of::<T>()]:,
 {
     value: T,
-    handle: &'a mut SuperBox<T>,
+    handle: &'a mut SuperBox<'a, T>,
 }
 
 impl<'a, T: Sized> Deref for SuperBoxRef<'a, T> {
@@ -144,7 +144,7 @@ mod test {
 
         // These values will be platform dependant, we just test it is constant
         assert_eq!(memory, 1);
-        assert_eq!(allocator, 16);
+        assert_eq!(allocator, 32);
         assert_eq!(our_box_1, 32);
         assert_eq!(our_box_4, 32);
         assert_eq!(our_box_128, 32);
@@ -163,14 +163,32 @@ mod test {
     #[test]
     fn test_simple_type() {
         let memory = DummyMemory::new([0u8; 32]);
-        let allocator = Box::leak(Box::new(DummyAllocator::new(memory)));
+        let allocator = DummyAllocator::new(memory);
 
-        let boxed = SuperBox::new(123456u32, allocator).unwrap();
+        {
+            let boxed = SuperBox::new(123456u32, &allocator).unwrap();
+            assert_eq!(boxed.to_owned().unwrap(), 123456u32);
+        }
 
-        assert_eq!(boxed.to_owned().unwrap(), 123456u32);
-
-        // We can't do this because of the static lifetime
         // println!("{:?}", allocator.collapse().collapse())
+    }
+
+    #[test]
+    fn test_multiple_allocations() {
+        let memory = DummyMemory::new([0u8; 32]);
+        let allocator = DummyAllocator::new(memory);
+
+        {
+            let boxed1 = SuperBox::new(123456u32, &allocator).unwrap();
+            assert_eq!(boxed1.to_owned().unwrap(), 123456u32);
+
+            let boxed2 = SuperBox::new(456789u32, &allocator).unwrap();
+            assert_eq!(boxed2.to_owned().unwrap(), 456789u32);
+            // Test original memory is not corrupted
+            assert_eq!(boxed1.to_owned().unwrap(), 123456u32);
+        }
+
+        println!("{:?}", allocator.collapse().collapse())
     }
 
     #[test]

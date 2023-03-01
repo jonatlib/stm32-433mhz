@@ -2,6 +2,7 @@ use crate::memory::{Address, Memory, MemoryError, Size};
 use core::borrow::Borrow;
 use core::cell::RefCell;
 use core::marker::PhantomData;
+use core::ops::Deref;
 
 #[derive(Debug)]
 pub enum AllocatorError {
@@ -19,7 +20,7 @@ impl From<MemoryError> for AllocatorError {
 }
 
 pub trait Allocator {
-    fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError>;
+    fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError>;
     fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError>;
 
     fn total_memory(&self) -> usize;
@@ -38,14 +39,14 @@ pub trait Allocator {
     ) -> Result<usize, AllocatorError>;
 }
 
-pub struct AllocationHandler {
+pub struct AllocationHandler<'a> {
     size: Size,
     start_address: Address,
 
-    handle: &'static dyn Allocator,
+    handle: &'a dyn Allocator,
 }
 
-impl AllocationHandler {
+impl<'a> AllocationHandler<'a> {
     pub fn read_bytes(&self, buffer: &mut [u8]) -> Result<usize, AllocatorError> {
         self.handle.read_bytes(self, buffer)
     }
@@ -55,7 +56,7 @@ impl AllocationHandler {
     }
 }
 
-impl Drop for AllocationHandler {
+impl<'a> Drop for AllocationHandler<'a> {
     fn drop(&mut self) {
         self.handle
             .free(self)
@@ -65,6 +66,7 @@ impl Drop for AllocationHandler {
 
 pub struct DummyAllocator<M> {
     memory: RefCell<M>,
+    index: RefCell<usize>,
 }
 
 impl<M> DummyAllocator<M>
@@ -74,6 +76,7 @@ where
     pub fn new(memory: M) -> Self {
         Self {
             memory: RefCell::new(memory),
+            index: RefCell::new(0),
         }
     }
 
@@ -86,11 +89,14 @@ impl<M> Allocator for DummyAllocator<M>
 where
     M: Memory,
 {
-    fn allocate(&'static self, size: Size) -> Result<AllocationHandler, AllocatorError> {
+    fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError> {
+        let current_index = self.index.borrow().deref().clone();
+        *self.index.borrow_mut() = current_index + size;
+
         // FIXME this is wrong...
         Ok(AllocationHandler {
             size,
-            start_address: 0,
+            start_address: current_index,
 
             handle: self,
         })
