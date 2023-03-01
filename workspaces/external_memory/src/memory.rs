@@ -28,8 +28,14 @@ pub trait Memory {
         E: Borrow<u8>;
 
     fn available_memory(&self) -> usize;
-    fn page_size(&self) -> usize;
-    fn available_pages(&self) -> usize;
+
+    fn page_size(&self) -> usize {
+        1
+    }
+
+    fn available_pages(&self) -> usize {
+        self.available_memory() / self.page_size()
+    }
 
     fn read_slice(&self, address: Range<usize>, buffer: &mut [u8]) -> Result<usize, MemoryError> {
         for (index, address) in address.enumerate() {
@@ -106,15 +112,7 @@ where
     }
 
     fn available_memory(&self) -> usize {
-        0
-    }
-
-    fn page_size(&self) -> usize {
-        0
-    }
-
-    fn available_pages(&self) -> usize {
-        0
+        self.memory.borrow().len()
     }
 }
 

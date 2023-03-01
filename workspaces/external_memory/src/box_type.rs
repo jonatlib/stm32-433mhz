@@ -127,6 +127,7 @@ mod test {
     use crate::memory::{DummyMemory, Memory};
 
     use std::boxed::Box;
+    use std::vec::Vec;
 
     #[test]
     fn test_memory_footprint() {
@@ -171,6 +172,28 @@ mod test {
         }
 
         // println!("{:?}", allocator.collapse().collapse())
+    }
+
+    #[test]
+    fn test_memory_size() {
+        let memory = DummyMemory::new([0u8; 32]);
+        let allocator = DummyAllocator::new(memory);
+        assert_eq!(allocator.available_memory(), 32);
+
+        {
+            let mut boxes = Vec::new();
+            for index in 0u8..32 {
+                let boxed = SuperBox::new(index, &allocator).unwrap();
+                assert_eq!(boxed.to_owned().unwrap(), index);
+                boxes.push(boxed);
+            }
+            assert_eq!(allocator.available_memory(), 0);
+
+            let failing = SuperBox::new(0u8, &allocator);
+            assert!(failing.is_err());
+        }
+
+        println!("{:?}", allocator.collapse().collapse())
     }
 
     #[test]

@@ -91,9 +91,10 @@ where
 {
     fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError> {
         let current_index = self.index.borrow().deref().clone();
+        if current_index + size > self.total_memory() {
+            return Err(AllocatorError::OOM);
+        }
         *self.index.borrow_mut() = current_index + size;
-
-        // FIXME this is wrong...
         Ok(AllocationHandler {
             size,
             start_address: current_index,
@@ -103,8 +104,7 @@ where
     }
 
     fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError> {
-        // FIXME
-        // todo!("free not implemented yet")
+        // This allocator does not free any memory
         Ok(())
     }
 
@@ -113,7 +113,7 @@ where
     }
 
     fn available_memory(&self) -> usize {
-        0
+        self.total_memory() - self.index.borrow().deref()
     }
 
     fn read_bytes(
