@@ -2,12 +2,12 @@ use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
 use core::marker::PhantomData;
 use core::ops::Deref;
 
-pub struct SuperBox<'a, T: Sized> {
+pub struct ColdBox<'a, T: Sized> {
     handler: AllocationHandler<'a>,
     _phantom: PhantomData<T>,
 }
 
-impl<'a, T: Sized> SuperBox<'a, T>
+impl<'a, T: Sized> ColdBox<'a, T>
 where
     [(); core::mem::size_of::<T>()]: Sized,
 {
@@ -86,7 +86,7 @@ where
     }
 }
 
-impl<'a, T: Sized, const SIZE: usize> SuperBox<'a, [T; SIZE]>
+impl<'a, T: Sized, const SIZE: usize> ColdBox<'a, [T; SIZE]>
 where
     [(); core::mem::size_of::<T>()]: Sized,
 {
@@ -103,7 +103,7 @@ where
 
 pub struct SuperBoxRef<'a, T: Sized> {
     value: T,
-    handle: &'a SuperBox<'a, T>,
+    handle: &'a ColdBox<'a, T>,
 }
 
 pub struct SuperBoxRefMut<'a, T: Sized>
@@ -111,7 +111,7 @@ where
     [(); core::mem::size_of::<T>()]:,
 {
     value: T,
-    handle: &'a mut SuperBox<'a, T>,
+    handle: &'a mut ColdBox<'a, T>,
 }
 
 impl<'a, T: Sized> Deref for SuperBoxRef<'a, T> {
@@ -148,9 +148,9 @@ mod test {
     fn test_memory_footprint() {
         let memory = std::mem::size_of::<DummyMemory<[u8; 1]>>();
         let allocator = std::mem::size_of::<DummyAllocator<DummyMemory<[u8; 1]>>>();
-        let our_box_1 = std::mem::size_of::<SuperBox<u8>>();
-        let our_box_4 = std::mem::size_of::<SuperBox<u32>>();
-        let our_box_128 = std::mem::size_of::<SuperBox<[u8; 128]>>();
+        let our_box_1 = std::mem::size_of::<ColdBox<u8>>();
+        let our_box_4 = std::mem::size_of::<ColdBox<u32>>();
+        let our_box_128 = std::mem::size_of::<ColdBox<[u8; 128]>>();
 
         // println!("{}", memory);
         // println!("{}", allocator);
@@ -171,7 +171,7 @@ mod test {
         let memory = DummyMemory::new([0u8; 32]);
         let allocator = Box::leak(Box::new(DummyAllocator::new(memory)));
 
-        let boxed = SuperBox::new(5u8, allocator).unwrap();
+        let boxed = ColdBox::new(5u8, allocator).unwrap();
 
         assert_eq!(boxed.to_owned().unwrap(), 5u8);
     }
@@ -182,7 +182,7 @@ mod test {
         let allocator = DummyAllocator::new(memory);
 
         {
-            let boxed = SuperBox::new(123456u32, &allocator).unwrap();
+            let boxed = ColdBox::new(123456u32, &allocator).unwrap();
             assert_eq!(boxed.to_owned().unwrap(), 123456u32);
         }
 
@@ -198,13 +198,13 @@ mod test {
         {
             let mut boxes = Vec::new();
             for index in 0u8..32 {
-                let boxed = SuperBox::new(index, &allocator).unwrap();
+                let boxed = ColdBox::new(index, &allocator).unwrap();
                 assert_eq!(boxed.to_owned().unwrap(), index);
                 boxes.push(boxed);
             }
             assert_eq!(allocator.available_memory(), 0);
 
-            let failing = SuperBox::new(0u8, &allocator);
+            let failing = ColdBox::new(0u8, &allocator);
             assert!(failing.is_err());
         }
 
@@ -217,10 +217,10 @@ mod test {
         let allocator = DummyAllocator::new(memory);
 
         {
-            let boxed1 = SuperBox::new(123456u32, &allocator).unwrap();
+            let boxed1 = ColdBox::new(123456u32, &allocator).unwrap();
             assert_eq!(boxed1.to_owned().unwrap(), 123456u32);
 
-            let boxed2 = SuperBox::new(456789u32, &allocator).unwrap();
+            let boxed2 = ColdBox::new(456789u32, &allocator).unwrap();
             assert_eq!(boxed2.to_owned().unwrap(), 456789u32);
             // Test original memory is not corrupted
             assert_eq!(boxed1.to_owned().unwrap(), 123456u32);
@@ -253,7 +253,7 @@ mod test {
                 value_2: -123456,
             },
         };
-        let boxed = SuperBox::new(value, allocator).unwrap();
+        let boxed = ColdBox::new(value, allocator).unwrap();
         let borrowed = boxed.borrow();
 
         assert_eq!(borrowed.value_1, -123456);
