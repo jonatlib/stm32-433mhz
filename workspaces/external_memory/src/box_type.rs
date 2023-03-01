@@ -1,16 +1,18 @@
 use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
+use box_ref::{SuperBoxRef, SuperBoxRefMut};
 use core::marker::PhantomData;
 use core::ops::Deref;
 
 pub mod box_ref;
 
-pub struct ColdBox<'a, T> {
+pub struct ColdBox<'a, T: ?Sized> {
     handler: AllocationHandler<'a>,
     _phantom: PhantomData<T>,
 }
 
 impl<'a, T> ColdBox<'a, T>
 where
+    T: Sized,
     [(); core::mem::size_of::<T>()]:,
 {
     pub fn new<A>(value: T, allocator: &'a A) -> Result<Self, AllocatorError>
@@ -60,7 +62,13 @@ where
 
         Ok(())
     }
+}
 
+impl<'a, T> ColdBox<'a, T>
+where
+    T: Sized,
+    [(); core::mem::size_of::<T>()]:,
+{
     pub fn try_borrow(&'a self) -> Result<SuperBoxRef<'a, T>, AllocatorError> {
         let value = self.to_owned()?;
 
@@ -101,39 +109,6 @@ where
     }
 
     // FIXME borrowing
-}
-
-pub struct SuperBoxRef<'a, T> {
-    value: T,
-    handle: &'a ColdBox<'a, T>,
-}
-
-pub struct SuperBoxRefMut<'a, T>
-where
-    [(); core::mem::size_of::<T>()]:,
-{
-    value: T,
-    handle: &'a mut ColdBox<'a, T>,
-}
-
-impl<'a, T> Deref for SuperBoxRef<'a, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
-}
-
-impl<'a, T> Drop for SuperBoxRefMut<'a, T>
-where
-    [(); core::mem::size_of::<T>()]:,
-{
-    fn drop(&mut self) {
-        let value = unsafe { core::mem::replace(&mut self.value, core::mem::zeroed()) };
-        self.handle
-            .update(value)
-            .expect("Memory could not be written");
-    }
 }
 
 #[cfg(test)]
