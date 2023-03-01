@@ -78,7 +78,7 @@ where
     }
 
     pub fn collapse(self) -> M {
-        self.memory
+        self.memory.into_inner()
     }
 }
 

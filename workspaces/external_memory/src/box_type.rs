@@ -169,7 +169,8 @@ mod test {
 
         assert_eq!(boxed.to_owned().unwrap(), 123456u32);
 
-        println!("{:?}", allocator.collapse().collapse())
+        // We can't do this because of the static lifetime
+        // println!("{:?}", allocator.collapse().collapse())
     }
 
     #[test]
