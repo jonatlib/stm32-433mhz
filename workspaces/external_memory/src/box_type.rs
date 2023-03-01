@@ -310,4 +310,33 @@ mod test {
 
         println!("{:?}", allocator.collapse().collapse())
     }
+
+    #[ignore]
+    fn test_dyn_types() {
+        let memory = DummyMemory::new([0u8; 32]);
+        let allocator = DummyAllocator::new(memory);
+
+        trait TestingTrait {
+            fn test(&self) -> usize;
+        }
+
+        struct TestingStruct {
+            value: usize,
+        }
+
+        impl TestingTrait for TestingStruct {
+            fn test(&self) -> usize {
+                self.value
+            }
+        }
+
+        {
+            // FIXME none of these working
+            // let boxed: ColdBox<dyn TestingTrait> =
+            //     ColdBox::new(TestingStruct { value: 10 }, &allocator).unwrap();
+            // let dyn_boxed = boxed as ColdBox<dyn TestingTrait>;
+        }
+
+        println!("{:?}", allocator.collapse().collapse())
+    }
 }
