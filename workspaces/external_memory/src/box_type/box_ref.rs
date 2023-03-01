@@ -7,24 +7,20 @@ pub struct ColdBoxRef<'a, T> {
     pub(super) handle: &'a ColdBox<'a, T>,
 }
 
-pub struct ColdBoxRefMut<'a, T>
-where
-    [(); core::mem::size_of::<T>()]:,
-{
-    pub(super) value: T,
-    pub(super) handle: &'a mut ColdBox<'a, T>,
-}
-
-pub struct ColdBoxArrayRef<'a, T, const SIZE: usize> {
-    pub(super) handle: &'a ColdBox<'a, [T; SIZE]>,
-}
-
 impl<'a, T> Deref for ColdBoxRef<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
         &self.value
     }
+}
+
+pub struct ColdBoxRefMut<'a, T>
+where
+    [(); core::mem::size_of::<T>()]:,
+{
+    pub(super) value: T,
+    pub(super) handle: &'a mut ColdBox<'a, T>,
 }
 
 impl<'a, T> Drop for ColdBoxRefMut<'a, T>
@@ -37,4 +33,8 @@ where
             .update(value)
             .expect("Memory could not be written");
     }
+}
+
+pub struct ColdBoxArrayRef<'a, T, const SIZE: usize> {
+    pub(super) handle: &'a ColdBox<'a, [T; SIZE]>,
 }

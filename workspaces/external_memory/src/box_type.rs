@@ -103,7 +103,9 @@ where
 {
     pub fn get(&self, index: usize) -> Result<T, AllocatorError> {
         let mut buffer = [0u8; { core::mem::size_of::<T>() }];
-        let read_size = self.handler.read_all_bytes(&mut buffer)?;
+        let read_size = self
+            .handler
+            .read_bytes(index * core::mem::size_of::<T>(), &mut buffer)?;
 
         // FIXME dont disable this
         // debug_assert_eq!(read_size, buffer.len());
@@ -116,13 +118,19 @@ where
         let ptr = &mut buffer as *mut _ as *mut T;
         let result = unsafe { ptr.read() };
         core::mem::forget(buffer);
-        // Ok(result)
-
-        todo!()
+        Ok(result)
     }
 
-    pub fn set(&self, index: usize, value: T) -> Result<(), AllocatorError> {
-        todo!()
+    pub fn set(&mut self, index: usize, mut value: T) -> Result<(), AllocatorError> {
+        //  TODO see comments in `to_owned`
+        let value_ptr = &mut value as *mut _ as *mut [u8; core::mem::size_of::<T>()];
+        let value_bytes: [u8; core::mem::size_of::<T>()] = unsafe { value_ptr.read() };
+        core::mem::forget(value);
+
+        self.handler
+            .write_bytes(index * core::mem::size_of::<T>(), &value_bytes)?;
+
+        Ok(())
     }
 
     pub fn len(&self) -> usize {
@@ -286,9 +294,20 @@ mod test {
         let allocator = DummyAllocator::new(memory);
 
         {
-            let boxed = ColdBox::new([1u8, 2, 3, 4], &allocator).unwrap();
+            let mut boxed = ColdBox::new([1u8, 2, 3, 4], &allocator).unwrap();
+
+            assert_eq!(boxed.get(0).unwrap(), 1);
+            assert_eq!(boxed.get(1).unwrap(), 2);
+            assert_eq!(boxed.get(2).unwrap(), 3);
+            assert_eq!(boxed.get(3).unwrap(), 4);
+
+            boxed.set(2, 4).unwrap();
+            assert_eq!(boxed.get(2).unwrap(), 4);
+
+            let data = boxed.to_owned().unwrap();
+            assert_eq!(data, [1u8, 2, 4, 4]);
         }
 
-        // println!("{:?}", allocator.collapse().collapse())
+        println!("{:?}", allocator.collapse().collapse())
     }
 }
