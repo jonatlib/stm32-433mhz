@@ -86,6 +86,21 @@ where
     }
 }
 
+impl<'a, T: Sized, const SIZE: usize> SuperBox<'a, [T; SIZE]>
+where
+    [(); core::mem::size_of::<T>()]: Sized,
+{
+    pub fn get(&self, index: usize) -> Result<T, AllocatorError> {
+        todo!()
+    }
+
+    pub fn set(&self, index: usize, value: T) -> Result<(), AllocatorError> {
+        todo!()
+    }
+
+    // FIXME borrowing
+}
+
 pub struct SuperBoxRef<'a, T: Sized> {
     value: T,
     handle: &'a SuperBox<'a, T>,
