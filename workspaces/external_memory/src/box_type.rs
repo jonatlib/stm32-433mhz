@@ -2,6 +2,8 @@ use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
 use core::marker::PhantomData;
 use core::ops::Deref;
 
+pub mod box_ref;
+
 pub struct ColdBox<'a, T: Sized> {
     handler: AllocationHandler<'a>,
     _phantom: PhantomData<T>,

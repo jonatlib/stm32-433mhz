@@ -11,3 +11,4 @@ extern crate std;
 pub mod allocator;
 pub mod box_type;
 pub mod memory;
+pub mod vec_type;
