@@ -1,7 +1,6 @@
 use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
 
 use core::marker::PhantomData;
-use std::slice::SliceIndex;
 
 struct RawColdVec<'a, T: ?Sized> {
     handle: AllocationHandler<'a>,
@@ -14,7 +13,7 @@ impl<'a, T> RawColdVec<'a, T>
 where
     T: Sized,
 {
-    pub fn new(size: usize, allocator: &'a Allocator) -> Result<Self, AllocatorError> {
+    pub fn new(size: usize, allocator: &'a dyn Allocator) -> Result<Self, AllocatorError> {
         Ok(Self {
             handle: allocator.allocate(size * core::mem::size_of::<T>())?,
             size,

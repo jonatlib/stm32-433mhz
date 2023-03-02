@@ -16,10 +16,7 @@ where
     T: Sized,
     [(); core::mem::size_of::<T>()]:,
 {
-    pub fn new<A>(value: T, allocator: &'a A) -> Result<Self, AllocatorError>
-    where
-        A: Allocator,
-    {
+    pub fn new(value: T, allocator: &'a dyn Allocator) -> Result<Self, AllocatorError> {
         let handler = allocator.allocate(core::mem::size_of::<T>())?;
         let mut this = Self {
             handler,
