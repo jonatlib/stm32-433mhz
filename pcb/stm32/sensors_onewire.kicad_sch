@@ -113,6 +113,19 @@
 
 
 
+  (hierarchical_label "VDD" (shape input) (at 121.92 81.28 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 2f2d94c3-1799-480d-a3b2-53ef79fc61f5)
+  )
+  (hierarchical_label "GND" (shape input) (at 121.92 85.09 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 6faf37d5-81fb-4c88-99dd-946b8ea8fa01)
+  )
+  (hierarchical_label "OneWire" (shape bidirectional) (at 121.92 77.47 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid f11db6a3-2b73-4720-be8c-f89f66cada13)
+  )
+
   (symbol (lib_id "Connector:4P4C") (at 59.69 68.58 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c233a0fe-ec51-4136-9039-8f80fa7e2b4e)

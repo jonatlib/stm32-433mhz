@@ -7,4 +7,22 @@
   (lib_symbols
   )
 
+
+
+  (hierarchical_label "TX" (shape output) (at 124.46 83.82 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 598f9fdf-6789-4754-816d-9da8a275dedf)
+  )
+  (hierarchical_label "RX" (shape input) (at 124.46 86.36 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 8cefc677-f1c3-453e-9853-c9aec9afe23e)
+  )
+  (hierarchical_label "VDD" (shape input) (at 124.46 77.47 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid cdd271ee-af2d-49b3-97de-b5c471072d18)
+  )
+  (hierarchical_label "GND" (shape input) (at 124.46 80.01 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid fb849785-2778-4612-b5a2-0eec65c9a355)
+  )
 )

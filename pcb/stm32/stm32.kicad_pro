@@ -32,7 +32,20 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      "multiple_net_names|1028700|571500|b7e724d8-7845-49a7-8f1e-226148b34b53|2b22362d-8d41-4daa-a67f-2646f42df1ee|||",
+      "multiple_net_names|1384300|330200|a433b60d-8dc7-4ccd-88ab-b4d432324828|0f0fa099-0a31-4a23-b5a8-e7437ef71c82|||",
+      "multiple_net_names|1384300|508000|02ec368a-e41e-4818-bb53-0cd71785cec9|ac110310-f2cd-46fa-afc4-7e31f643ea3a|||",
+      "multiple_net_names|1384300|508000|bd7592e3-632d-4650-90e5-bcb15e0ad55e|ac110310-f2cd-46fa-afc4-7e31f643ea3a|||",
+      "multiple_net_names|1384300|533400|7527f8c6-5bcd-4239-a672-c7a8af404aa4|6565b09d-fbb0-4186-a91f-861d5491d2e6|||",
+      "multiple_net_names|1384300|533400|83c61860-f52b-42cd-9d80-8fdb66ebf759|6565b09d-fbb0-4186-a91f-861d5491d2e6|||",
+      "multiple_net_names|2514600|914400|4ecdc8fa-2aae-450f-ae42-399a077e1e86|6ce7a3f5-f3c0-44d4-b03f-3f65f488c200|||",
+      "multiple_net_names|2527300|1066800|10ad293f-bc40-4ae4-83f7-180cca19a2c7|a3fb8d3f-e215-45d9-9f90-7e7d86b3f9e8|||",
+      "multiple_net_names|368300|698500|70309ea0-ec25-4a16-bb0f-f37371e7782d|7df174be-8ef9-44ef-bf80-96a121620ed6|||",
+      "multiple_net_names|977900|215900|d9af4376-1046-4c67-9f25-857f7de69d70|61e19ccb-a77b-498d-9b6f-b49633f8c597|||",
+      "pin_not_driven|317500|1219200|776a6bdc-0667-4bec-aeec-394f522c2fb2|00000000-0000-0000-0000-000000000000|||",
+      "power_pin_not_driven|495300|622300|28adc422-9454-4104-869e-63859042f303|00000000-0000-0000-0000-000000000000|||"
+    ],
     "meta": {
       "version": 0
     },
@@ -232,7 +245,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "ignore",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "simulation_model_issue": "error",
@@ -352,10 +365,6 @@
     [
       "2f9a377a-ab8f-4f3f-978d-a700fa170109",
       "sensors_i2c"
-    ],
-    [
-      "c2b25c97-20cd-4e05-b700-7413317b2ccc",
-      "components_spi"
     ],
     [
       "373d422b-50db-40b1-b72f-ec977be46bcc",

@@ -113,6 +113,23 @@
 
 
 
+  (hierarchical_label "RF_RX" (shape output) (at 140.97 77.47 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 35c90ea9-7746-44c0-bef9-7b6affeb6e71)
+  )
+  (hierarchical_label "RF_TX" (shape input) (at 140.97 73.66 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid a30f1751-9176-4223-bcee-aa3dbfa6125a)
+  )
+  (hierarchical_label "VDD" (shape input) (at 142.24 87.63 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid a753c39b-b341-411d-8028-68b597358d99)
+  )
+  (hierarchical_label "GND" (shape input) (at 142.24 91.44 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid f7e9459d-1f48-4ff2-9dae-4702d138606a)
+  )
+
   (symbol (lib_id "Connector:4P4C") (at 72.39 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3b38418a-3fd0-4643-9d31-6e1cbd1c7d76)

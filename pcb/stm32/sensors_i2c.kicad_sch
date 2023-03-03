@@ -7,4 +7,22 @@
   (lib_symbols
   )
 
+
+
+  (hierarchical_label "VDD" (shape input) (at 90.17 91.44 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 3f6742ed-4164-4c9c-88e0-6cc834da5769)
+  )
+  (hierarchical_label "GND" (shape input) (at 90.17 93.98 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 42ef2c5f-6ea5-48f8-b3e2-2e7ebcfb46c5)
+  )
+  (hierarchical_label "I2C_SDA" (shape bidirectional) (at 90.17 83.82 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid 69c46018-0441-41b5-929d-4ca60243e802)
+  )
+  (hierarchical_label "I2C_SCL" (shape bidirectional) (at 90.17 80.01 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27) bold) (justify left))
+    (uuid caaebe1d-2ddd-4ea1-8409-ba88fb327553)
+  )
 )
