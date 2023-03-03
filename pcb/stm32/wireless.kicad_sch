@@ -112,6 +112,7 @@
   )
 
 
+
   (symbol (lib_id "Connector:4P4C") (at 72.39 72.39 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3b38418a-3fd0-4643-9d31-6e1cbd1c7d76)

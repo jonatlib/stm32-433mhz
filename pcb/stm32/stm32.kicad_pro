@@ -360,6 +360,10 @@
     [
       "373d422b-50db-40b1-b72f-ec977be46bcc",
       "wireless"
+    ],
+    [
+      "dd21196a-5f3f-4a2a-9bdd-afc183d705bd",
+      "USB"
     ]
   ],
   "text_variables": {}
