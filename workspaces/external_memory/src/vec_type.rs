@@ -1,7 +1,10 @@
 use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
 
+use crate::vec_type::iterator::ColdVecIter;
 use core::marker::PhantomData;
 use core::ops::Range;
+
+pub mod iterator;
 
 struct RawColdVec<'a, T: ?Sized> {
     handler: AllocationHandler<'a>,
@@ -129,6 +132,13 @@ where
     pub fn capacity(&self) -> usize {
         self.data.size
     }
+
+    pub fn iter(&'a self) -> impl Iterator<Item = T> + 'a {
+        ColdVecIter {
+            index: 0,
+            vector: &self,
+        }
+    }
 }
 
 impl<'a, T> ColdVec<'a, T>
@@ -164,6 +174,20 @@ where
 
     fn shrink(&mut self, new_capacity: usize) -> Result<(), AllocatorError> {
         todo!()
+    }
+}
+
+impl<'a, T> FromIterator<T> for ColdVec<'a, T>
+where
+    T: Sized,
+    [(); core::mem::size_of::<T>()]:,
+{
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut data = Self::new(todo!()).expect("Could not allocate memory");
+        for element in iter {
+            data.push(element).expect("Could not add element to Vector");
+        }
+        data
     }
 }
 
