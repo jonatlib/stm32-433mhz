@@ -1042,7 +1042,7 @@
   (symbol (lib_id "power:+3.3V") (at 27.94 73.66 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 0e8b9795-1c6e-4646-bcd7-e6a6e3b53d6f)
-    (property "Reference" "#PWR031" (at 27.94 77.47 0)
+    (property "Reference" "#PWR02" (at 27.94 77.47 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 27.94 69.85 0)
@@ -1058,7 +1058,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR031") (unit 1)
+          (reference "#PWR02") (unit 1)
         )
       )
     )
@@ -1073,7 +1073,7 @@
     (property "Value" "100n" (at 81.28 162.56 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "" (at 83.5152 163.83 0)
+    (property "Footprint" "Capacitor_SMD:C_0201_0603Metric" (at 83.5152 163.83 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 82.55 160.02 0)
@@ -1087,7 +1087,7 @@
           (reference "C6") (unit 1)
         )
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "C8") (unit 1)
+          (reference "C1") (unit 1)
         )
       )
     )
@@ -1096,7 +1096,7 @@
   (symbol (lib_id "power:GND") (at 191.77 52.07 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 150abd23-301d-4f33-ae65-468cccec4789)
-    (property "Reference" "#PWR035" (at 191.77 58.42 0)
+    (property "Reference" "#PWR016" (at 191.77 58.42 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 191.77 57.15 0)
@@ -1112,7 +1112,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR035") (unit 1)
+          (reference "#PWR016") (unit 1)
         )
       )
     )
@@ -1121,7 +1121,7 @@
   (symbol (lib_id "power:+5V") (at 26.67 30.48 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 162ec864-d594-40f9-8a9e-d71add42208a)
-    (property "Reference" "#PWR026" (at 26.67 34.29 0)
+    (property "Reference" "#PWR01" (at 26.67 34.29 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+5V" (at 26.67 26.67 0)
@@ -1137,7 +1137,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR026") (unit 1)
+          (reference "#PWR01") (unit 1)
         )
       )
     )
@@ -1152,7 +1152,7 @@
     (property "Value" "10u" (at 88.9 181.61 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "" (at 91.1352 182.88 0)
+    (property "Footprint" "Capacitor_SMD:C_0805_2012Metric" (at 91.1352 182.88 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 90.17 179.07 0)
@@ -1166,7 +1166,7 @@
           (reference "C6") (unit 1)
         )
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "C9") (unit 1)
+          (reference "C2") (unit 1)
         )
       )
     )
@@ -1181,7 +1181,7 @@
     (property "Value" "10K" (at 31.75 158.7499 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (at 36.068 157.48 90)
+    (property "Footprint" "Resistor_SMD:R_1206_3216Metric" (at 36.068 157.48 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 34.29 157.48 0)
@@ -1195,7 +1195,7 @@
           (reference "R3") (unit 1)
         )
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "R15") (unit 1)
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -1204,7 +1204,7 @@
   (symbol (lib_id "power:GND") (at 82.55 80.01 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3a31fd0c-3a42-45b9-92da-07135033d7c1)
-    (property "Reference" "#PWR030" (at 82.55 86.36 0)
+    (property "Reference" "#PWR011" (at 82.55 86.36 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 82.55 85.09 0)
@@ -1220,7 +1220,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR030") (unit 1)
+          (reference "#PWR011") (unit 1)
         )
       )
     )
@@ -1229,7 +1229,7 @@
   (symbol (lib_id "power:+3.3V") (at 80.01 67.31 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 3cefa4cf-88d2-4415-b603-6d8fdf6a8d70)
-    (property "Reference" "#PWR029" (at 80.01 71.12 0)
+    (property "Reference" "#PWR010" (at 80.01 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 80.01 63.5 0)
@@ -1245,7 +1245,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR029") (unit 1)
+          (reference "#PWR010") (unit 1)
         )
       )
     )
@@ -1254,7 +1254,7 @@
   (symbol (lib_id "power:GND") (at 154.94 50.8 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 58da825b-7a9d-4d28-bcbd-406ddaef0338)
-    (property "Reference" "#PWR040" (at 154.94 57.15 0)
+    (property "Reference" "#PWR015" (at 154.94 57.15 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 154.94 55.88 0)
@@ -1270,7 +1270,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR040") (unit 1)
+          (reference "#PWR015") (unit 1)
         )
       )
     )
@@ -1279,7 +1279,7 @@
   (symbol (lib_id "power:GND") (at 58.42 187.96 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 62b1b122-538f-49a9-9e87-e793e6da7961)
-    (property "Reference" "#PWR033" (at 58.42 194.31 0)
+    (property "Reference" "#PWR09" (at 58.42 194.31 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 58.42 193.04 0)
@@ -1295,7 +1295,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR033") (unit 1)
+          (reference "#PWR09") (unit 1)
         )
       )
     )
@@ -1304,7 +1304,7 @@
   (symbol (lib_id "power:+3.3V") (at 154.94 39.37 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 6ee3c184-3895-447c-b7cd-c9dccd262211)
-    (property "Reference" "#PWR039" (at 154.94 43.18 0)
+    (property "Reference" "#PWR014" (at 154.94 43.18 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 154.94 35.56 0)
@@ -1320,7 +1320,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR039") (unit 1)
+          (reference "#PWR014") (unit 1)
         )
       )
     )
@@ -1329,7 +1329,7 @@
   (symbol (lib_id "power:GND") (at 27.94 93.98 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8d5e644a-352c-4f3e-bc93-382255315b71)
-    (property "Reference" "#PWR032" (at 27.94 100.33 0)
+    (property "Reference" "#PWR03" (at 27.94 100.33 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 27.94 99.06 0)
@@ -1345,7 +1345,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR032") (unit 1)
+          (reference "#PWR03") (unit 1)
         )
       )
     )
@@ -1354,7 +1354,7 @@
   (symbol (lib_id "power:GND") (at 191.77 78.74 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8f2a32b4-6531-4aa4-9f39-094bd8c7edee)
-    (property "Reference" "#PWR038" (at 191.77 85.09 0)
+    (property "Reference" "#PWR017" (at 191.77 85.09 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 191.77 83.82 0)
@@ -1370,7 +1370,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR038") (unit 1)
+          (reference "#PWR017") (unit 1)
         )
       )
     )
@@ -1379,7 +1379,7 @@
   (symbol (lib_id "power:+3.3V") (at 41.91 109.22 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 969ab793-8430-45c3-ba32-e607c0bad847)
-    (property "Reference" "#PWR043" (at 41.91 113.03 0)
+    (property "Reference" "#PWR06" (at 41.91 113.03 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 41.91 105.41 0)
@@ -1395,7 +1395,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR043") (unit 1)
+          (reference "#PWR06") (unit 1)
         )
       )
     )
@@ -1404,7 +1404,7 @@
   (symbol (lib_id "power:GND") (at 139.7 82.55 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 97b6c0d3-c292-485f-bf23-7f12b4768624)
-    (property "Reference" "#PWR036" (at 139.7 88.9 0)
+    (property "Reference" "#PWR013" (at 139.7 88.9 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 139.7 87.63 0)
@@ -1420,7 +1420,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR036") (unit 1)
+          (reference "#PWR013") (unit 1)
         )
       )
     )
@@ -1435,7 +1435,7 @@
     (property "Value" "100n" (at 96.52 181.61 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "" (at 98.7552 182.88 0)
+    (property "Footprint" "Capacitor_SMD:C_0805_2012Metric" (at 98.7552 182.88 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 97.79 179.07 0)
@@ -1449,7 +1449,7 @@
           (reference "C6") (unit 1)
         )
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "C10") (unit 1)
+          (reference "C3") (unit 1)
         )
       )
     )
@@ -1458,7 +1458,7 @@
   (symbol (lib_id "Memory_EEPROM:M95256-WMN6P") (at 41.91 119.38 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b5ed2917-a132-4ade-85d2-49a3aefd3066)
-    (property "Reference" "U5" (at 43.8659 110.49 0)
+    (property "Reference" "U2" (at 43.8659 110.49 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "23A256" (at 43.8659 113.03 0)
@@ -1481,7 +1481,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "U5") (unit 1)
+          (reference "U2") (unit 1)
         )
       )
     )
@@ -1490,7 +1490,7 @@
   (symbol (lib_id "power:+3.3V") (at 57.15 146.05 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c0132281-bd4f-4629-9749-0a1987fe0de5)
-    (property "Reference" "#PWR034" (at 57.15 149.86 0)
+    (property "Reference" "#PWR08" (at 57.15 149.86 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 57.15 142.24 0)
@@ -1506,7 +1506,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR034") (unit 1)
+          (reference "#PWR08") (unit 1)
         )
       )
     )
@@ -1515,7 +1515,7 @@
   (symbol (lib_id "power:+3.3V") (at 33.02 30.48 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c8314f03-e400-43e0-af78-f7470c61e8f3)
-    (property "Reference" "#PWR027" (at 33.02 34.29 0)
+    (property "Reference" "#PWR04" (at 33.02 34.29 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 33.02 26.67 0)
@@ -1531,7 +1531,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR027") (unit 1)
+          (reference "#PWR04") (unit 1)
         )
       )
     )
@@ -1540,7 +1540,7 @@
   (symbol (lib_id "Power_Management:TPS2041B") (at 58.42 170.18 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid def98d40-3f60-456a-8dd9-e3a3fe55923e)
-    (property "Reference" "U4" (at 58.42 158.75 0)
+    (property "Reference" "U3" (at 58.42 158.75 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "TPS2041B" (at 58.42 161.29 0)
@@ -1560,7 +1560,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "U4") (unit 1)
+          (reference "U3") (unit 1)
         )
       )
     )
@@ -1569,7 +1569,7 @@
   (symbol (lib_id "power:+5V") (at 139.7 68.58 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid e4eed631-8d33-4253-a9e5-e6fba19abc92)
-    (property "Reference" "#PWR037" (at 139.7 72.39 0)
+    (property "Reference" "#PWR012" (at 139.7 72.39 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+5V" (at 139.7 64.77 0)
@@ -1585,7 +1585,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR037") (unit 1)
+          (reference "#PWR012") (unit 1)
         )
       )
     )
@@ -1594,7 +1594,7 @@
   (symbol (lib_id "power:GND") (at 33.02 53.34 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid e64487df-a103-4f46-a0af-0d7b352065f6)
-    (property "Reference" "#PWR028" (at 33.02 59.69 0)
+    (property "Reference" "#PWR05" (at 33.02 59.69 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 33.02 58.42 0)
@@ -1610,7 +1610,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR028") (unit 1)
+          (reference "#PWR05") (unit 1)
         )
       )
     )
@@ -1625,7 +1625,7 @@
     (property "Value" "10K" (at 39.37 158.7499 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (at 43.688 157.48 90)
+    (property "Footprint" "Resistor_SMD:R_1206_3216Metric" (at 43.688 157.48 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 41.91 157.48 0)
@@ -1639,7 +1639,7 @@
           (reference "R3") (unit 1)
         )
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "R14") (unit 1)
+          (reference "R2") (unit 1)
         )
       )
     )
@@ -1648,7 +1648,7 @@
   (symbol (lib_id "power:GND") (at 41.91 129.54 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid f4a9d725-469c-4b1e-ac57-fb3257108b1e)
-    (property "Reference" "#PWR044" (at 41.91 135.89 0)
+    (property "Reference" "#PWR07" (at 41.91 135.89 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 41.91 134.62 0)
@@ -1664,7 +1664,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "#PWR044") (unit 1)
+          (reference "#PWR07") (unit 1)
         )
       )
     )
@@ -1679,7 +1679,7 @@
     (property "Value" "Conn_01x02_Pin" (at 72.39 74.93 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "" (at 73.66 69.85 0)
+    (property "Footprint" "Connector_PinHeader_2.00mm:PinHeader_1x02_P2.00mm_Vertical" (at 73.66 69.85 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 73.66 69.85 0)
@@ -1693,7 +1693,7 @@
           (reference "J12") (unit 1)
         )
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "J13") (unit 1)
+          (reference "J1") (unit 1)
         )
       )
     )
@@ -1702,7 +1702,7 @@
   (symbol (lib_id "Memory_EEPROM:24AA02-OT") (at 27.94 83.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid feb4ac7e-cd92-4d4b-bc3b-d50ac9268c64)
-    (property "Reference" "U3" (at 29.8959 74.93 0)
+    (property "Reference" "U1" (at 29.8959 74.93 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "24AA02-OT" (at 29.8959 77.47 0)
@@ -1722,7 +1722,7 @@
     (instances
       (project "stm32"
         (path "/cc56704c-71b4-401e-bec6-203f83946289"
-          (reference "U3") (unit 1)
+          (reference "U1") (unit 1)
         )
       )
     )
