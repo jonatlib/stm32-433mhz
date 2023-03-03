@@ -24,7 +24,9 @@ where
         })
     }
 
-    pub fn get_range(&self, range: Range<usize>) -> Result<[T], AllocatorError> {
+    pub fn get_range(&self, range: Range<usize>) -> Result<&[T], AllocatorError> {
+        // FIXME don't use `get` but read a range of memory instead
+        // FIXME use some helper struct to keep range values
         todo!()
     }
 
@@ -67,22 +69,100 @@ where
 
 pub struct ColdVec<'a, T: ?Sized> {
     data: RawColdVec<'a, T>,
+
+    // TODO use atomic instead?
     len: usize,
+
+    allocator: &'a dyn Allocator,
 }
 
 impl<'a, T> ColdVec<'a, T>
 where
     T: Sized,
+    [(); core::mem::size_of::<T>()]:,
 {
+    const DEFAULT_SIZE: usize = 32;
+    // Grow about 20% and shrink when 30% of capacity is not used
+    // (but keep 20% buffer - so shrink about 10%)
+    const GROW_FACTOR: usize = 20; // This means 20%
+    const SHRINK_FACTOR: usize = 30; // This means 30%
+
     pub fn new(allocator: &'a dyn Allocator) -> Result<Self, AllocatorError> {
-        todo!()
+        Self::with_capacity(Self::DEFAULT_SIZE, allocator)
     }
 
-    pub fn with_capacity(capacity: usize) -> Result<Self, AllocatorError> {
-        todo!()
+    pub fn with_capacity(
+        capacity: usize,
+        allocator: &'a dyn Allocator,
+    ) -> Result<Self, AllocatorError> {
+        Ok(Self {
+            data: RawColdVec::new(capacity, allocator)?,
+            len: 0,
+
+            allocator,
+        })
     }
 
     pub fn push(&mut self, element: T) -> Result<(), AllocatorError> {
+        // TODO do we want to do this check here? (other method)
+        if self.len() + 1 > self.capacity() {
+            self.grow_default()?;
+        }
+
+        self.data.set(self.len, element)?;
+        self.len += 1;
+        Ok(())
+    }
+
+    pub fn get(&self, index: usize) -> Result<Option<T>, AllocatorError> {
+        if index >= self.len() {
+            return Ok(None);
+        }
+
+        Ok(Some(self.data.get(index)?))
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.data.size
+    }
+}
+
+impl<'a, T> ColdVec<'a, T>
+where
+    T: Sized,
+    [(); core::mem::size_of::<T>()]:,
+{
+    fn grow_default(&mut self) -> Result<(), AllocatorError> {
+        // FIXME
+        let capacity = 100;
+        self.grow(capacity)
+    }
+
+    fn shrink_default(&mut self) -> Result<(), AllocatorError> {
+        // FIXME
+        let capacity = 100;
+        self.shrink(capacity)
+    }
+
+    fn grow(&mut self, new_capacity: usize) -> Result<(), AllocatorError> {
+        let old_data = core::mem::replace(
+            &mut self.data,
+            RawColdVec::new(new_capacity, self.allocator)?,
+        );
+
+        // TODO use range operation instead
+        for index in 0..self.len {
+            self.data.set(index, old_data.get(index)?)?;
+        }
+
+        Ok(())
+    }
+
+    fn shrink(&mut self, new_capacity: usize) -> Result<(), AllocatorError> {
         todo!()
     }
 }
@@ -95,12 +175,26 @@ mod test {
 
     #[test]
     fn test_basic_operations() {
-        let memory = DummyMemory::new([0u8; 32]);
+        let memory = DummyMemory::new([0u8; 4 * 4]);
         let allocator = DummyAllocator::new(memory);
 
-        let mut vector: ColdVec<u32> = ColdVec::new(&allocator).unwrap();
-        vector.push(123456).unwrap();
-        vector.push(789013).unwrap();
-        vector.push(456789).unwrap();
+        {
+            let mut vector: ColdVec<u32> = ColdVec::with_capacity(4, &allocator).unwrap();
+            vector.push(123456).unwrap();
+            vector.push(789013).unwrap();
+            vector.push(456789).unwrap();
+
+            assert_eq!(vector.get(0).unwrap().unwrap(), 123456);
+            assert_eq!(vector.get(1).unwrap().unwrap(), 789013);
+            assert_eq!(vector.get(2).unwrap().unwrap(), 456789);
+            assert_eq!(vector.get(3).unwrap(), None);
+
+            let result1 = vector.push(123456);
+            assert!(result1.is_ok());
+            let result2 = vector.push(123456);
+            assert!(result2.is_err());
+        }
+
+        println!("{:?}", allocator.collapse().collapse())
     }
 }
