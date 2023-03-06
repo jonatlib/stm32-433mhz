@@ -1163,6 +1163,11 @@
     (effects (font (size 2 2) (thickness 0.4) bold) (justify left bottom))
     (uuid 20fad811-7fc7-432f-ac25-62713ed35889)
   )
+  (text "TODO\n\nUSB to ldo to 3v3\nSwitch USB ldo/battery\nThen add jumpers to connect ldo/battery to 3v3\n\noptional back-boost from battery to 3v3\nbut put usb mosfet transistor before. So we turn it off when connected to USB\nalso add jumper to disconnect it and connect battery directly"
+    (at 153.67 39.37 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid baf9a063-f48e-4e7a-ba69-a7fba761284e)
+  )
   (text "5V Supply" (at 36.83 53.34 0)
     (effects (font (size 1.27 1.27) bold) (justify left bottom))
     (uuid d85d1c51-1f7f-487e-8529-d8d953e3219d)
