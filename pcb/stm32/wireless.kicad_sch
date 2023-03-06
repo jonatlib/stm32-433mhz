@@ -112,7 +112,6 @@
   )
 
 
-
   (hierarchical_label "RF_RX" (shape output) (at 140.97 77.47 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27) bold) (justify left))
     (uuid 35c90ea9-7746-44c0-bef9-7b6affeb6e71)

@@ -1188,6 +1188,10 @@
     (effects (font (size 1.27 1.27) bold) (justify left))
     (uuid c4ea3ffc-1885-4dd2-9e39-6cba8ef52941)
   )
+  (hierarchical_label "VDD_USB" (shape input) (at 130.81 33.02 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left))
+    (uuid eab6cb7a-db26-4f4e-b308-9ab5f507f7a8)
+  )
 
   (symbol (lib_id "Transistor_FET:AO3401A") (at 36.83 24.13 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)

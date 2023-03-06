@@ -223,7 +223,6 @@
   )
 
 
-
   (hierarchical_label "VDD" (shape input) (at 121.92 81.28 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27) bold) (justify left))
     (uuid 2f2d94c3-1799-480d-a3b2-53ef79fc61f5)
