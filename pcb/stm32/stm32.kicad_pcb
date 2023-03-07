@@ -555,7 +555,7 @@
 
   (footprint "Resistor_SMD:R_1206_3216Metric" (layer "F.Cu")
     (tstamp 1a3b0f0f-2e60-4417-a243-b72e28902774)
-    (at 198.44 72.87)
+    (at 120.4575 70.37)
     (descr "Resistor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -832,7 +832,7 @@
 
   (footprint "Capacitor_SMD:C_0805_2012Metric" (layer "F.Cu")
     (tstamp 240847a6-9a59-4554-8b30-cb385ebadc71)
-    (at 243.03 95.39)
+    (at 120.97 106.68)
     (descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -972,7 +972,7 @@
 
   (footprint "Package_TO_SOT_SMD:SOT-23" (layer "F.Cu")
     (tstamp 3a2d1265-9651-48e8-b45a-492a3c3ac08d)
-    (at 74.5975 61.91)
+    (at 74.5975 63.5)
     (descr "SOT, 3 Pin (https://www.jedec.org/system/files/docs/to-236h.pdf variant AB), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOT TO_SOT_SMD")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -1034,7 +1034,7 @@
 
   (footprint "Capacitor_SMD:C_0805_2012Metric" (layer "F.Cu")
     (tstamp 3c648835-bbae-49c1-a5e6-ed9ce75fd1f4)
-    (at 243.03 98.4)
+    (at 126.05 106.68)
     (descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -1386,7 +1386,7 @@
 
   (footprint "Package_TO_SOT_SMD:SOT-23" (layer "F.Cu")
     (tstamp 58db4a3d-1fdc-4f83-8dd7-89ce1ec5aa5a)
-    (at 214.9625 53.34)
+    (at 102.6075 61.92)
     (descr "SOT, 3 Pin (https://www.jedec.org/system/files/docs/to-236h.pdf variant AB), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOT TO_SOT_SMD")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -1526,7 +1526,7 @@
 
   (footprint "Capacitor_SMD:C_0805_2012Metric" (layer "F.Cu")
     (tstamp 5a964093-94e7-4451-9779-f53eb593a509)
-    (at 193.41 72.45)
+    (at 78.74 63.5 90)
     (descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -1535,15 +1535,15 @@
     (property "ki_keywords" "cap capacitor")
     (path "/8878edf1-eecf-4d8b-8425-07bf183b31b3/9235654d-d01a-495a-a335-58d4a661fdeb")
     (attr smd)
-    (fp_text reference "C8" (at 0 -1.68) (layer "F.SilkS")
+    (fp_text reference "C8" (at 2.54 0 180) (layer "F.SilkS")
         (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 1569f716-b872-4770-ac21-e04fb97d3705)
     )
-    (fp_text value "10u" (at 0 1.68) (layer "F.Fab")
+    (fp_text value "10u" (at -2.54 0 180) (layer "F.Fab")
         (effects (font (size 1 1) (thickness 0.15)))
       (tstamp b245c8c5-2136-4bf6-b2b4-0c9156fa44c1)
     )
-    (fp_text user "${REFERENCE}" (at 0 0) (layer "F.Fab")
+    (fp_text user "${REFERENCE}" (at 0 0 90) (layer "F.Fab")
         (effects (font (size 0.5 0.5) (thickness 0.08)))
       (tstamp 694f6620-aa02-4461-aba4-884b09c13a6c)
     )
@@ -1567,9 +1567,9 @@
       (stroke (width 0.1) (type solid)) (layer "F.Fab") (tstamp 82180826-7511-44e0-9cce-3e8aa216c4c8))
     (fp_line (start 1 0.625) (end -1 0.625)
       (stroke (width 0.1) (type solid)) (layer "F.Fab") (tstamp a5d130eb-be09-439c-b95e-184628b211dd))
-    (pad "1" smd roundrect (at -0.95 0) (size 1 1.45) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
+    (pad "1" smd roundrect (at -0.95 0 90) (size 1 1.45) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 3 "+3.3V") (pintype "passive") (tstamp 6dc76883-8462-4daa-9f9a-f4b3d4b3bce1))
-    (pad "2" smd roundrect (at 0.95 0) (size 1 1.45) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
+    (pad "2" smd roundrect (at 0.95 0 90) (size 1 1.45) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 2 "GND") (pintype "passive") (tstamp 48a21576-bb4a-45eb-822b-ba1e2280b8fa))
     (model "${KICAD6_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0805_2012Metric.wrl"
       (offset (xyz 0 0 0))
@@ -1688,7 +1688,7 @@
 
   (footprint "Connector_PinHeader_2.00mm:PinHeader_1x02_P2.00mm_Vertical" (layer "F.Cu")
     (tstamp 63999685-8fc7-49b2-b68b-0f6afbd6a18f)
-    (at 213.88 69.96)
+    (at 76.2 33.56)
     (descr "Through hole straight pin header, 1x02, 2.00mm pitch, single row")
     (tags "Through hole pin header THT 1x02 2.00mm single row")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -1752,7 +1752,7 @@
 
   (footprint "Capacitor_SMD:C_0805_2012Metric" (layer "F.Cu")
     (tstamp 654153ef-a54a-428f-a159-ed7d07f81e61)
-    (at 193.41 75.46)
+    (at 105.73 33.02)
     (descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -1806,7 +1806,7 @@
 
   (footprint "Capacitor_SMD:C_0805_2012Metric" (layer "F.Cu")
     (tstamp 6dbab269-7503-4b4e-934a-6a07b590be06)
-    (at 193.41 78.47)
+    (at 105.73 36.03)
     (descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -2192,7 +2192,7 @@
 
   (footprint "Package_TO_SOT_SMD:SOT-23-5" (layer "F.Cu")
     (tstamp 7b60613c-d8a2-4c4b-96e5-7db0fdca0c73)
-    (at 243.38 91.66)
+    (at 114.3 101.6)
     (descr "SOT, 5 Pin (https://www.jedec.org/sites/default/files/docs/Mo-178c.PDF variant AA), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOT TO_SOT_SMD")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -2392,7 +2392,7 @@
 
   (footprint "Package_LGA:Bosch_LGA-8_2.5x2.5mm_P0.65mm_ClockwisePinNumbering" (layer "F.Cu")
     (tstamp 8f94b317-33cb-401f-be0f-65ef35c64cca)
-    (at 242.74 103.97)
+    (at 87.925 103.97)
     (descr "LGA-8")
     (tags "lga land grid array")
     (property "Sheetfile" "sensors_i2c.kicad_sch")
@@ -2470,7 +2470,7 @@
 
   (footprint "Package_TO_SOT_SMD:SOT-23-5" (layer "F.Cu")
     (tstamp 923b3bac-e240-498b-8dfb-724834b5b06d)
-    (at 243.38 87.21)
+    (at 247.5175 54.29)
     (descr "SOT, 5 Pin (https://www.jedec.org/sites/default/files/docs/Mo-178c.PDF variant AA), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOT TO_SOT_SMD")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -2840,7 +2840,7 @@
 
   (footprint "Capacitor_SMD:C_0201_0603Metric" (layer "F.Cu")
     (tstamp bceb9bb2-6106-42f2-9668-8f821b8970ca)
-    (at 247.18 98.89)
+    (at 84.165 40.64)
     (descr "Capacitor SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator")
     (tags "capacitor")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -2892,7 +2892,7 @@
 
   (footprint "Resistor_SMD:R_1206_3216Metric" (layer "F.Cu")
     (tstamp c0cdcb87-9a15-418e-9359-0f8f47a21f3e)
-    (at 198.44 76.16)
+    (at 120.4575 73.66)
     (descr "Resistor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -3012,7 +3012,7 @@
 
   (footprint "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" (layer "F.Cu")
     (tstamp c8a51743-e8c3-4bab-ad40-da86e2031bd9)
-    (at 250.18 88.21)
+    (at 254.3175 55.29)
     (descr "SOIC, 8 Pin (JEDEC MS-012AA, https://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/soic_narrow-r/r_8.pdf), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOIC SO")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -3222,7 +3222,7 @@
 
   (footprint "Package_TO_SOT_SMD:SOT-23-6" (layer "F.Cu")
     (tstamp d6de7569-22d2-450a-a64b-d27762dc3572)
-    (at 215.0925 48.89)
+    (at 102.7375 57.47)
     (descr "SOT, 6 Pin (https://www.jedec.org/sites/default/files/docs/Mo-178c.PDF variant AB), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOT TO_SOT_SMD")
     (property "Sheetfile" "stm32.kicad_sch")
@@ -3412,7 +3412,7 @@
 
   (footprint "Resistor_SMD:R_1206_3216Metric" (layer "F.Cu")
     (tstamp e63eb3d5-7ba2-4a57-be8d-7b3ae8057919)
-    (at 198.44 69.58)
+    (at 100.1375 35.56)
     (descr "Resistor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
     (tags "resistor")
     (property "Sheetfile" "power_supply.kicad_sch")
@@ -4078,7 +4078,7 @@
 
   (footprint "Package_TO_SOT_THT:TO-92_Inline" (layer "F.Cu")
     (tstamp fe60729d-aa0c-4f44-a034-84af76bb17d9)
-    (at 184.66 36.71)
+    (at 53.34 116.84)
     (descr "TO-92 leads in-line, narrow, oval pads, drill 0.75mm (see NXP sot054_po.pdf)")
     (tags "to-92 sc-43 sc-43a sot54 PA33 transistor")
     (property "Sheetfile" "sensors_onewire.kicad_sch")

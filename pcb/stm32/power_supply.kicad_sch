@@ -1163,6 +1163,10 @@
     (effects (font (size 2 2) (thickness 0.4) bold) (justify left bottom))
     (uuid 20fad811-7fc7-432f-ac25-62713ed35889)
   )
+  (text "TODO change footprint" (at 83.82 80.01 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 782ad08d-f0ae-48f4-9bcd-19841507f3f0)
+  )
   (text "TODO\n\nUSB to ldo to 3v3\nSwitch USB ldo/battery\nThen add jumpers to connect ldo/battery to 3v3\n\noptional back-boost from battery to 3v3\nbut put usb mosfet transistor before. So we turn it off when connected to USB\nalso add jumper to disconnect it and connect battery directly\n\nadd another ldo after 5v to 3v3"
     (at 153.67 39.37 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
