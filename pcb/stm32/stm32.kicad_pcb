@@ -38,6 +38,19 @@
   )
 
   (setup
+    (stackup
+      (layer "F.SilkS" (type "Top Silk Screen"))
+      (layer "F.Paste" (type "Top Solder Paste"))
+      (layer "F.Mask" (type "Top Solder Mask") (thickness 0.01))
+      (layer "F.Cu" (type "copper") (thickness 0.035))
+      (layer "dielectric 1" (type "core") (thickness 1.51) (material "FR4") (epsilon_r 4.5) (loss_tangent 0.02))
+      (layer "B.Cu" (type "copper") (thickness 0.035))
+      (layer "B.Mask" (type "Bottom Solder Mask") (thickness 0.01))
+      (layer "B.Paste" (type "Bottom Solder Paste"))
+      (layer "B.SilkS" (type "Bottom Silk Screen"))
+      (copper_finish "HAL SnPb")
+      (dielectric_constraints no)
+    )
     (pad_to_mask_clearance 0)
     (pcbplotparams
       (layerselection 0x00010fc_ffffffff)
@@ -3290,7 +3303,7 @@
 
   (footprint "Package_TO_SOT_SMD:SOT-23-6" (layer "F.Cu")
     (tstamp dcd5d580-2d76-4544-b923-773256e22230)
-    (at 69.9825 82.87)
+    (at 72.475 80.23)
     (descr "SOT, 6 Pin (https://www.jedec.org/sites/default/files/docs/Mo-178c.PDF variant AB), generated with kicad-footprint-generator ipc_gullwing_generator.py")
     (tags "SOT TO_SOT_SMD")
     (property "Sheetfile" "usb.kicad_sch")
@@ -3466,7 +3479,7 @@
 
   (footprint "Connector_USB:USB_C_Receptacle_Amphenol_12401548E4-2A" (layer "F.Cu")
     (tstamp ebe23a7c-90f5-4778-892f-d42a79206c96)
-    (at 60.96 81.28 -90)
+    (at 60.96 78.64 -90)
     (descr "USB TYPE C, RA RCPT PCB, Hybrid, https://www.amphenolcanada.com/StockAvailabilityPrice.aspx?From=&PartNum=12401548E4%7e2A")
     (tags "USB C Type-C Receptacle Hybrid")
     (property "Sheetfile" "usb.kicad_sch")
@@ -3664,7 +3677,7 @@
 
   (footprint "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm" (layer "F.Cu")
     (tstamp f5551dff-76ac-4b3f-b0cc-62cc6ddf68e4)
-    (at 71.77 78.09)
+    (at 74.2625 75.45)
     (descr "QFN, 24 Pin (http://ww1.microchip.com/downloads/en/PackagingSpec/00000049BQ.pdf#page=278), generated with kicad-footprint-generator ipc_noLead_generator.py")
     (tags "QFN NoLead")
     (property "Sheetfile" "usb.kicad_sch")
@@ -4293,5 +4306,8 @@
       (rotate (xyz 0 0 0))
     )
   )
+
+  (gr_rect (start 55.88 38.1) (end 154.94 88.9)
+    (stroke (width 0.1) (type default)) (fill none) (layer "Edge.Cuts") (tstamp c53d553d-6d80-48fe-8a94-aee9a26c5348))
 
 )
