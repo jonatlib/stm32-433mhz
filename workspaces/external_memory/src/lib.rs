@@ -8,7 +8,7 @@
 #[macro_use]
 extern crate std;
 
-pub type GlobalAllocator = &'static (dyn allocator::Allocator + Sync);
+pub type GlobalAllocator = &'static (dyn allocator::Allocator + Sync + 'static);
 
 /// Global variable holding the global allocator used in cases where you can't pass it
 static _GLOBAL_DEFAULT_EXTERNAL_ALLOCATOR: AllocatorHandler =
