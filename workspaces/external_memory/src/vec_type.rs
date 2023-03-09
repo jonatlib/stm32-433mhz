@@ -183,7 +183,7 @@ where
     [(); core::mem::size_of::<T>()]:,
 {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut data = Self::new(todo!()).expect("Could not allocate memory");
+        let mut data = Self::new(crate::get_global_allocator()).expect("Could not allocate memory");
         for element in iter {
             data.push(element).expect("Could not add element to Vector");
         }
