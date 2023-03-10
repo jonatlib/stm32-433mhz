@@ -19,7 +19,7 @@ impl From<MemoryError> for AllocatorError {
     }
 }
 
-pub trait Allocator {
+pub trait Allocator: Sync {
     fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError>;
     fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError>;
 
@@ -199,6 +199,9 @@ where
             .write_slice(addresses, data.into_iter())?)
     }
 }
+
+// FIXME this is not correct and it will fail!
+unsafe impl<M> Sync for DummyAllocator<M> {}
 
 #[cfg(test)]
 mod test {

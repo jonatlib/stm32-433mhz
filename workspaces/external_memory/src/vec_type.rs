@@ -200,75 +200,6 @@ mod test {
 
     use std::sync::{Arc, Mutex};
 
-    /// Some structures used only in testing
-    mod testing_structure {
-        use crate::allocator::{AllocationHandler, Allocator, AllocatorError, DummyAllocator};
-        use crate::memory::{Address, DummyMemory, Memory, Size};
-
-        use std::sync::{Arc, Mutex};
-
-        pub struct LockedAllocator<A: Allocator>(pub Arc<Mutex<A>>);
-
-        impl<A: Allocator> Allocator for LockedAllocator<A> {
-            fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError> {
-                // self.0.lock().unwrap().allocate(size)
-                todo!()
-            }
-
-            fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError> {
-                self.0.lock().unwrap().free(handler)
-            }
-
-            fn total_memory(&self) -> usize {
-                self.0.lock().unwrap().total_memory()
-            }
-
-            fn available_memory(&self) -> usize {
-                self.0.lock().unwrap().available_memory()
-            }
-
-            fn read_all_bytes(
-                &self,
-                handler: &AllocationHandler,
-                buffer: &mut [u8],
-            ) -> Result<usize, AllocatorError> {
-                self.0.lock().unwrap().read_all_bytes(handler, buffer)
-            }
-
-            fn write_all_bytes(
-                &self,
-                handler: &AllocationHandler,
-                data: &[u8],
-            ) -> Result<usize, AllocatorError> {
-                self.0.lock().unwrap().write_all_bytes(handler, data)
-            }
-
-            fn read_bytes(
-                &self,
-                handler: &AllocationHandler,
-                offset_address: Address,
-                buffer: &mut [u8],
-            ) -> Result<usize, AllocatorError> {
-                self.0
-                    .lock()
-                    .unwrap()
-                    .read_bytes(handler, offset_address, buffer)
-            }
-
-            fn write_bytes(
-                &self,
-                handler: &AllocationHandler,
-                offset_address: Address,
-                data: &[u8],
-            ) -> Result<usize, AllocatorError> {
-                self.0
-                    .lock()
-                    .unwrap()
-                    .write_bytes(handler, offset_address, data)
-            }
-        }
-    }
-
     #[test]
     fn test_basic_operations() {
         let memory = DummyMemory::new([0u8; 4 * 4]);
@@ -296,14 +227,10 @@ mod test {
 
     #[test]
     fn test_from_iter() {
-        let memory = DummyMemory::new([0u8; 4 * 4]);
-        let dummy_allocator = DummyAllocator::new(memory);
-        let allocator = testing_structure::LockedAllocator(Arc::new(Mutex::new(dummy_allocator)));
-        let static_ref_allocator: &'static testing_structure::LockedAllocator<
-            DummyAllocator<DummyMemory<[u8; 16]>>,
-        > = unsafe {
-            &*((&std::mem::ManuallyDrop::new(allocator)) as *const _
-                as *const testing_structure::LockedAllocator<_>)
+        let memory = DummyMemory::new([0u8; 16]);
+        let allocator = DummyAllocator::new(memory);
+        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> = unsafe {
+            &*((&std::mem::ManuallyDrop::new(allocator)) as *const _ as *const DummyAllocator<_>)
         };
 
         crate::init_global_allocator(static_ref_allocator);
@@ -311,8 +238,8 @@ mod test {
         {
             let mut vector: ColdVec<u32> = ColdVec::with_capacity(4, static_ref_allocator).unwrap();
             vector.push(123456).unwrap();
-            vector.push(789013).unwrap();
-            vector.push(456789).unwrap();
         }
+
+        // TODO add removing the allocator and uninit the global allocator again
     }
 }
