@@ -226,18 +226,60 @@ mod test {
     }
 
     #[test]
-    fn test_from_iter() {
+    fn test_global_allocator_init() {
         let memory = DummyMemory::new([0u8; 16]);
         let allocator = DummyAllocator::new(memory);
-        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> = unsafe {
-            &*((&std::mem::ManuallyDrop::new(allocator)) as *const _ as *const DummyAllocator<_>)
-        };
+
+        // TODO make some function?
+        let non_droppable = std::mem::ManuallyDrop::new(allocator);
+        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> =
+            unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
+        std::mem::forget(non_droppable);
 
         crate::init_global_allocator(static_ref_allocator);
 
         {
             let mut vector: ColdVec<u32> = ColdVec::with_capacity(4, static_ref_allocator).unwrap();
             vector.push(123456).unwrap();
+            vector.push(789013).unwrap();
+            vector.push(456789).unwrap();
+
+            assert_eq!(vector.get(0).unwrap().unwrap(), 123456);
+            assert_eq!(vector.get(1).unwrap().unwrap(), 789013);
+            assert_eq!(vector.get(2).unwrap().unwrap(), 456789);
+            assert_eq!(vector.get(3).unwrap(), None);
+
+            let result1 = vector.push(123456);
+            assert!(result1.is_ok());
+            let result2 = vector.push(123456);
+            assert!(result2.is_err());
+        }
+
+        // TODO add removing the allocator and uninit the global allocator again
+    }
+
+    #[test]
+    fn test_from_iter() {
+        let memory = DummyMemory::new([0u8; 16]);
+        let allocator = DummyAllocator::new(memory);
+
+        // TODO make some function? like `leak` for allocator. But then it must be defined only in main on stack
+        let non_droppable = std::mem::ManuallyDrop::new(allocator);
+        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> =
+            unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
+        std::mem::forget(non_droppable);
+
+        crate::init_global_allocator(static_ref_allocator);
+
+        {
+            let vector: ColdVec<_> = (0u8..5).into_iter().collect();
+
+            assert_eq!(vector.len(), 5);
+            assert_eq!(vector.get(0).unwrap().unwrap(), 0);
+            assert_eq!(vector.get(1).unwrap().unwrap(), 1);
+            assert_eq!(vector.get(2).unwrap().unwrap(), 2);
+            assert_eq!(vector.get(3).unwrap().unwrap(), 3);
+            assert_eq!(vector.get(4).unwrap().unwrap(), 4);
         }
 
         // TODO add removing the allocator and uninit the global allocator again
