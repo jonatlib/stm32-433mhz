@@ -26,7 +26,9 @@ pub fn init_global_allocator(value: GlobalAllocator) {
 
 /// Get current global allocator. `init_global_allocator` must be called before
 pub fn get_global_allocator() -> GlobalAllocator {
-    unsafe { *(*_GLOBAL_DEFAULT_EXTERNAL_ALLOCATOR.0.get()).as_ptr() }
+    let uninit_alloc = unsafe { &*_GLOBAL_DEFAULT_EXTERNAL_ALLOCATOR.0.get() };
+
+    unsafe { *uninit_alloc.as_ptr() }
 }
 
 pub mod allocator;
