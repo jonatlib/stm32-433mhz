@@ -259,6 +259,46 @@ mod test {
     }
 
     #[test]
+    fn test_global_allocator_basic_test() {
+        let memory = DummyMemory::new([0u8; 16]);
+        let allocator = DummyAllocator::new(memory);
+
+        // TODO make some function?
+        let non_droppable = std::mem::ManuallyDrop::new(allocator);
+        let original_address = std::ptr::addr_of!(non_droppable) as usize;
+        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> =
+            unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
+        std::mem::forget(non_droppable);
+
+        crate::init_global_allocator(static_ref_allocator);
+        let initialized_address = std::ptr::addr_of!(*static_ref_allocator) as usize;
+        assert_eq!(original_address, initialized_address);
+
+        {
+            let alloc = crate::get_global_allocator();
+            let alloc_address = alloc as *const _ as *const () as usize;
+            assert_eq!(original_address, alloc_address);
+
+            let mut vector: ColdVec<u32> = ColdVec::with_capacity(4, alloc).unwrap();
+            vector.push(123456).unwrap();
+            vector.push(789013).unwrap();
+            vector.push(456789).unwrap();
+
+            assert_eq!(vector.get(0).unwrap().unwrap(), 123456);
+            assert_eq!(vector.get(1).unwrap().unwrap(), 789013);
+            assert_eq!(vector.get(2).unwrap().unwrap(), 456789);
+            assert_eq!(vector.get(3).unwrap(), None);
+
+            let result1 = vector.push(123456);
+            assert!(result1.is_ok());
+            let result2 = vector.push(123456);
+            assert!(result2.is_err());
+        }
+
+        // TODO add removing the allocator and uninit the global allocator again
+    }
+
+    #[test]
     fn test_from_iter() {
         let memory = DummyMemory::new([0u8; 16]);
         let allocator = DummyAllocator::new(memory);
