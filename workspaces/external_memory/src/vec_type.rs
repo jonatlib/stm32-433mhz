@@ -300,13 +300,14 @@ mod test {
 
     #[test]
     fn test_from_iter() {
-        let memory = DummyMemory::new([0u8; 16]);
+        let memory = DummyMemory::new([0u8; ColdVec::<()>::DEFAULT_SIZE]);
         let allocator = DummyAllocator::new(memory);
 
         // TODO make some function? like `leak` for allocator. But then it must be defined only in main on stack
         let non_droppable = std::mem::ManuallyDrop::new(allocator);
-        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> =
-            unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
+        let static_ref_allocator: &'static DummyAllocator<
+            DummyMemory<[u8; ColdVec::<()>::DEFAULT_SIZE]>,
+        > = unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
         std::mem::forget(non_droppable);
 
         crate::init_global_allocator(static_ref_allocator);
