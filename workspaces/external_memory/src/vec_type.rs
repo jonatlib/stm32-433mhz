@@ -183,7 +183,8 @@ where
     [(); core::mem::size_of::<T>()]:,
 {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut data = Self::new(crate::get_global_allocator()).expect("Could not allocate memory");
+        let allocator = unsafe { crate::get_global_allocator() };
+        let mut data = Self::new(allocator).expect("Could not allocate memory");
         for element in iter {
             data.push(element).expect("Could not add element to Vector");
         }
@@ -194,6 +195,7 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::mem::ManuallyDrop;
 
     use crate::allocator::{Allocator, DummyAllocator};
     use crate::memory::{Address, DummyMemory, Memory, Size};
@@ -229,14 +231,8 @@ mod test {
     fn test_global_allocator_init() {
         let memory = DummyMemory::new([0u8; 16]);
         let allocator = DummyAllocator::new(memory);
-
-        // TODO make some function?
-        let non_droppable = std::mem::ManuallyDrop::new(allocator);
-        let static_ref_allocator: &'static DummyAllocator<DummyMemory<[u8; 16]>> =
-            unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
-        std::mem::forget(non_droppable);
-
-        crate::init_global_allocator(static_ref_allocator);
+        crate::leak_and_init_global_allocator!(allocator, DummyAllocator<DummyMemory<[u8; 16]>>);
+        let static_ref_allocator = unsafe { crate::get_global_allocator() };
 
         {
             let mut vector: ColdVec<u32> = ColdVec::with_capacity(4, static_ref_allocator).unwrap();
@@ -255,7 +251,9 @@ mod test {
             assert!(result2.is_err());
         }
 
-        // TODO add removing the allocator and uninit the global allocator again
+        unsafe {
+            crate::uninit_global_allocator();
+        }
     }
 
     #[test]
@@ -270,12 +268,14 @@ mod test {
             unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
         std::mem::forget(non_droppable);
 
-        crate::init_global_allocator(static_ref_allocator);
+        unsafe {
+            crate::init_global_allocator(static_ref_allocator);
+        }
         let initialized_address = std::ptr::addr_of!(*static_ref_allocator) as usize;
         assert_eq!(original_address, initialized_address);
 
         {
-            let alloc = crate::get_global_allocator();
+            let alloc = unsafe { crate::get_global_allocator() };
             let alloc_address = alloc as *const _ as *const () as usize;
             assert_eq!(original_address, alloc_address);
 
@@ -295,22 +295,20 @@ mod test {
             assert!(result2.is_err());
         }
 
-        // TODO add removing the allocator and uninit the global allocator again
+        unsafe {
+            crate::uninit_global_allocator();
+        }
     }
 
     #[test]
     fn test_from_iter() {
         let memory = DummyMemory::new([0u8; ColdVec::<()>::DEFAULT_SIZE]);
         let allocator = DummyAllocator::new(memory);
-
-        // TODO make some function? like `leak` for allocator. But then it must be defined only in main on stack
-        let non_droppable = std::mem::ManuallyDrop::new(allocator);
-        let static_ref_allocator: &'static DummyAllocator<
-            DummyMemory<[u8; ColdVec::<()>::DEFAULT_SIZE]>,
-        > = unsafe { &*((&non_droppable as *const _) as *const DummyAllocator<_>) };
-        std::mem::forget(non_droppable);
-
-        crate::init_global_allocator(static_ref_allocator);
+        crate::leak_and_init_global_allocator!(
+            allocator,
+            DummyAllocator<DummyMemory<[u8; ColdVec::<()>::DEFAULT_SIZE]>>
+        );
+        let static_ref_allocator = unsafe { crate::get_global_allocator() };
 
         {
             let vector: ColdVec<_> = (0u8..5).into_iter().collect();
@@ -323,6 +321,8 @@ mod test {
             assert_eq!(vector.get(4).unwrap().unwrap(), 4);
         }
 
-        // TODO add removing the allocator and uninit the global allocator again
+        unsafe {
+            crate::uninit_global_allocator();
+        }
     }
 }

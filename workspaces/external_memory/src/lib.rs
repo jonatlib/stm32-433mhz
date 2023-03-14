@@ -19,16 +19,33 @@ struct AllocatorHandler(core::cell::UnsafeCell<core::mem::MaybeUninit<GlobalAllo
 unsafe impl Sync for AllocatorHandler {}
 
 /// Initialize global allocator
-pub fn init_global_allocator(value: GlobalAllocator) {
+pub unsafe fn init_global_allocator(value: GlobalAllocator) {
     let global_ref = unsafe { &mut *_GLOBAL_DEFAULT_EXTERNAL_ALLOCATOR.0.get() };
     *global_ref = core::mem::MaybeUninit::new(value);
 }
 
+pub unsafe fn uninit_global_allocator() {
+    let global_ref = unsafe { &mut *_GLOBAL_DEFAULT_EXTERNAL_ALLOCATOR.0.get() };
+    *global_ref = core::mem::MaybeUninit::uninit();
+}
+
 /// Get current global allocator. `init_global_allocator` must be called before
-pub fn get_global_allocator() -> GlobalAllocator {
+pub unsafe fn get_global_allocator() -> GlobalAllocator {
     let uninit_alloc = unsafe { &*_GLOBAL_DEFAULT_EXTERNAL_ALLOCATOR.0.get() };
 
     unsafe { *uninit_alloc.as_ptr() }
+}
+
+#[macro_export]
+macro_rules! leak_and_init_global_allocator {
+    ($allocator: expr, $typ: ty) => {
+        let non_droppable: core::mem::ManuallyDrop<$typ> = core::mem::ManuallyDrop::new($allocator);
+        let static_ref_allocator: &'static $typ =
+            unsafe { &*((&non_droppable as *const _) as *const $typ) };
+        core::mem::forget(non_droppable);
+
+        unsafe { crate::init_global_allocator(static_ref_allocator) }
+    };
 }
 
 pub mod allocator;
