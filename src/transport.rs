@@ -1,9 +1,6 @@
 use crate::hardware::{io, HardwareSetup};
 use embassy_time::Duration;
 
-use codec::chain::Chain;
-use codec::four_to_six::FourToSixBits;
-use codec::Identity;
 use physical_layer::pwm::ReaderTiming;
 use physical_layer::pwm::WriterTiming;
 use physical_layer::pwm::{PinPwmReader, PinPwmWriter, SyncReader, SyncSequence, SyncWriter};

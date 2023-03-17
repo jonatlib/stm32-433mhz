@@ -1,6 +1,5 @@
 use core::borrow::{Borrow, BorrowMut};
-use core::marker::PhantomData;
-use core::ops::Deref;
+
 use core::ops::Range;
 
 pub type Address = usize;
@@ -53,7 +52,7 @@ pub trait Memory {
         E: Borrow<u8>,
     {
         for (address, data) in address.zip(value) {
-            self.write(address, data.borrow().clone())?;
+            self.write(address, *data.borrow())?;
         }
 
         // FIXME
@@ -95,16 +94,16 @@ where
             .memory
             .borrow_mut()
             .get_mut(address)
-            .ok_or(MemoryError::OutOfBound)?) = value.clone();
+            .ok_or(MemoryError::OutOfBound)?) = value;
 
         Ok(())
     }
 
-    fn read_page(&self, start: Address, buffer: &mut [u8]) -> Result<usize, MemoryError> {
+    fn read_page(&self, _start: Address, _buffer: &mut [u8]) -> Result<usize, MemoryError> {
         todo!()
     }
 
-    fn write_page<I, E>(&mut self, start: Address, value: I) -> Result<(), MemoryError>
+    fn write_page<I, E>(&mut self, _start: Address, _value: I) -> Result<(), MemoryError>
     where
         I: Iterator<Item = E>,
         E: Borrow<u8>,

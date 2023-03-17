@@ -24,7 +24,7 @@ where
         let mut prev_bits_used = 0u8;
 
         let mut data = payload
-            .into_iter()
+            .iter()
             .copied()
             .map(|v: u8| {
                 ((SYMBOLS[(v >> 4) as usize] as u16) << 6) | SYMBOLS[(v & 0xf) as usize] as u16
@@ -37,7 +37,7 @@ where
 
                     if !finished {
                         value = (value << prev_bits_used) | prev_value;
-                        bits_used = bits_used + prev_bits_used;
+                        bits_used += prev_bits_used;
                         finished = true;
                     }
 
@@ -46,7 +46,7 @@ where
                         let v = (value & 0xff) as u8;
                         acc.push(v).unwrap();
 
-                        value = value >> 8;
+                        value >>= 8;
                         bits_used -= 8;
 
                         // println!("{:#034b} {}", value, bits_used);
@@ -81,7 +81,7 @@ where
         let mut prev_bits_used = 0u8;
 
         let result = payload
-            .into_iter()
+            .iter()
             .copied()
             .fold(
                 heapless::Vec::<u8, { Self::get_encode_const_size(MAX_INPUT_SIZE) }>::new(),
@@ -91,7 +91,7 @@ where
 
                     if !finished {
                         value = (value << prev_bits_used) | prev_value;
-                        bits_used = bits_used + prev_bits_used;
+                        bits_used += prev_bits_used;
                         finished = true;
                     }
 
@@ -100,7 +100,7 @@ where
                         let v = (value & 0x3f) as u8;
                         acc.push(v).unwrap();
 
-                        value = value >> 6;
+                        value >>= 6;
                         bits_used -= 6;
                         // println!("{:#034b} {}", value, bits_used);
                     }

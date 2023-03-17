@@ -27,7 +27,7 @@ where
         })
     }
 
-    pub fn get_range(&self, range: Range<usize>) -> Result<&[T], AllocatorError> {
+    pub fn get_range(&self, _range: Range<usize>) -> Result<&[T], AllocatorError> {
         // FIXME don't use `get` but read a range of memory instead
         // FIXME use some helper struct to keep range values
         todo!()
@@ -35,7 +35,7 @@ where
 
     pub fn get(&self, index: usize) -> Result<T, AllocatorError> {
         let mut buffer = [0u8; { core::mem::size_of::<T>() }];
-        let read_size = self
+        let _read_size = self
             .handler
             .read_bytes(index * core::mem::size_of::<T>(), &mut buffer)?;
 
@@ -136,7 +136,7 @@ where
     pub fn iter(&'a self) -> impl Iterator<Item = T> + 'a {
         ColdVecIter {
             index: 0,
-            vector: &self,
+            vector: self,
         }
     }
 }
@@ -172,7 +172,7 @@ where
         Ok(())
     }
 
-    fn shrink(&mut self, new_capacity: usize) -> Result<(), AllocatorError> {
+    fn shrink(&mut self, _new_capacity: usize) -> Result<(), AllocatorError> {
         todo!()
     }
 }

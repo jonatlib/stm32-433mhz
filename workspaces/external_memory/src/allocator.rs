@@ -1,7 +1,7 @@
 use crate::memory::{Address, Memory, MemoryError, Size};
 use core::borrow::Borrow;
 use core::cell::RefCell;
-use core::marker::PhantomData;
+
 use core::ops::Deref;
 
 #[derive(Debug)]
@@ -121,7 +121,7 @@ where
     M: Memory,
 {
     fn allocate(&self, size: Size) -> Result<AllocationHandler, AllocatorError> {
-        let current_index = self.index.borrow().deref().clone();
+        let current_index = *self.index.borrow().deref();
         if current_index + size > self.total_memory() {
             return Err(AllocatorError::OOM);
         }
@@ -134,7 +134,7 @@ where
         })
     }
 
-    fn free(&self, handler: &AllocationHandler) -> Result<(), AllocatorError> {
+    fn free(&self, _handler: &AllocationHandler) -> Result<(), AllocatorError> {
         // This allocator does not free any memory
         Ok(())
     }
@@ -165,7 +165,7 @@ where
         Ok(self
             .memory
             .borrow_mut()
-            .write_slice(addresses, data.into_iter())?)
+            .write_slice(addresses, data.iter())?)
     }
 
     fn read_bytes(
@@ -196,7 +196,7 @@ where
         Ok(self
             .memory
             .borrow_mut()
-            .write_slice(addresses, data.into_iter())?)
+            .write_slice(addresses, data.iter())?)
     }
 }
 

@@ -44,7 +44,7 @@ macro_rules! leak_and_init_global_allocator {
             unsafe { &*((&non_droppable as *const _) as *const $typ) };
         core::mem::forget(non_droppable);
 
-        unsafe { crate::init_global_allocator(static_ref_allocator) }
+        unsafe { $crate::init_global_allocator(static_ref_allocator) }
     };
 }
 

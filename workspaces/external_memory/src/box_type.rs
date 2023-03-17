@@ -2,7 +2,6 @@ use crate::allocator::{AllocationHandler, Allocator, AllocatorError};
 use crate::box_type::box_ref::ColdBoxArrayRef;
 use box_ref::{ColdBoxRef, ColdBoxRefMut};
 use core::marker::PhantomData;
-use core::ops::Deref;
 
 pub mod box_ref;
 
@@ -29,7 +28,7 @@ where
 
     pub fn to_owned(&self) -> Result<T, AllocatorError> {
         let mut buffer = [0u8; { core::mem::size_of::<T>() }];
-        let read_size = self.handler.read_all_bytes(&mut buffer)?;
+        let _read_size = self.handler.read_all_bytes(&mut buffer)?;
 
         // FIXME dont disable this
         // debug_assert_eq!(read_size, buffer.len());
@@ -100,7 +99,7 @@ where
 {
     pub fn get(&self, index: usize) -> Result<T, AllocatorError> {
         let mut buffer = [0u8; { core::mem::size_of::<T>() }];
-        let read_size = self
+        let _read_size = self
             .handler
             .read_bytes(index * core::mem::size_of::<T>(), &mut buffer)?;
 

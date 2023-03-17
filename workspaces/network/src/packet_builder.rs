@@ -50,8 +50,8 @@ where
     type Item = Packet32;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let byte_0 = self.prev_element.as_ref()?.borrow().clone();
-        let byte_1 = self.payload.next().map(|v| v.borrow().clone());
+        let byte_0 = *self.prev_element.as_ref()?.borrow();
+        let byte_1 = self.payload.next().map(|v| *v.borrow());
         let byte_2 = self.payload.next();
 
         self.prev_element = byte_2.clone();
