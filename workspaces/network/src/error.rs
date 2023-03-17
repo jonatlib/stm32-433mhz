@@ -6,8 +6,8 @@ pub enum NetworkError {
     SenderEncodingError(postcard::Error),
     ReceiverEncodingError(postcard::Error),
 
-    SenderWriterError(bit_io::error::WriterError),
-    ReceiverReaderError(bit_io::error::ReadError),
+    SenderWriterError(physical_layer::error::WriterError),
+    ReceiverReaderError(physical_layer::error::ReadError),
 
     DataConstructingError(DataConstructionError),
     CodecError(CodecError),

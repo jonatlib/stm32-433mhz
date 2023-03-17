@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["workspaces/codec", "workspaces/bit_io", "workspaces/network", "workspaces/sequence_number", "workspaces/external_memory"]
+members = ["workspaces/codec", "workspaces/physical_layer", "workspaces/network", "workspaces/sequence_number", "workspaces/external_memory"]
 
 
 [features]
@@ -16,7 +16,7 @@ nucleo_stm32l053r8 = []
 [dependencies]
 # Our own dependency
 codec = { path = "workspaces/codec" }
-bit_io = { path = "workspaces/bit_io" }
+physical_layer = { path = "workspaces/physical_layer" }
 network = { path = "workspaces/network" }
 external_memory = { path = "workspaces/external_memory" }
 
@@ -55,9 +55,9 @@ opt-level = "s"
 
 [profile.dev.package.cortex-m-rt]
 opt-level = 0
-[profile.dev.package.bit_io]
+[profile.dev.package.physical_layer]
 opt-level = 3
-[profile.release.package.bit_io]
+[profile.release.package.physical_layer]
 opt-level = 3
 [profile.dev.package.sequence_number]
 opt-level = 3

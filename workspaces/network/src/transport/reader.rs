@@ -3,8 +3,8 @@ use crate::packet::Packet32;
 use crate::transport::window::Window;
 use crate::transport::TransportReceiver;
 use crate::Address;
-use bit_io::BaseReader;
 use codec::{Codec, CodecSize};
+use physical_layer::BaseReader;
 
 pub struct TransportReader<'a, R, C, P> {
     address: Address,

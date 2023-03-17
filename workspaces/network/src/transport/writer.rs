@@ -5,8 +5,8 @@ use crate::packet_builder::PacketBuilder;
 use crate::transport::TransportSender;
 use crate::Address;
 
-use bit_io::BaseWriter;
 use codec::Codec;
+use physical_layer::BaseWriter;
 use sequence_number::SequenceNumber;
 
 pub struct TransportWriter<'a, W, C, P> {

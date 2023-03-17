@@ -62,16 +62,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bit_io"
-version = "0.1.0"
-dependencies = [
- "defmt",
- "embassy-stm32",
- "embassy-time",
- "futures",
-]
-
-[[package]]
 name = "bitfield"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -822,11 +812,11 @@ checksum = "546c37ac5d9e56f55e73b677106873d9d9f5190605e41a856503623648488cae"
 name = "network"
 version = "0.1.0"
 dependencies = [
- "bit_io",
  "bitfield-struct",
  "codec",
  "defmt",
  "heapless",
+ "physical_layer",
  "postcard",
  "sequence_number",
  "serde",
@@ -881,6 +871,16 @@ checksum = "3ab1f00eac22bd18f8e5cae9555f2820b3a0c166b5b556ee3e203746ea6dcf3a"
 dependencies = [
  "cortex-m",
  "defmt",
+]
+
+[[package]]
+name = "physical_layer"
+version = "0.1.0"
+dependencies = [
+ "defmt",
+ "embassy-stm32",
+ "embassy-time",
+ "futures",
 ]
 
 [[package]]
@@ -1173,7 +1173,6 @@ dependencies = [
 name = "stm32_433mhz_test"
 version = "0.1.0"
 dependencies = [
- "bit_io",
  "codec",
  "cortex-m",
  "cortex-m-rt",
@@ -1188,6 +1187,7 @@ dependencies = [
  "network",
  "onewire",
  "panic-probe",
+ "physical_layer",
  "serde",
  "static_cell",
 ]

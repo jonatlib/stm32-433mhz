@@ -4,8 +4,8 @@ use crate::simple::codec::{
     create_codec, create_compression, CodecFactoryType, CompressionFactoryType,
 };
 use crate::Address;
-use bit_io::BaseReader;
 use codec::Codec;
+use physical_layer::BaseReader;
 
 pub struct SimpleReceiver<R, C, P> {
     address: Address,

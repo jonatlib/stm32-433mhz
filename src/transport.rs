@@ -1,12 +1,12 @@
 use crate::hardware::{io, HardwareSetup};
 use embassy_time::Duration;
 
-use bit_io::reader::ReaderTiming;
-use bit_io::writer::WriterTiming;
-use bit_io::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 use codec::chain::Chain;
 use codec::four_to_six::FourToSixBits;
 use codec::Identity;
+use physical_layer::reader::ReaderTiming;
+use physical_layer::writer::WriterTiming;
+use physical_layer::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;
