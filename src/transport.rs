@@ -4,9 +4,9 @@ use embassy_time::Duration;
 use codec::chain::Chain;
 use codec::four_to_six::FourToSixBits;
 use codec::Identity;
-use physical_layer::reader::ReaderTiming;
-use physical_layer::writer::WriterTiming;
-use physical_layer::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
+use physical_layer::pwm::ReaderTiming;
+use physical_layer::pwm::WriterTiming;
+use physical_layer::pwm::{PinReader, PinWriter, SyncReader, SyncSequence, SyncWriter};
 
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;

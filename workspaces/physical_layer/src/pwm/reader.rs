@@ -7,8 +7,8 @@ use embassy_stm32::gpio::Pin;
 use embassy_time::{with_timeout, Duration, Instant};
 
 use crate::error::ReadError;
-use crate::writer::WriterTiming;
-use crate::SyncSequence;
+use crate::pwm::sync::SyncSequence;
+use crate::pwm::writer::WriterTiming;
 
 pub struct ReaderTiming {
     pub zeroes: Duration,

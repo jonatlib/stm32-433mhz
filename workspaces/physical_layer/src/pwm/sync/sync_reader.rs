@@ -1,8 +1,8 @@
-use crate::sync::SyncSequence;
-use crate::Reader;
+use crate::pwm::reader::ReaderTiming;
+use crate::pwm::sync::SyncSequence;
+use crate::pwm::Reader;
 
 use crate::error::ReadError;
-use crate::reader::ReaderTiming;
 
 pub struct SyncReader<R: Reader> {
     reader: R,

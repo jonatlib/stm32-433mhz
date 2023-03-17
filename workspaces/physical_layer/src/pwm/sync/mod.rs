@@ -1,7 +1,7 @@
 use embassy_time::{Duration, Timer};
 
 use crate::error::{ReadError, WriterError};
-use crate::{Reader, Writer};
+use crate::pwm::{Reader, Writer};
 
 pub mod sync_reader;
 pub mod sync_writer;

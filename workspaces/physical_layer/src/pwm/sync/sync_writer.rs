@@ -1,10 +1,9 @@
 use embassy_time::Timer;
 
-use crate::sync::SyncSequence;
-use crate::Writer;
-
 use crate::error::WriterError;
-use crate::writer::WriterTiming;
+use crate::pwm::sync::SyncSequence;
+use crate::pwm::writer::WriterTiming;
+use crate::pwm::Writer;
 
 pub struct SyncWriter<W: Writer> {
     writer: W,
