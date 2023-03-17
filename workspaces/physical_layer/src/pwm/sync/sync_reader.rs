@@ -4,20 +4,15 @@ use crate::pwm::sync::SyncSequence;
 
 use crate::error::ReadError;
 
-pub struct SyncReader<R: PwmReader> {
+pub struct SyncPwmReader<R: PwmReader> {
     reader: R,
     sync: SyncSequence,
-    number_of_bytes: usize,
 }
 
-impl<R: PwmReader> SyncReader<R> {
-    pub fn new(mut reader: R, sync: SyncSequence, number_of_bytes: usize) -> Self {
+impl<R: PwmReader> SyncPwmReader<R> {
+    pub fn new(mut reader: R, sync: SyncSequence) -> Self {
         reader.get_mut_timing().adjust_to_sync_marker(&sync);
-        Self {
-            sync,
-            reader,
-            number_of_bytes,
-        }
+        Self { sync, reader }
     }
 
     pub fn get_timing(&self) -> &ReaderTiming {
@@ -25,7 +20,7 @@ impl<R: PwmReader> SyncReader<R> {
     }
 }
 
-impl<R: PwmReader> crate::BaseReader for SyncReader<R> {
+impl<R: PwmReader> crate::BaseReader for SyncPwmReader<R> {
     async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
         // TODO check if buffer is smaller then read bytes
         self.sync.read_sequence(&mut self.reader).await?;

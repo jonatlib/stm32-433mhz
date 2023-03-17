@@ -1,5 +1,4 @@
 use crate::memory::{Address, Memory, MemoryError, Size};
-use core::borrow::Borrow;
 use core::cell::RefCell;
 
 use core::ops::Deref;
