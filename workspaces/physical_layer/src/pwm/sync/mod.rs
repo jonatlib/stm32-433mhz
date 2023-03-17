@@ -1,7 +1,8 @@
 use embassy_time::{Duration, Timer};
 
 use crate::error::{ReadError, WriterError};
-use crate::pwm::{Reader, Writer};
+use crate::pwm::reader::PwmReader;
+use crate::pwm::writer::PwmWriter;
 
 pub mod sync_reader;
 pub mod sync_writer;
@@ -41,7 +42,7 @@ impl SyncSequence {
         Self::new(ones, ones / 2, ones / 4, ones / 6, number_of_bits, sequence)
     }
 
-    pub async fn write_sequence<W: Writer>(&self, writer: &mut W) -> Result<(), WriterError> {
+    pub async fn write_sequence<W: PwmWriter>(&self, writer: &mut W) -> Result<(), WriterError> {
         for index in 0..self.number_of_bits {
             let mask = 1u32 << index;
             let bit = (self.sequence & mask) > 0;
@@ -56,7 +57,7 @@ impl SyncSequence {
         Ok(())
     }
 
-    pub async fn read_sequence<R: Reader>(&self, reader: &mut R) -> Result<(), ReadError> {
+    pub async fn read_sequence<R: PwmReader>(&self, reader: &mut R) -> Result<(), ReadError> {
         let mut index = 0u8;
 
         loop {

@@ -2,15 +2,15 @@ use embassy_time::Timer;
 
 use crate::error::WriterError;
 use crate::pwm::sync::SyncSequence;
+use crate::pwm::writer::PwmWriter;
 use crate::pwm::writer::WriterTiming;
-use crate::pwm::Writer;
 
-pub struct SyncWriter<W: Writer> {
+pub struct SyncWriter<W: PwmWriter> {
     writer: W,
     sync: SyncSequence,
 }
 
-impl<W: Writer> SyncWriter<W> {
+impl<W: PwmWriter> SyncWriter<W> {
     pub fn new(writer: W, sync: SyncSequence) -> Self {
         Self { writer, sync }
     }
@@ -20,7 +20,7 @@ impl<W: Writer> SyncWriter<W> {
     }
 }
 
-impl<W: Writer> crate::BaseWriter for SyncWriter<W> {
+impl<W: PwmWriter> crate::BaseWriter for SyncWriter<W> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
         self.sync.write_sequence(&mut self.writer).await?;
         self.writer.write_bytes(buffer).await

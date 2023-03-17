@@ -59,7 +59,7 @@ impl From<&WriterTiming> for ReaderTiming {
     }
 }
 
-pub trait Reader: crate::BaseReader {
+pub trait PwmReader: crate::BaseReader {
     async fn read_timing(&mut self) -> Result<Duration, ReadError>;
     fn get_timing(&self) -> &ReaderTiming;
     fn get_mut_timing(&mut self) -> &mut ReaderTiming;
@@ -136,12 +136,12 @@ pub trait Reader: crate::BaseReader {
     }
 }
 
-pub struct PinReader<'a, P: Pin, const INVERT: bool = false> {
+pub struct PinPwmReader<'a, P: Pin, const INVERT: bool = false> {
     timing: ReaderTiming,
     pin: ExtiInput<'a, P>,
 }
 
-impl<'a, P: Pin, const INVERT: bool> PinReader<'a, P, INVERT> {
+impl<'a, P: Pin, const INVERT: bool> PinPwmReader<'a, P, INVERT> {
     #[allow(clippy::result_unit_err)]
     pub fn new(timing: ReaderTiming, pin: ExtiInput<'a, P>) -> Result<Self, ()> {
         Ok(Self { timing, pin })
@@ -154,13 +154,13 @@ impl<'a, P: Pin, const INVERT: bool> PinReader<'a, P, INVERT> {
     }
 }
 
-impl<'a, P: Pin, const INVERT: bool> crate::BaseReader for PinReader<'a, P, INVERT> {
+impl<'a, P: Pin, const INVERT: bool> crate::BaseReader for PinPwmReader<'a, P, INVERT> {
     async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
         self.read_bytes(buffer.len(), buffer).await
     }
 }
 
-impl<'a, P: Pin, const INVERT: bool> Reader for PinReader<'a, P, INVERT> {
+impl<'a, P: Pin, const INVERT: bool> PwmReader for PinPwmReader<'a, P, INVERT> {
     #[inline]
     async fn read_timing(&mut self) -> Result<Duration, ReadError> {
         if INVERT {

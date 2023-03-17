@@ -37,7 +37,7 @@ impl Default for WriterTiming {
     }
 }
 
-pub trait Writer: crate::BaseWriter {
+pub trait PwmWriter: crate::BaseWriter {
     async fn write_timing(&mut self, duration: Duration) -> Result<(), WriterError>;
     fn get_timing(&self) -> &WriterTiming;
 
@@ -77,12 +77,12 @@ pub trait Writer: crate::BaseWriter {
     }
 }
 
-pub struct PinWriter<'a, P: Pin, const INVERT: bool = false> {
+pub struct PinPwmWriter<'a, P: Pin, const INVERT: bool = false> {
     timing: WriterTiming,
     pin: Output<'a, P>,
 }
 
-impl<'a, P: Pin, const INVERT: bool> PinWriter<'a, P, INVERT> {
+impl<'a, P: Pin, const INVERT: bool> PinPwmWriter<'a, P, INVERT> {
     #[allow(clippy::result_unit_err)]
     pub fn new(timing: WriterTiming, mut pin: Output<'a, P>) -> Result<Self, ()> {
         if INVERT {
@@ -95,7 +95,7 @@ impl<'a, P: Pin, const INVERT: bool> PinWriter<'a, P, INVERT> {
     }
 }
 
-impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinWriter<'a, P, INVERT> {
+impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinPwmWriter<'a, P, INVERT> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
         self.write_bytes(buffer).await
     }
@@ -121,7 +121,7 @@ impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinWriter<'a, P, INVE
     }
 }
 
-impl<'a, P: Pin, const INVERT: bool> Writer for PinWriter<'a, P, INVERT> {
+impl<'a, P: Pin, const INVERT: bool> PwmWriter for PinPwmWriter<'a, P, INVERT> {
     #[inline]
     async fn write_timing(&mut self, duration: Duration) -> Result<(), WriterError> {
         if INVERT {
