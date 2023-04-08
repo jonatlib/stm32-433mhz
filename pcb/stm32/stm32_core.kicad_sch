@@ -1757,6 +1757,10 @@
     (uuid ef99c61b-74ed-4fe7-908b-9c47dfd46e69)
   )
 
+  (text "TODO: Add spare pins to a header for dev board\n" (at 128.27 144.78 0)
+    (effects (font (size 3 3)) (justify left bottom))
+    (uuid 1a57ab60-afb5-4ed0-aa11-c3980e754ac1)
+  )
   (text "I2C" (at 15.24 26.67 0)
     (effects (font (size 3 3) (thickness 0.6) bold) (justify left bottom))
     (uuid 28026ca1-d144-4ea1-bca7-bf348cfbce4b)

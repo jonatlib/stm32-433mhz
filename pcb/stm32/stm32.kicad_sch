@@ -890,6 +890,10 @@
     (uuid bafdb043-a9dd-43b4-bc18-0ed67297bddc)
   )
 
+  (text "TODO:Try adding place for breadboard\nTODO: EPS32" (at 127 120.65 0)
+    (effects (font (size 3 3)) (justify left bottom))
+    (uuid 0f446646-496c-4aea-aacd-c9a9ac72a017)
+  )
   (text "Memory" (at 53.34 110.49 0)
     (effects (font (size 2 2) bold) (justify left bottom))
     (uuid 104321ad-fc60-461d-9089-1035783d37c3)
