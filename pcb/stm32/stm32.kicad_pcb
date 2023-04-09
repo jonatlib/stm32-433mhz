@@ -4309,5 +4309,8 @@
 
   (gr_rect (start 55.88 38.1) (end 155.94 88.9)
     (stroke (width 0.1) (type default)) (fill none) (layer "Edge.Cuts") (tstamp c53d553d-6d80-48fe-8a94-aee9a26c5348))
+  (gr_text "TODO: breadboard\n" (at 129.54 121.92) (layer "F.SilkS") (tstamp f365d84c-ffda-4e73-ae63-58bf080c5072)
+    (effects (font (size 1.5 1.5) (thickness 0.3) bold) (justify left bottom))
+  )
 
 )

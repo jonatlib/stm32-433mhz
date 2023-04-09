@@ -890,10 +890,6 @@
     (uuid bafdb043-a9dd-43b4-bc18-0ed67297bddc)
   )
 
-  (text "TODO:Try adding place for breadboard\nTODO: EPS32" (at 127 120.65 0)
-    (effects (font (size 3 3)) (justify left bottom))
-    (uuid 0f446646-496c-4aea-aacd-c9a9ac72a017)
-  )
   (text "Memory" (at 53.34 110.49 0)
     (effects (font (size 2 2) bold) (justify left bottom))
     (uuid 104321ad-fc60-461d-9089-1035783d37c3)
@@ -905,6 +901,10 @@
   (text "SENSORS\nSwitch" (at 91.44 161.29 0)
     (effects (font (size 2 2) bold) (justify left bottom))
     (uuid 806bfebd-9bb3-476d-bb97-b8b13277fefe)
+  )
+  (text "TODO: header?" (at 71.12 43.18 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid b09c30e0-c3c9-45f6-9563-63a40ea97d36)
   )
 
   (global_label "SPI_MOSI" (shape input) (at 57.15 119.38 0) (fields_autoplaced)
