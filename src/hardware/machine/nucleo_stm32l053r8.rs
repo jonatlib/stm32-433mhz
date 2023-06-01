@@ -5,6 +5,7 @@ use embassy_stm32::interrupt;
 use embassy_stm32::peripherals::EXTI0;
 use embassy_stm32::rcc::ClockSrc;
 use embassy_stm32::time::Hertz;
+use embassy_stm32::{bind_interrupts, i2c, peripherals};
 use embassy_stm32::{Config, Peripherals};
 
 use crate::hardware::HardwareSetup;
@@ -12,6 +13,10 @@ use crate::hardware::HardwareSetup;
 pub struct Hardware {
     peripherals: Peripherals,
 }
+
+bind_interrupts!(struct Irqs {
+    I2C1 => i2c::InterruptHandler<peripherals::I2C1>;
+});
 
 impl HardwareSetup for Hardware {
     fn setup_hardware(input_config: Option<Config>) -> Self {
@@ -50,13 +55,11 @@ impl HardwareSetup for Hardware {
         let sda = unsafe { io::I2C1_SDA::steal() };
         let scl = unsafe { io::I2C1_SCL::steal() };
 
-        let irq = interrupt::take!(I2C1);
-
         io::I2c::new(
             peripheral,
             scl,
             sda,
-            irq,
+            Irqs,
             NoDma,
             NoDma,
             Hertz(100_000),

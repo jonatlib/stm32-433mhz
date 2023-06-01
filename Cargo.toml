@@ -21,10 +21,10 @@ network = { path = "workspaces/network" }
 external_memory = { path = "workspaces/external_memory" }
 
 # Embasy HAL Runtime
-embassy-executor = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "integrated-timers"] }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt"] }
-embassy-time = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
-embassy-stm32 = { git = "https://github.com/embassy-rs/embassy",  version = "0.1.0", features = ["nightly", "defmt", "memory-x", "stm32l053r8", "time-driver-any", "exti"] }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy",  version = "0.2.0", features = ["arch-cortex-m", "executor-thread", "executor-interrupt", "defmt", "integrated-timers"] }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy",  version = "0.2.0", features = ["defmt"] }
+embassy-time = { git = "https://github.com/embassy-rs/embassy",  version = "^0.1.0", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
+embassy-stm32 = { git = "https://github.com/embassy-rs/embassy",  version = "^0.1.0", features = ["nightly", "defmt", "memory-x", "stm32l053r8", "time-driver-any", "exti"] }
 
 # HW and HAL
 cortex-m = { version = "0.7.6", features = ["critical-section-single-core"] }
@@ -44,7 +44,7 @@ onewire = "~0.3.13"
 # Async and libraries
 futures = { version = "0.3.17", default-features = false, features = ["async-await"] }
 #heapless = { version = "0.7.5", default-features = false }
-static_cell = "~1.0.0"
+static_cell = "^1.0.0"
 serde = { version = "~1.0.152", default-features = false, features = ["derive"] }
 
 

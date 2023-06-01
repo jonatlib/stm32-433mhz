@@ -1,5 +1,10 @@
 #![no_std]
-#![feature(type_alias_impl_trait, const_trait_impl, int_roundings)]
+#![feature(
+    type_alias_impl_trait,
+    impl_trait_in_assoc_type,
+    const_trait_impl,
+    int_roundings
+)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
