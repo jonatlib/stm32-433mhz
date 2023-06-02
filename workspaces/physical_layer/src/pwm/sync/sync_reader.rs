@@ -14,10 +14,6 @@ impl<R: PwmReader> SyncPwmReader<R> {
         reader.get_mut_timing().adjust_to_sync_marker(&sync);
         Self { sync, reader }
     }
-
-    pub fn get_timing(&self) -> &ReaderTiming {
-        self.reader.get_timing()
-    }
 }
 
 impl<R: PwmReader> crate::BaseReader for SyncPwmReader<R> {

@@ -14,10 +14,6 @@ impl<W: PwmWriter> SyncPwmWriter<W> {
     pub fn new(writer: W, sync: SyncSequence) -> Self {
         Self { writer, sync }
     }
-
-    pub fn get_timing(&self) -> &WriterTiming {
-        self.writer.get_timing()
-    }
 }
 
 impl<W: PwmWriter> crate::BaseWriter for SyncPwmWriter<W> {
@@ -37,13 +33,13 @@ impl<W: PwmWriter> crate::BaseWriter for SyncPwmWriter<W> {
             self.writer.write_byte(byte).await?;
             bytes += 1;
 
-            if let Some(between_bytes) = self.get_timing().between_bytes {
+            if let Some(between_bytes) = self.writer.get_timing().between_bytes {
                 Timer::after(between_bytes).await;
             }
         }
 
         // Let some time between streams
-        Timer::after(self.get_timing().ones * 4).await;
+        Timer::after(self.writer.get_timing().ones * 4).await;
 
         Ok(bytes)
     }
