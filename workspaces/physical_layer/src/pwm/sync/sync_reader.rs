@@ -3,24 +3,22 @@ use crate::pwm::reader::ReaderTiming;
 use crate::pwm::sync::SyncSequence;
 
 use crate::error::ReadError;
+use crate::sync::SyncMarkerRead;
 
-pub struct SyncPwmReader<R: PwmReader> {
+pub struct PwmSyncMarkerReader<R: PwmReader> {
     reader: R,
     sync: SyncSequence,
 }
 
-impl<R: PwmReader> SyncPwmReader<R> {
+impl<R: PwmReader> PwmSyncMarkerReader<R> {
     pub fn new(mut reader: R, sync: SyncSequence) -> Self {
         reader.get_mut_timing().adjust_to_sync_marker(&sync);
         Self { sync, reader }
     }
 }
 
-impl<R: PwmReader> crate::BaseReader for SyncPwmReader<R> {
-    async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
-        // TODO check if buffer is smaller then read bytes
-        self.sync.read_sequence(&mut self.reader).await?;
-        // FIXME check original line here...
-        self.reader.read_bytes(buffer.len(), buffer).await
+impl<R: PwmReader> SyncMarkerRead for PwmSyncMarkerReader<R> {
+    async fn sync(&mut self) -> Result<(), ReadError> {
+        self.sync.read_sequence(&mut self.reader).await
     }
 }

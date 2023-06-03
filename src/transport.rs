@@ -3,7 +3,9 @@ use embassy_time::Duration;
 
 use physical_layer::pwm::ReaderTiming;
 use physical_layer::pwm::WriterTiming;
-use physical_layer::pwm::{PinPwmReader, PinPwmWriter, SyncPwmReader, SyncPwmWriter, SyncSequence};
+use physical_layer::pwm::{
+    PinPwmReader, PinPwmWriter, PwmSyncMarkerReader, SyncPwmWriter, SyncSequence,
+};
 
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;
@@ -56,7 +58,7 @@ pub type SenderFactory<'a> = SimpleSender<
     CompressionType,
 >;
 pub type ReceiverFactory<'a> = SimpleReceiver<
-    SyncPwmReader<PinPwmReader<'a, io::RadioReceiverPin, false>>,
+    PwmSyncMarkerReader<PinPwmReader<'a, io::RadioReceiverPin, false>>,
     CodecType,
     CompressionType,
 >;
@@ -77,7 +79,7 @@ pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> R
     let pin_reader = PinPwmReader::<_, false>::new(get_reader_timing(), input)
         .expect("Could not create PinReader");
     // 4-bytes to send single packet of 32bits
-    let sync_reader = SyncPwmReader::new(pin_reader, get_sync_sequence());
+    let sync_reader = PwmSyncMarkerReader::new(pin_reader, get_sync_sequence());
 
     SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 }

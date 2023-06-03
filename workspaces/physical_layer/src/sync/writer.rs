@@ -15,7 +15,7 @@ impl<W: BaseWriter, SW: SyncMarkerWriter> BaseWriter for SyncWriter<W, SW> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
         self.sync.write_sync().await?;
         Timer::after(self.time_after_sync).await;
-        self.writer.write_bytes_buffer(buffer)
+        self.writer.write_bytes_buffer(buffer).await
     }
 
     async fn write_bytes_iterator<I: Iterator<Item = u8>>(
@@ -24,6 +24,6 @@ impl<W: BaseWriter, SW: SyncMarkerWriter> BaseWriter for SyncWriter<W, SW> {
     ) -> Result<usize, WriterError> {
         self.sync.write_sync().await?;
         Timer::after(self.time_after_sync).await;
-        self.writer.write_bytes_iterator(data)
+        self.writer.write_bytes_iterator(data).await
     }
 }
