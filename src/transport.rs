@@ -1,4 +1,5 @@
 use crate::hardware::{io, HardwareSetup};
+use core::cell::RefCell;
 use embassy_time::Duration;
 
 use physical_layer::pwm::ReaderTiming;
@@ -14,6 +15,7 @@ use network::simple::sender::SimpleSender;
 
 use network::simple::receiver::SimpleReceiver;
 use network::Address;
+use physical_layer::sync::reader::SyncReader;
 
 fn get_sync_sequence() -> SyncSequence {
     SyncSequence::new_simple(Duration::from_micros(1500), 4, 0b1011)
@@ -58,7 +60,10 @@ pub type SenderFactory<'a> = SimpleSender<
     CompressionType,
 >;
 pub type ReceiverFactory<'a> = SimpleReceiver<
-    PwmSyncMarkerReader<PinPwmReader<'a, io::RadioReceiverPin, false>>,
+    SyncReader<
+        PinPwmReader<'a, io::RadioReceiverPin, false>,
+        PwmSyncMarkerReader<PinPwmReader<'a, io::RadioReceiverPin, false>>,
+    >,
     CodecType,
     CompressionType,
 >;
@@ -76,10 +81,13 @@ pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> Sen
 pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> ReceiverFactory {
     let input = hw.create_radio_receiving_input();
 
-    let pin_reader = PinPwmReader::<_, false>::new(get_reader_timing(), input)
-        .expect("Could not create PinReader");
+    let pin_reader = RefCell::new(
+        PinPwmReader::<_, false>::new(get_reader_timing(), input)
+            .expect("Could not create PinReader"),
+    );
     // 4-bytes to send single packet of 32bits
-    let sync_reader = PwmSyncMarkerReader::new(pin_reader, get_sync_sequence());
+    let sync = PwmSyncMarkerReader::new(pin_reader, get_sync_sequence());
+    let sync_reader = SyncReader::new(sync, &pin_reader, Duration::from_micros(0));
 
     SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 }
