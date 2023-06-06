@@ -633,6 +633,7 @@ dependencies = [
  "embassy-stm32",
  "embassy-time",
  "futures",
+ "static_cell",
 ]
 
 [[package]]

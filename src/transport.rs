@@ -85,7 +85,8 @@ pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> R
     // // 4-bytes to send single packet of 32bits
     // let sync = PwmSyncMarkerReader::new(pin_reader, get_sync_sequence());
     // let sync_reader = SyncReader::new(sync, &pin_reader, Duration::from_micros(0));
+    //
+    // SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 
     todo!()
-    // SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 }

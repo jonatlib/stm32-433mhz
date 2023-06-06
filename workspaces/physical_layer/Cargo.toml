@@ -12,3 +12,4 @@ embassy-stm32 = { git = "https://github.com/embassy-rs/embassy",  version = "^0.
 futures = { version = "~0.3.26", default-features = false, features = ["async-await"] }
 
 defmt = "~0.3.2"
+static_cell = "^1.0.0"

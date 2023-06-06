@@ -6,6 +6,7 @@ pub mod error;
 pub mod manchester;
 pub mod pwm;
 pub mod sync;
+pub mod utils;
 
 pub trait BaseReader {
     async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, error::ReadError>;
