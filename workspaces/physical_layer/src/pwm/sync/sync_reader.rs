@@ -8,18 +8,15 @@ use core::ops::DerefMut;
 use crate::error::ReadError;
 use crate::sync::SyncMarkerRead;
 
-pub struct PwmSyncMarkerReader<'a, R: PwmReader> {
-    reader: &'a RefCell<R>,
+pub struct PwmSyncMarkerReader<R: PwmReader> {
+    reader: R,
     sync: SyncSequence,
     _phantom: PhantomData<R>,
 }
 
-impl<'a, R: PwmReader> PwmSyncMarkerReader<'a, R> {
-    pub fn new(mut reader: &'a RefCell<R>, sync: SyncSequence) -> Self {
-        reader
-            .borrow_mut()
-            .get_mut_timing()
-            .adjust_to_sync_marker(&sync);
+impl<R: PwmReader> PwmSyncMarkerReader<R> {
+    pub fn new(mut reader: R, sync: SyncSequence) -> Self {
+        reader.get_mut_timing().adjust_to_sync_marker(&sync);
         Self {
             sync,
             reader,
@@ -28,10 +25,8 @@ impl<'a, R: PwmReader> PwmSyncMarkerReader<'a, R> {
     }
 }
 
-impl<R: PwmReader> SyncMarkerRead for PwmSyncMarkerReader<'_, R> {
+impl<R: PwmReader> SyncMarkerRead for PwmSyncMarkerReader<R> {
     async fn sync(&mut self) -> Result<(), ReadError> {
-        self.sync
-            .read_sequence(self.reader.borrow_mut().deref_mut())
-            .await
+        self.sync.read_sequence(&mut self.reader).await
     }
 }
