@@ -1,5 +1,8 @@
 use crate::hardware::{io, HardwareSetup};
+use core::cell::RefCell;
+use embassy_stm32::exti::ExtiInput;
 use embassy_time::Duration;
+use static_cell::StaticCell;
 
 use physical_layer::pwm::ReaderTiming;
 use physical_layer::pwm::WriterTiming;
@@ -7,14 +10,15 @@ use physical_layer::pwm::{
     PinPwmReader, PinPwmWriter, PwmSyncMarkerReader, SyncPwmWriter, SyncSequence,
 };
 
+use crate::hardware::io::RadioReceiverPin;
+
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;
-
-use network::simple::sender::SimpleSender;
-
 use network::simple::receiver::SimpleReceiver;
+use network::simple::sender::SimpleSender;
 use network::Address;
 use physical_layer::sync::reader::SyncReader;
+use physical_layer::utils::SharedExtiPin;
 
 fn get_sync_sequence() -> SyncSequence {
     SyncSequence::new_simple(Duration::from_micros(1500), 4, 0b1011)
@@ -77,11 +81,17 @@ pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> Sen
     SimpleSender::new(address, sync_writer, create_codec(), create_compression())
 }
 
-pub fn create_transport_receiver(hw: &impl HardwareSetup, address: Address) -> ReceiverFactory {
+pub fn create_transport_receiver(
+    hw: &'static impl HardwareSetup,
+    input_pin_cell: &'static StaticCell<RefCell<ExtiInput<RadioReceiverPin>>>,
+    address: Address,
+) -> ReceiverFactory<'static> {
     let input = hw.create_radio_receiving_input();
+    let shared_input = SharedExtiPin::new(input, input_pin_cell);
 
-    // let pin_reader = PinPwmReader::<_, false>::new(get_reader_timing(), input)
-    //     .expect("Could not create PinReader");
+    let pin_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input)
+        .expect("Could not create PinReader");
+
     // // 4-bytes to send single packet of 32bits
     // let sync = PwmSyncMarkerReader::new(pin_reader, get_sync_sequence());
     // let sync_reader = SyncReader::new(sync, &pin_reader, Duration::from_micros(0));

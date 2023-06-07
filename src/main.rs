@@ -4,10 +4,12 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
+use core::cell::RefCell;
 use defmt::info;
 use {defmt_rtt as _, panic_probe as _};
 
 use embassy_executor::Spawner;
+use embassy_stm32::exti::ExtiInput;
 use embassy_time::{Duration, Timer};
 use static_cell::StaticCell;
 
@@ -15,12 +17,13 @@ mod hardware;
 mod payload;
 mod transport;
 
+use hardware::io::RadioReceiverPin;
 use hardware::{Hardware, HardwareSetup};
-
 use network::transport::{TransportReceiver, TransportSender};
 use network::Address;
 
 static HARDWARE: StaticCell<Hardware> = StaticCell::new();
+static RF_INPUT_PIN: StaticCell<RefCell<ExtiInput<RadioReceiverPin>>> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
@@ -44,7 +47,8 @@ async fn main(spawner: Spawner) -> ! {
     // Init reader
 
     let receiver_address = Address::new(0x01, 0x0f);
-    let simple_receiver = transport::create_transport_receiver(hardware, receiver_address);
+    let simple_receiver =
+        transport::create_transport_receiver(hardware, &RF_INPUT_PIN, receiver_address);
     spawner.spawn(read_task(simple_receiver)).unwrap();
 
     ///////////////////
