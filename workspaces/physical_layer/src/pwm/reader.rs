@@ -9,7 +9,7 @@ use embassy_time::{with_timeout, Duration, Instant};
 use crate::error::ReadError;
 use crate::pwm::sync::SyncSequence;
 use crate::pwm::writer::WriterTiming;
-use crate::utils::SharedExtiPin;
+use crate::utils::SharedPin;
 
 pub struct ReaderTiming {
     pub zeroes: Duration,
@@ -139,12 +139,12 @@ pub trait PwmReader: crate::BaseReader {
 
 pub struct PinPwmReader<'a, P: Pin, const INVERT: bool = false> {
     timing: ReaderTiming,
-    pin: SharedExtiPin<'a, ExtiInput<'a, P>>,
+    pin: SharedPin<'a, ExtiInput<'a, P>>,
 }
 
 impl<'a, P: Pin, const INVERT: bool> PinPwmReader<'a, P, INVERT> {
     #[allow(clippy::result_unit_err)]
-    pub fn new(timing: ReaderTiming, pin: SharedExtiPin<'a, ExtiInput<'a, P>>) -> Result<Self, ()> {
+    pub fn new(timing: ReaderTiming, pin: SharedPin<'a, ExtiInput<'a, P>>) -> Result<Self, ()> {
         Ok(Self { timing, pin })
     }
 

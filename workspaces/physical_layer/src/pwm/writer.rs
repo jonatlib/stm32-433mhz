@@ -2,6 +2,7 @@ use embassy_stm32::gpio::{Output, Pin};
 use embassy_time::{Duration, Timer};
 
 use crate::error::WriterError;
+use crate::utils::SharedPin;
 
 pub struct WriterTiming {
     pub zeroes: Duration,
@@ -79,12 +80,12 @@ pub trait PwmWriter: crate::BaseWriter {
 
 pub struct PinPwmWriter<'a, P: Pin, const INVERT: bool = false> {
     timing: WriterTiming,
-    pin: Output<'a, P>,
+    pin: SharedPin<'a, Output<'a, P>>,
 }
 
 impl<'a, P: Pin, const INVERT: bool> PinPwmWriter<'a, P, INVERT> {
     #[allow(clippy::result_unit_err)]
-    pub fn new(timing: WriterTiming, mut pin: Output<'a, P>) -> Result<Self, ()> {
+    pub fn new(timing: WriterTiming, mut pin: SharedPin<'a, Output<'a, P>>) -> Result<Self, ()> {
         if INVERT {
             pin.set_high();
         } else {

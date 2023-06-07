@@ -11,6 +11,16 @@ pub struct SyncWriter<W: BaseWriter, SW: SyncMarkerWriter> {
     time_after_sync: Duration,
 }
 
+impl<W: BaseWriter, SW: SyncMarkerWriter> SyncWriter<W, SW> {
+    pub fn new(sync: SW, writer: W, time_after_sync: Duration) -> Self {
+        Self {
+            sync,
+            writer,
+            time_after_sync,
+        }
+    }
+}
+
 impl<W: BaseWriter, SW: SyncMarkerWriter> BaseWriter for SyncWriter<W, SW> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
         self.sync.write_sync().await?;

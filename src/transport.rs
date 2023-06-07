@@ -1,16 +1,17 @@
 use crate::hardware::{io, HardwareSetup};
 use core::cell::RefCell;
 use embassy_stm32::exti::ExtiInput;
+use embassy_stm32::gpio::Output;
 use embassy_time::Duration;
 use static_cell::StaticCell;
 
 use physical_layer::pwm::ReaderTiming;
 use physical_layer::pwm::WriterTiming;
 use physical_layer::pwm::{
-    PinPwmReader, PinPwmWriter, PwmSyncMarkerReader, SyncPwmWriter, SyncSequence,
+    PinPwmReader, PinPwmWriter, PwmSyncMarkerReader, PwmSyncMarkerWriter, SyncSequence,
 };
 
-use crate::hardware::io::RadioReceiverPin;
+use crate::hardware::io::{RadioReceiverPin, RadioSenderPin};
 
 use codec::lzss::LzssCompression;
 use codec::reed_solomon::ReedSolomon;
@@ -18,7 +19,8 @@ use network::simple::receiver::SimpleReceiver;
 use network::simple::sender::SimpleSender;
 use network::Address;
 use physical_layer::sync::reader::SyncReader;
-use physical_layer::utils::SharedExtiPin;
+use physical_layer::sync::writer::SyncWriter;
+use physical_layer::utils::SharedPin;
 
 fn get_sync_sequence() -> SyncSequence {
     SyncSequence::new_simple(Duration::from_micros(1500), 4, 0b1011)
@@ -58,7 +60,10 @@ fn create_compression() -> CompressionType {
 }
 
 pub type SenderFactory<'a> = SimpleSender<
-    SyncPwmWriter<PinPwmWriter<'a, io::RadioSenderPin, false>>,
+    SyncWriter<
+        PinPwmWriter<'a, io::RadioSenderPin, false>,
+        PwmSyncMarkerWriter<PinPwmWriter<'a, io::RadioSenderPin, false>>,
+    >,
     CodecType,
     CompressionType,
 >;
@@ -71,12 +76,21 @@ pub type ReceiverFactory<'a> = SimpleReceiver<
     CompressionType,
 >;
 
-pub fn create_transport_sender(hw: &impl HardwareSetup, address: Address) -> SenderFactory {
+pub fn create_transport_sender(
+    hw: &'static impl HardwareSetup,
+    output_pin_cell: &'static StaticCell<RefCell<Output<RadioSenderPin>>>,
+    address: Address,
+) -> SenderFactory<'static> {
     let output = hw.create_radio_sending_output();
+    let shared_output = SharedPin::new(output, output_pin_cell);
 
-    let pin_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), output)
+    let pin_sync_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output)
         .expect("Could not create PinWriter");
-    let sync_writer = SyncPwmWriter::new(pin_writer, get_sync_sequence());
+    let pin_data_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output)
+        .expect("Could not create PinWriter");
+
+    let sync = PwmSyncMarkerWriter::new(pin_sync_writer, get_sync_sequence());
+    let sync_writer = SyncWriter::new(sync, pin_data_writer, Duration::from_millis(1));
 
     SimpleSender::new(address, sync_writer, create_codec(), create_compression())
 }
@@ -87,7 +101,7 @@ pub fn create_transport_receiver(
     address: Address,
 ) -> ReceiverFactory<'static> {
     let input = hw.create_radio_receiving_input();
-    let shared_input = SharedExtiPin::new(input, input_pin_cell);
+    let shared_input = SharedPin::new(input, input_pin_cell);
 
     let pin_sync_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input)
         .expect("Could not create PinReader");

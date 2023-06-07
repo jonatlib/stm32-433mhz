@@ -10,6 +10,7 @@ use {defmt_rtt as _, panic_probe as _};
 
 use embassy_executor::Spawner;
 use embassy_stm32::exti::ExtiInput;
+use embassy_stm32::gpio::Output;
 use embassy_time::{Duration, Timer};
 use static_cell::StaticCell;
 
@@ -18,12 +19,14 @@ mod payload;
 mod transport;
 
 use hardware::io::RadioReceiverPin;
+use hardware::io::RadioSenderPin;
 use hardware::{Hardware, HardwareSetup};
 use network::transport::{TransportReceiver, TransportSender};
 use network::Address;
 
 static HARDWARE: StaticCell<Hardware> = StaticCell::new();
 static RF_INPUT_PIN: StaticCell<RefCell<ExtiInput<RadioReceiverPin>>> = StaticCell::new();
+static RF_OUTPUT_PIN: StaticCell<RefCell<Output<RadioSenderPin>>> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
@@ -55,7 +58,8 @@ async fn main(spawner: Spawner) -> ! {
     // Init sender
 
     let sender_address = Address::new(0x0f, 0x01);
-    let mut simple_sender = transport::create_transport_sender(hardware, sender_address);
+    let mut simple_sender =
+        transport::create_transport_sender(hardware, &RF_OUTPUT_PIN, sender_address);
     let mut transport = simple_sender.create_transport();
 
     // Main loop
