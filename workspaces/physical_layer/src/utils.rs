@@ -35,6 +35,8 @@ impl<'a, T> Clone for SharedExtiPin<'a, T> {
     }
 }
 
+impl<'a, T> Copy for SharedExtiPin<'a, T> {}
+
 impl<'a, T: Pin> SharedExtiPin<'a, ExtiInput<'a, T>> {
     pub async fn wait_for_falling_edge(&self) {
         self.borrow_mut().wait_for_falling_edge().await

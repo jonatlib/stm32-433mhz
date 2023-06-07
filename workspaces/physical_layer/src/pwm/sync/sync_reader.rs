@@ -11,17 +11,12 @@ use crate::sync::SyncMarkerRead;
 pub struct PwmSyncMarkerReader<R: PwmReader> {
     reader: R,
     sync: SyncSequence,
-    _phantom: PhantomData<R>,
 }
 
 impl<R: PwmReader> PwmSyncMarkerReader<R> {
     pub fn new(mut reader: R, sync: SyncSequence) -> Self {
         reader.get_mut_timing().adjust_to_sync_marker(&sync);
-        Self {
-            sync,
-            reader,
-            _phantom: Default::default(),
-        }
+        Self { sync, reader }
     }
 }
 

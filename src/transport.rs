@@ -89,14 +89,14 @@ pub fn create_transport_receiver(
     let input = hw.create_radio_receiving_input();
     let shared_input = SharedExtiPin::new(input, input_pin_cell);
 
-    let pin_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input)
+    let pin_sync_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input)
+        .expect("Could not create PinReader");
+    let pin_data_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input)
         .expect("Could not create PinReader");
 
-    // // 4-bytes to send single packet of 32bits
-    // let sync = PwmSyncMarkerReader::new(pin_reader, get_sync_sequence());
-    // let sync_reader = SyncReader::new(sync, &pin_reader, Duration::from_micros(0));
-    //
-    // SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
+    // 4-bytes to send single packet of 32bits
+    let sync = PwmSyncMarkerReader::new(pin_sync_reader, get_sync_sequence());
+    let sync_reader = SyncReader::new(sync, pin_data_reader, Duration::from_micros(0));
 
-    todo!()
+    SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 }
