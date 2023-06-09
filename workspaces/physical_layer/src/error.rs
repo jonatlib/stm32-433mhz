@@ -14,7 +14,9 @@ impl ReadError {
 }
 
 #[derive(Format, Debug)]
-pub enum WriterError {}
+pub enum WriterError {
+    RuntimeError,
+}
 
 impl WriterError {
     pub fn is_recoverable(&self) -> bool {

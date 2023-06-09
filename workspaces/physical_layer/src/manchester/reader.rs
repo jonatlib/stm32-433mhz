@@ -8,12 +8,13 @@ use manchester_code::Decoder;
 
 pub struct ManchesterReader<'a, P: Pin> {
     pin: SharedPin<'a, Input<'a, P>>,
+    // FIXME remove
     decoder: Decoder,
     timing: Duration,
 }
 
 impl<'a, P: Pin> ManchesterReader<'a, P> {
-    pub fn new(pin: SharedPin<'a, Input<P>>, decoder: Decoder, timing: Duration) -> Self {
+    pub fn new(pin: SharedPin<'a, Input<'a, P>>, decoder: Decoder, timing: Duration) -> Self {
         Self {
             pin,
             decoder,
