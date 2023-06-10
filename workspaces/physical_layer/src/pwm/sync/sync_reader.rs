@@ -22,6 +22,7 @@ impl<R: PwmReader> PwmSyncMarkerReader<R> {
 
 impl<R: PwmReader> SyncMarkerRead for PwmSyncMarkerReader<R> {
     async fn sync(&mut self) -> Result<(), ReadError> {
+        self.reader.init().await;
         self.sync.read_sequence(&mut self.reader).await
     }
 }

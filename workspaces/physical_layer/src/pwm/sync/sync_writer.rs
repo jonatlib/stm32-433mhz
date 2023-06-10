@@ -19,6 +19,7 @@ impl<W: PwmWriter> PwmSyncMarkerWriter<W> {
 
 impl<W: PwmWriter> SyncMarkerWriter for PwmSyncMarkerWriter<W> {
     async fn write_sync(&mut self) -> Result<(), WriterError> {
+        self.writer.init().await;
         self.sync.write_sequence(&mut self.writer).await
     }
 }

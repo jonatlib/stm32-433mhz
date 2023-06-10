@@ -9,10 +9,12 @@ pub mod sync;
 pub mod utils;
 
 pub trait BaseReader {
+    async fn init(&mut self) {} // FIXME call inits before using reader (not inside the reader)
     async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, error::ReadError>;
 }
 
 pub trait BaseWriter {
+    async fn init(&mut self) {} // FIXME call inits before using writer
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, error::WriterError>;
     async fn write_bytes_iterator<I: Iterator<Item = u8>>(
         &mut self,

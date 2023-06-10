@@ -97,6 +97,11 @@ impl<'a, P: Pin, const INVERT: bool> PinPwmWriter<'a, P, INVERT> {
 }
 
 impl<'a, P: Pin, const INVERT: bool> crate::BaseWriter for PinPwmWriter<'a, P, INVERT> {
+    async fn init(&mut self) {
+        self.pin.set_low();
+        Timer::after(Duration::from_millis(10)).await;
+    }
+
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
         self.write_bytes(buffer).await
     }

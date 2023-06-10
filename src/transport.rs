@@ -1,4 +1,5 @@
 use crate::hardware::{io, HardwareSetup};
+use codec::Identity;
 use core::cell::RefCell;
 use embassy_stm32::exti::ExtiInput;
 use embassy_stm32::gpio::Output;
@@ -18,6 +19,7 @@ use codec::reed_solomon::ReedSolomon;
 use network::simple::receiver::SimpleReceiver;
 use network::simple::sender::SimpleSender;
 use network::Address;
+use physical_layer::manchester::writer::ManchesterWriter;
 use physical_layer::sync::reader::SyncReader;
 use physical_layer::sync::writer::SyncWriter;
 use physical_layer::utils::SharedPin;
@@ -45,12 +47,12 @@ fn get_reader_timing() -> ReaderTiming {
 }
 
 // type CodecType = FourToSixBits<10>; // FIXME wtf this is not 4?
-type CodecType = ReedSolomon<4, 4>;
-// type CodecType = Identity;
+// type CodecType = ReedSolomon<4, 4>;
+type CodecType = Identity;
 // type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<20>, 4>; // FIXME FourToSixBits buffer weird
 
-type CompressionType = LzssCompression;
-// type CompressionType = Identity;
+// type CompressionType = LzssCompression;
+type CompressionType = Identity;
 
 fn create_codec() -> CodecType {
     CodecType::default()
@@ -61,7 +63,8 @@ fn create_compression() -> CompressionType {
 
 pub type SenderFactory<'a> = SimpleSender<
     SyncWriter<
-        PinPwmWriter<'a, io::RadioSenderPin, false>,
+        // PinPwmWriter<'a, io::RadioSenderPin, false>,
+        ManchesterWriter<'a, io::RadioSenderPin>,
         PwmSyncMarkerWriter<PinPwmWriter<'a, io::RadioSenderPin, false>>,
     >,
     CodecType,
@@ -86,8 +89,8 @@ pub fn create_transport_sender(
 
     let pin_sync_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output)
         .expect("Could not create PinWriter");
-    let pin_data_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output)
-        .expect("Could not create PinWriter");
+    // let pin_data_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output).expect("Could not create PinWriter");
+    let pin_data_writer = ManchesterWriter::new(shared_output, Duration::from_millis(1));
 
     let sync = PwmSyncMarkerWriter::new(pin_sync_writer, get_sync_sequence());
     let sync_writer = SyncWriter::new(sync, pin_data_writer, Duration::from_millis(1));
