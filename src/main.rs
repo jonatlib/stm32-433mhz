@@ -52,7 +52,7 @@ async fn main(spawner: Spawner) -> ! {
     let receiver_address = Address::new(0x01, 0x0f);
     let simple_receiver =
         transport::create_transport_receiver(hardware, &RF_INPUT_PIN, receiver_address);
-    // spawner.spawn(read_task(simple_receiver)).unwrap();
+    spawner.spawn(read_task(simple_receiver)).unwrap();
 
     ///////////////////
     // Init sender

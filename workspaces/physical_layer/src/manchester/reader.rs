@@ -3,17 +3,18 @@ use crate::manchester::codec::{create_manchester_timing, BitOrder, DecoderBool, 
 use crate::utils::SharedPin;
 use crate::BaseReader;
 use defmt::debug;
+use embassy_stm32::exti::ExtiInput;
 
 use embassy_stm32::gpio::{Input, Pin};
 use embassy_time::{with_timeout, Duration, Timer};
 
 pub struct ManchesterReader<'a, P: Pin> {
-    pin: SharedPin<'a, Input<'a, P>>,
+    pin: SharedPin<'a, ExtiInput<'a, P>>,
     timing: ManchesterTiming,
 }
 
 impl<'a, P: Pin> ManchesterReader<'a, P> {
-    pub fn new(pin: SharedPin<'a, Input<'a, P>>, data_timing: Duration) -> Self {
+    pub fn new(pin: SharedPin<'a, ExtiInput<'a, P>>, data_timing: Duration) -> Self {
         Self {
             pin,
             timing: create_manchester_timing(data_timing),

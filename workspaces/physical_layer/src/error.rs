@@ -5,6 +5,7 @@ pub enum ReadError {
     TimeoutError,
     ThresholdError,
     OutOfTiming,
+    RuntimeError,
 }
 
 impl ReadError {

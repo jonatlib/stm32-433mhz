@@ -45,6 +45,14 @@ impl<'a, T: Pin> SharedPin<'a, ExtiInput<'a, T>> {
     pub async fn wait_for_rising_edge(&self) {
         self.borrow_mut().wait_for_rising_edge().await
     }
+
+    pub fn is_high(&self) -> bool {
+        self.borrow().is_high()
+    }
+
+    pub fn is_low(&self) -> bool {
+        self.borrow().is_low()
+    }
 }
 
 impl<'a, T: Pin> SharedPin<'a, Output<'a, T>> {
@@ -54,15 +62,5 @@ impl<'a, T: Pin> SharedPin<'a, Output<'a, T>> {
 
     pub fn set_low(&self) {
         self.borrow_mut().set_low()
-    }
-}
-
-impl<'a, T: Pin> SharedPin<'a, Input<'a, T>> {
-    pub fn is_high(&self) -> bool {
-        self.borrow().is_high()
-    }
-
-    pub fn is_low(&self) -> bool {
-        self.borrow().is_low()
     }
 }
