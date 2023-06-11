@@ -568,16 +568,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "manchester-code"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "719cf6f877104a546c4daaa10d7315888365912e19bff819c1c3a31059d054fe"
-dependencies = [
- "defmt",
- "embedded-hal 0.2.7",
-]
-
-[[package]]
 name = "nb"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -643,7 +633,6 @@ dependencies = [
  "embassy-stm32",
  "embassy-time",
  "futures",
- "manchester-code",
  "static_cell",
 ]
 
