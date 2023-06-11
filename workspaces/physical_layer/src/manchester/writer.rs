@@ -4,7 +4,7 @@ use embassy_time::{Duration, Timer};
 
 use crate::error::WriterError;
 use crate::manchester::codec::{
-    create_manchester_timing, BitOrder, EncoderIterator, ManchesterTiming,
+    create_manchester_timing, BitOrder, EncoderBoolIterator, ManchesterTiming,
 };
 use crate::utils::SharedPin;
 use crate::BaseWriter;
@@ -32,7 +32,7 @@ impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
         &mut self,
         data: I,
     ) -> Result<usize, WriterError> {
-        let mut encoder = EncoderIterator::new(data, BitOrder::LittleEndian);
+        let mut encoder = EncoderBoolIterator::new(data, BitOrder::LittleEndian);
         // FIXME use DMA instead and implement different encoder
         for bit in encoder {
             if bit {
