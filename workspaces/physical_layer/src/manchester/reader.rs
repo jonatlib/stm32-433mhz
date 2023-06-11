@@ -2,7 +2,7 @@ use crate::error::ReadError;
 use crate::manchester::codec::{create_manchester_timing, BitOrder, DecoderBool, ManchesterTiming};
 use crate::utils::SharedPin;
 use crate::BaseReader;
-use defmt::debug;
+use defmt::{debug, trace};
 use embassy_stm32::exti::ExtiInput;
 
 use embassy_stm32::gpio::{Input, Pin};
@@ -55,6 +55,7 @@ impl<'a, P: Pin> BaseReader for ManchesterReader<'a, P> {
             *element = with_timeout(self.timing.decoding_timeout, self.read_byte(&mut decoder))
                 .await
                 .map_err(|_| ReadError::TimeoutError)??;
+            trace!("Manchester reader received byte = {:#04x}", element);
         }
         Ok(buffer.len())
     }

@@ -92,10 +92,10 @@ pub fn create_transport_sender(
     let pin_sync_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output)
         .expect("Could not create PinWriter");
     // let pin_data_writer = PinPwmWriter::<_, false>::new(get_writer_timing(), shared_output).expect("Could not create PinWriter");
-    let pin_data_writer = ManchesterWriter::new(shared_output, Duration::from_millis(1)); // FIXME timing in a method
+    let pin_data_writer = ManchesterWriter::new(shared_output, Duration::from_millis(2)); // FIXME timing in a method
 
     let sync = PwmSyncMarkerWriter::new(pin_sync_writer, get_sync_sequence());
-    let sync_writer = SyncWriter::new(sync, pin_data_writer, Duration::from_millis(1));
+    let sync_writer = SyncWriter::new(sync, pin_data_writer, Duration::from_millis(2));
 
     SimpleSender::new(address, sync_writer, create_codec(), create_compression())
 }
@@ -111,11 +111,11 @@ pub fn create_transport_receiver(
     let pin_sync_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input)
         .expect("Could not create PinReader");
     // let pin_data_reader = PinPwmReader::<_, false>::new(get_reader_timing(), shared_input).expect("Could not create PinReader");
-    let pin_data_reader = ManchesterReader::new(shared_input, Duration::from_millis(1)); // FIXME timing in a method
+    let pin_data_reader = ManchesterReader::new(shared_input, Duration::from_millis(2)); // FIXME timing in a method
 
     // 4-bytes to send single packet of 32bits
     let sync = PwmSyncMarkerReader::new(pin_sync_reader, get_sync_sequence());
-    let sync_reader = SyncReader::new(sync, pin_data_reader, Duration::from_micros(0));
+    let sync_reader = SyncReader::new(sync, pin_data_reader, Duration::from_millis(2));
 
     SimpleReceiver::new(address, sync_reader, create_codec(), create_compression())
 }

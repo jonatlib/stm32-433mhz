@@ -1,4 +1,5 @@
 use defmt::export::str;
+use defmt::trace;
 use embassy_stm32::gpio::{Output, Pin};
 use embassy_time::{Duration, Timer};
 
@@ -25,6 +26,7 @@ impl<'a, P: Pin> ManchesterWriter<'a, P> {
 
 impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
+        trace!("Manchester writer writing buffer = {:?}", buffer);
         self.write_bytes_iterator(buffer.iter().copied()).await
     }
 
@@ -32,6 +34,18 @@ impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
         &mut self,
         data: I,
     ) -> Result<usize, WriterError> {
+        let mut tmp_buffer = [0u8; 32];
+        let mut elements = 0usize;
+        data.enumerate().for_each(|(index, v)| {
+            tmp_buffer[index] = v;
+            elements = index + 1;
+        });
+        trace!(
+            "Manchester writer writing buffer = {:#04x}",
+            &tmp_buffer[..elements]
+        );
+        let data = tmp_buffer[..elements].into_iter().copied();
+
         let mut encoder = EncoderBoolIterator::new(data, BitOrder::LittleEndian);
         // FIXME use DMA instead and implement different encoder
         for bit in encoder {
@@ -42,6 +56,7 @@ impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
             }
             Timer::after(self.timing.encoding_between_half_bits).await;
         }
+        self.pin.set_low();
         Ok(1) // FIXME
     }
 }

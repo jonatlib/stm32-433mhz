@@ -1,5 +1,7 @@
+use defmt::trace;
 use embassy_time::Duration;
 
+#[derive(Debug)]
 pub struct ManchesterTiming {
     pub encoding_between_half_bits: Duration,
     pub decoding_start_wait: Duration,
@@ -19,7 +21,7 @@ pub fn create_manchester_timing(data_timing: Duration) -> ManchesterTiming {
         decoding_middle_wait: half,
         decoding_end_wait: quarter,
 
-        decoding_timeout: data_timing * 10,
+        decoding_timeout: data_timing * 15,
     }
 }
 
@@ -58,7 +60,7 @@ impl<I: Iterator<Item = u8>> Iterator for EncoderBoolIterator<I> {
             self.current_index = 0;
         }
 
-        let current_byte = self.current_byte.or(self.data.next())?;
+        let current_byte = self.current_byte.or_else(|| self.data.next())?;
         if self.current_byte.is_none() {
             self.current_byte = Some(current_byte);
             self.current_index = 0;
@@ -98,6 +100,14 @@ impl DecoderBool {
     }
 
     pub fn next(&mut self, input: bool) -> Option<u8> {
+        trace!(
+            "Manchester decoder[state: {:b}; index: {}], received = {}, pair = ({:?}, {:?})",
+            self.current_byte,
+            self.current_index,
+            input,
+            self.pair_0,
+            self.pair_1,
+        );
         if self.pair_0.is_none() {
             self.pair_0 = Some(input);
             return None;
@@ -108,6 +118,9 @@ impl DecoderBool {
         }
 
         let pair = (self.pair_0.unwrap(), self.pair_1.unwrap());
+        self.pair_0 = None;
+        self.pair_1 = None;
+
         // TODO wha about the invalid values?
         let received_bit = match pair {
             (false, false) => false, // Just a heuristic
@@ -116,7 +129,10 @@ impl DecoderBool {
             (true, true) => true,    // Just a heuristic
         };
 
-        self.current_byte |= (received_bit as u8) << self.current_index;
+        // FIXME implement other bit orders
+        if received_bit {
+            self.current_byte |= (0x01 << self.current_index);
+        }
         self.current_index += 1;
 
         if self.current_index >= 8 {
