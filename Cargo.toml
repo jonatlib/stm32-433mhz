@@ -5,7 +5,14 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["workspaces/codec", "workspaces/physical_layer", "workspaces/network", "workspaces/sequence_number", "workspaces/external_memory"]
+members = [
+    "workspaces/codec",
+    "workspaces/physical_layer",
+    "workspaces/network",
+    "workspaces/sequence_number",
+    "workspaces/external_memory",
+    "workspaces/manchester",
+]
 
 
 [features]

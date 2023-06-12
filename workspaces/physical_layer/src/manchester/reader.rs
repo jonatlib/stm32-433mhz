@@ -1,9 +1,9 @@
 use crate::error::ReadError;
-use crate::manchester::codec::{create_manchester_timing, BitOrder, DecoderBool, ManchesterTiming};
 use crate::utils::SharedPin;
 use crate::BaseReader;
 use defmt::{debug, trace};
 use embassy_stm32::exti::ExtiInput;
+use manchester::{create_manchester_timing, BitOrder, DecoderBool, ManchesterTiming};
 
 use embassy_stm32::gpio::{Input, Pin};
 use embassy_time::{with_timeout, Duration, Timer};

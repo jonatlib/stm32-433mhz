@@ -4,11 +4,9 @@ use embassy_stm32::gpio::{Output, Pin};
 use embassy_time::{Duration, Timer};
 
 use crate::error::WriterError;
-use crate::manchester::codec::{
-    create_manchester_timing, BitOrder, EncoderBoolIterator, ManchesterTiming,
-};
 use crate::utils::SharedPin;
 use crate::BaseWriter;
+use manchester::{create_manchester_timing, BitOrder, EncoderBoolIterator, ManchesterTiming};
 
 pub struct ManchesterWriter<'a, P: Pin> {
     pin: SharedPin<'a, Output<'a, P>>,

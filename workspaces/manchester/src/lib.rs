@@ -1,3 +1,10 @@
+#![no_std]
+
+// Enable testing on local machine
+#[cfg(test)]
+#[macro_use]
+extern crate std;
+
 use defmt::trace;
 use embassy_time::Duration;
 
@@ -149,3 +156,6 @@ impl DecoderBool {
         None
     }
 }
+
+#[cfg(test)]
+mod test {}
