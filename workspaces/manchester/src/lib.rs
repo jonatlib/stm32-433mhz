@@ -107,14 +107,14 @@ impl DecoderBool {
     }
 
     pub fn next(&mut self, input: bool) -> Option<u8> {
-        trace!(
-            "Manchester decoder[state: {:b}; index: {}], received = {}, pair = ({:?}, {:?})",
-            self.current_byte,
-            self.current_index,
-            input,
-            self.pair_0,
-            self.pair_1,
-        );
+        // trace!(
+        //     "Manchester decoder[state: {:b}; index: {}], received = {}, pair = ({:?}, {:?})",
+        //     self.current_byte,
+        //     self.current_index,
+        //     input,
+        //     self.pair_0,
+        //     self.pair_1,
+        // );
         if self.pair_0.is_none() {
             self.pair_0 = Some(input);
             return None;
@@ -158,4 +158,30 @@ impl DecoderBool {
 }
 
 #[cfg(test)]
-mod test {}
+mod test {
+    use super::*;
+
+    use std::vec::Vec;
+
+    #[test]
+    fn test_encode_bits() {}
+
+    #[test]
+    fn test_decode_bits() {}
+
+    #[test]
+    fn test_encode_decode() {
+        let payload = [1u8, 2, 3, 4, 5];
+        let mut encoder = EncoderBoolIterator::new(payload.iter().copied(), BitOrder::LittleEndian);
+        let mut decoder = DecoderBool::new(BitOrder::LittleEndian);
+
+        let mut result: Vec<u8> = Vec::new();
+        for bit in encoder {
+            if let Some(byte) = decoder.next(bit) {
+                result.push(byte);
+            }
+        }
+
+        assert_eq!(Vec::from(payload), result);
+    }
+}
