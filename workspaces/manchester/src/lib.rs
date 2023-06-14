@@ -45,6 +45,7 @@ pub struct EncoderBoolIterator<I> {
 
     current_byte: Option<u8>,
     current_index: u8,
+    next_bit: Option<bool>,
 }
 
 impl<I: Iterator<Item = u8>> EncoderBoolIterator<I> {
@@ -54,6 +55,7 @@ impl<I: Iterator<Item = u8>> EncoderBoolIterator<I> {
             data,
             current_byte: None,
             current_index: 0,
+            next_bit: None,
         }
     }
 }
@@ -62,15 +64,22 @@ impl<I: Iterator<Item = u8>> Iterator for EncoderBoolIterator<I> {
     type Item = bool;
 
     fn next(&mut self) -> Option<Self::Item> {
+        if let Some(next_bit) = self.next_bit {
+            self.next_bit = None;
+            return Some(next_bit);
+        }
+
         if self.current_index >= 8 {
             self.current_byte = None;
             self.current_index = 0;
+            self.next_bit = None;
         }
 
         let current_byte = self.current_byte.or_else(|| self.data.next())?;
         if self.current_byte.is_none() {
             self.current_byte = Some(current_byte);
             self.current_index = 0;
+            self.next_bit = None;
         }
 
         let result = match self.bit_order {
@@ -79,7 +88,13 @@ impl<I: Iterator<Item = u8>> Iterator for EncoderBoolIterator<I> {
         };
 
         self.current_index += 1;
-        Some(result > 0)
+        if result > 0 {
+            self.next_bit = Some(true);
+            return Some(false);
+        } else {
+            self.next_bit = Some(false);
+            return Some(true);
+        }
     }
 }
 
@@ -164,10 +179,37 @@ mod test {
     use std::vec::Vec;
 
     #[test]
-    fn test_encode_bits() {}
+    fn test_encode_bits() {
+        let payload = [0x01; 1];
+        let mut encoder = EncoderBoolIterator::new(payload.iter().copied(), BitOrder::LittleEndian);
+        let result: Vec<bool> = encoder.collect();
+
+        assert_eq!(
+            vec![0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,]
+                .into_iter()
+                .map(|v| v > 0)
+                .collect::<Vec<bool>>(),
+            result
+        );
+    }
 
     #[test]
-    fn test_decode_bits() {}
+    fn test_decode_bits() {
+        let payload = vec![0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+            .into_iter()
+            .map(|v| v > 0)
+            .collect::<Vec<bool>>();
+        let mut decoder = DecoderBool::new(BitOrder::LittleEndian);
+        let mut result: Vec<u8> = Vec::new();
+
+        for bit in payload {
+            if let Some(byte) = decoder.next(bit) {
+                result.push(byte);
+            }
+        }
+
+        assert_eq!(result, [0x01; 1]);
+    }
 
     #[test]
     fn test_encode_decode() {

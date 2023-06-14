@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/workspaces/sequence_number/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/workspaces/external_memory/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/workspaces/physical_layer/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/workspaces/manchester/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
