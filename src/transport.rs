@@ -26,7 +26,7 @@ use physical_layer::sync::writer::SyncWriter;
 use physical_layer::utils::SharedPin;
 
 fn get_sync_sequence() -> SyncSequence {
-    SyncSequence::new_simple(Duration::from_micros(1500), 4, 0b1011)
+    SyncSequence::new_simple(Duration::from_micros(2500), 4, 0b1011)
 }
 
 fn get_writer_timing() -> WriterTiming {
