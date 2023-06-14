@@ -34,7 +34,7 @@ async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
 
     loop {
         let data: Result<payload::SensorPayload, _> =
-            match with_timeout(Duration::from_secs(10), transport.receive_struct()).await {
+            match with_timeout(Duration::from_secs(30), transport.receive_struct()).await {
                 Ok(v) => v,
                 Err(e) => {
                     trace!("Timeout while waiting for reader");
