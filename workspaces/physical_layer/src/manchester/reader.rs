@@ -55,7 +55,7 @@ impl<'a, P: Pin> BaseReader for ManchesterReader<'a, P> {
             *element = with_timeout(self.timing.decoding_timeout, self.read_byte(&mut decoder))
                 .await
                 .map_err(|_| ReadError::TimeoutError)??;
-            trace!("Manchester reader received byte = {:#04x}", element);
+            // trace!("Manchester reader received byte = {:#04x}", element);
         }
         Ok(buffer.len())
     }

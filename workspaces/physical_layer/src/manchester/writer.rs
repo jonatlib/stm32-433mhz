@@ -24,7 +24,7 @@ impl<'a, P: Pin> ManchesterWriter<'a, P> {
 
 impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
     async fn write_bytes_buffer(&mut self, buffer: &[u8]) -> Result<usize, WriterError> {
-        trace!("Manchester writer writing buffer = {:?}", buffer);
+        // trace!("Manchester writer writing buffer = {:?}", buffer);
         self.write_bytes_iterator(buffer.iter().copied()).await
     }
 
@@ -38,10 +38,10 @@ impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
             tmp_buffer[index] = v;
             elements = index + 1;
         });
-        trace!(
-            "Manchester writer writing buffer = {:#04x}",
-            &tmp_buffer[..elements]
-        );
+        // trace!(
+        //     "Manchester writer writing buffer = {:#04x}",
+        //     &tmp_buffer[..elements]
+        // );
         let data = tmp_buffer[..elements].into_iter().copied();
 
         let mut encoder = EncoderBoolIterator::new(data, BitOrder::LittleEndian);

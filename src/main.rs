@@ -5,13 +5,13 @@
 #![feature(generic_const_exprs)]
 
 use core::cell::RefCell;
-use defmt::info;
+use defmt::{info, trace};
 use {defmt_rtt as _, panic_probe as _};
 
 use embassy_executor::Spawner;
 use embassy_stm32::exti::ExtiInput;
 use embassy_stm32::gpio::Output;
-use embassy_time::{Duration, Timer};
+use embassy_time::{with_timeout, Duration, Timer};
 use static_cell::StaticCell;
 
 mod hardware;
@@ -33,7 +33,14 @@ async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
     let mut transport = simple_receiver.create_transport();
 
     loop {
-        let data: Result<payload::SensorPayload, _> = transport.receive_struct().await;
+        let data: Result<payload::SensorPayload, _> =
+            match with_timeout(Duration::from_secs(10), transport.receive_struct()).await {
+                Ok(v) => v,
+                Err(e) => {
+                    trace!("Timeout while waiting for reader");
+                    continue;
+                }
+            };
         info!("---------------------------------------------------");
         info!("Read data = {:?}", data);
         info!("---------------------------------------------------");
