@@ -148,6 +148,18 @@ impl<const MODULO: u8> From<u32> for SequenceNumber<MODULO> {
     }
 }
 
+impl<const MODULO: u8> From<SequenceNumber<MODULO>> for u64 {
+    fn from(value: SequenceNumber<MODULO>) -> Self {
+        value.value() as u64
+    }
+}
+
+impl<const MODULO: u8> From<u64> for SequenceNumber<MODULO> {
+    fn from(value: u64) -> Self {
+        Self::new((value % (MODULO as u64)) as u8)
+    }
+}
+
 impl<const MODULO: u8> From<u8> for SequenceNumber<MODULO> {
     fn from(value: u8) -> Self {
         Self::new(value)
