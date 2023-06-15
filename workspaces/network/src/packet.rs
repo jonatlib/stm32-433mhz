@@ -121,7 +121,7 @@ impl Packet64 {
         let bits: u8 = (CRC4_BITS_TO_CHECK + 3) & !0x3;
 
         // Calculate crc4 over four-bit nibbles, starting at the MSbit
-        let mut index = bits - 4;
+        let mut index: i16 = bits as i16 - 4;
         let mut crc = CRC4_START;
         while index >= 0 {
             crc = CRC4_TABLE[(crc ^ ((value >> index) & 0xfu64) as u8) as usize];
@@ -159,5 +159,24 @@ impl defmt::Format for Packet64 {
             self.payload_used_index(),
             self.crc4(),
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_crc_packet64() {
+        let packet_data = 0x1234_1234_1234_1234u64;
+        let mut packet64 = Packet64::from(packet_data);
+        assert!(!packet64.validate());
+
+        packet64.update_crc();
+        assert!(packet64.validate());
+
+        let crc = packet64.crc4();
+        packet64.update_crc();
+        assert_eq!(crc, packet64.crc4());
     }
 }
