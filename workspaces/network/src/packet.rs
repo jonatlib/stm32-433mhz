@@ -67,6 +67,18 @@ pub struct Packet32 {
     pub both_bytes_used: bool,
 }
 
+impl Packet32 {
+    pub fn to_be_bytes(self) -> [u8; 4] {
+        Into::<u32>::into(self).to_be_bytes()
+    }
+}
+
+impl From<u64> for Packet32 {
+    fn from(value: u64) -> Self {
+        ((value & 0x0000_0000_ffff_ffff) as u32).into()
+    }
+}
+
 impl defmt::Format for Packet32 {
     fn format(&self, fmt: defmt::Formatter) {
         let payload = self.payload().to_be_bytes();
@@ -138,6 +150,10 @@ impl Packet64 {
     pub fn validate(&self) -> bool {
         let expected = self.compute_crc4();
         expected == self.crc4()
+    }
+
+    pub fn to_be_bytes(self) -> [u8; 8] {
+        Into::<u64>::into(self).to_be_bytes()
     }
 }
 

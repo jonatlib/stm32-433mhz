@@ -9,9 +9,14 @@ use codec::Codec;
 use physical_layer::BaseWriter;
 use sequence_number::SequenceNumber;
 
+#[cfg(feature = "packet-32")]
+const SEQUENCE_NUMBER_SIZE: u8 = 8;
+#[cfg(feature = "packet-64")]
+const SEQUENCE_NUMBER_SIZE: u8 = 32;
+
 pub struct TransportWriter<'a, W, C, P> {
     address: Address,
-    sequence_number: SequenceNumber<8>,
+    sequence_number: SequenceNumber<SEQUENCE_NUMBER_SIZE>,
     resend: u8,
 
     compression: &'a P,
@@ -62,7 +67,7 @@ where
 
         for packet in packet_builder {
             trace!("Sending packet = {:?}", packet);
-            let data = Into::<u32>::into(packet).to_be_bytes();
+            let data = packet.to_be_bytes();
             for _ in 0..self.resend {
                 // TODO don't re-encode the same data multiple times
                 // When encoder raise an error we should just stop, as the same data won't be sent at all
