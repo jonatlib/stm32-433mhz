@@ -76,11 +76,13 @@ impl Packet32 {
     pub fn to_be_bytes(self) -> [u8; 4] {
         Into::<u32>::into(self).to_be_bytes()
     }
-}
 
-impl From<u64> for Packet32 {
-    fn from(value: u64) -> Self {
-        ((value & 0x0000_0000_ffff_ffff) as u32).into()
+    pub fn from_be_bytes(bytes: &[u8]) -> Self {
+        let mut data = [0u8; 4];
+        for index in 0..4 {
+            data[index] = bytes[index];
+        }
+        u32::from_be_bytes(data).into()
     }
 }
 
@@ -159,6 +161,14 @@ impl Packet64 {
 
     pub fn to_be_bytes(self) -> [u8; 8] {
         Into::<u64>::into(self).to_be_bytes()
+    }
+
+    pub fn from_be_bytes(bytes: &[u8]) -> Self {
+        let mut data = [0u8; 8];
+        for index in 0..8 {
+            data[index] = bytes[index];
+        }
+        u64::from_be_bytes(data).into()
     }
 }
 

@@ -4,6 +4,7 @@ use crate::transport::window::Window;
 use crate::transport::TransportReceiver;
 use crate::Address;
 use codec::{Codec, CodecSize};
+use defmt::{error, trace};
 use physical_layer::BaseReader;
 
 pub struct TransportReader<'a, R, C, P> {
@@ -53,6 +54,7 @@ where
             // Update: Abowe is correct for Packet32 but not Packet64 - changing to 8
             let mut reader_buffer = [0u8; C::get_encode_const_size(8)];
 
+            // FIXME what about packet size 32/64
             let read_size = C::get_encode_size(4);
             let received_size = self
                 .reader
@@ -66,6 +68,7 @@ where
             //   We can receive packet multiple times even when the first
             //   transmission is broken
             if decoded_data_result.is_err() {
+                error!("Decoding data error = {:?}", decoded_data_result.err());
                 continue;
             }
             let decoded_data = decoded_data_result.expect("This cant be error after the if");
@@ -75,8 +78,14 @@ where
             }
 
             // And here is our packet (comment for readability)
-            let packet: PacketType = u64::from_be_bytes(packet_buffer).into();
+            let packet = PacketType::from_be_bytes(&packet_buffer);
+            trace!("Received packet = {:?}", packet);
             if packet.destination_address() != self.address.local_address {
+                trace!(
+                    "Received packet for different address = {}. Expected = {}",
+                    packet.destination_address(),
+                    self.address.local_address
+                );
                 continue;
             }
 
