@@ -19,6 +19,12 @@ pub mod error;
 pub mod simple;
 pub mod transport;
 
+#[cfg(not(any(feature = "packet-32", feature = "packet-64")))]
+compile_error!("You need to enable one of the features `packet-32` or `packet-64`");
+
+#[cfg(all(feature = "packet-32", feature = "packet-64"))]
+compile_error!("You need to enable exactly one of the features `packet-32` or `packet-64`");
+
 #[derive(Clone)]
 pub struct Address {
     pub local_address: u8,
