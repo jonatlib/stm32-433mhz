@@ -3,9 +3,14 @@
 #![feature(async_fn_in_trait)]
 
 pub mod error;
+
+#[cfg(feature = "embassy")]
 pub mod manchester;
+#[cfg(feature = "embassy")]
 pub mod pwm;
+#[cfg(feature = "embassy")]
 pub mod sync;
+#[cfg(feature = "embassy")]
 pub mod utils;
 
 pub trait BaseReader {

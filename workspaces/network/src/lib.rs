@@ -7,6 +7,11 @@
     generic_const_exprs
 )]
 
+// Enable testing on local machine
+#[cfg(test)]
+#[macro_use]
+extern crate std;
+
 mod packet;
 mod packet_builder;
 

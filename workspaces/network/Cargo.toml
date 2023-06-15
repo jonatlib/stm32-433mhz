@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 codec = { path = "../codec" }
-physical_layer = { path = "../physical_layer" }
+physical_layer = { path = "../physical_layer", default-features = false }
 sequence_number = { path = "../sequence_number" }
 
 bitfield-struct = "~0.3.2"
