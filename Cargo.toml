@@ -24,7 +24,7 @@ nucleo_stm32l053r8 = []
 # Our own dependency
 codec = { path = "workspaces/codec" }
 physical_layer = { path = "workspaces/physical_layer" }
-network = { path = "workspaces/network" }
+network = { path = "workspaces/network", features = ["packet-32"] }
 external_memory = { path = "workspaces/external_memory" }
 
 # Embasy HAL Runtime

@@ -1,9 +1,9 @@
 use crate::error::{DataConstructionError, NetworkError};
-use crate::packet::{Packet32, PacketKind};
+use crate::packet::{PacketKind, PacketType};
 use sequence_number::SequenceNumber;
 
 pub struct Window<const SIZE: usize> {
-    buffer: heapless::Vec<Packet32, SIZE>,
+    buffer: heapless::Vec<PacketType, SIZE>,
     base_received: bool,
 }
 
@@ -19,7 +19,7 @@ impl<const SIZE: usize> Window<SIZE> {
         self.buffer.clear();
     }
 
-    pub fn push_packet(&mut self, packet: Packet32) -> Result<Option<usize>, NetworkError> {
+    pub fn push_packet(&mut self, packet: PacketType) -> Result<Option<usize>, NetworkError> {
         // FIXME when to return Error earlier then when the buffer is full?
 
         if self.buffer.is_empty() {
@@ -86,8 +86,10 @@ impl<const SIZE: usize> Window<SIZE> {
         for (index, packet) in self.buffer.iter().enumerate() {
             let bytes = packet.payload().to_be_bytes();
 
+            // FIXME solve this issue for arbitrary big packet
             buffer[index * 2] = bytes[0];
-            if packet.both_bytes_used() {
+            // FIXME won't work for packet64
+            if packet.payload_used_index() > 0 {
                 buffer[(index * 2) + 1] = bytes[1];
             }
         }
@@ -106,7 +108,7 @@ impl<const SIZE: usize> Window<SIZE> {
     fn received_bytes(&self) -> usize {
         self.buffer
             .iter()
-            .map(|v| if v.both_bytes_used() { 2 } else { 1 })
+            .map(|v| v.payload_used_index() as usize + 1)
             .sum()
     }
 

@@ -1,5 +1,5 @@
 use crate::error::NetworkError;
-use crate::packet::Packet32;
+use crate::packet::PacketType;
 use crate::transport::window::Window;
 use crate::transport::TransportReceiver;
 use crate::Address;
@@ -75,7 +75,7 @@ where
             }
 
             // And here is our packet (comment for readability)
-            let packet: Packet32 = u64::from_be_bytes(packet_buffer).into();
+            let packet: PacketType = u64::from_be_bytes(packet_buffer).into();
             if packet.destination_address() != self.address.local_address {
                 continue;
             }

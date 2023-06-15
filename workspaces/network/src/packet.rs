@@ -2,6 +2,11 @@ use bitfield_struct::bitfield;
 
 use sequence_number::SequenceNumber;
 
+#[cfg(feature = "packet-32")]
+pub type PacketType = Packet32;
+#[cfg(feature = "packet-64")]
+pub type PacketType = Packet64;
+
 #[derive(Debug, Eq, PartialEq, Clone, defmt::Format)]
 #[repr(u8)]
 pub enum PacketKind {
@@ -64,7 +69,7 @@ pub struct Packet32 {
     pub payload: u16,
 
     #[bits(1)]
-    pub both_bytes_used: bool,
+    pub payload_used_index: u8,
 }
 
 impl Packet32 {
@@ -84,14 +89,14 @@ impl defmt::Format for Packet32 {
         let payload = self.payload().to_be_bytes();
         defmt::write!(
             fmt,
-            "Packet32 {{ kind: {:?}, sequence_number: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}], both_bytes_used: {} }}",
+            "Packet32 {{ kind: {:?}, sequence_number: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}], payload_used_index: {} }}",
             self.kind(),
             self.sequence_number(),
             self.source_address(),
             self.destination_address(),
             payload[0],
             payload[1],
-            self.both_bytes_used(),
+            self.payload_used_index(),
         )
     }
 }

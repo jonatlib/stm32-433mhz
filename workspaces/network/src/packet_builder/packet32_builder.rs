@@ -80,7 +80,7 @@ where
                 .with_source_address(self.address.local_address)
                 .with_destination_address(self.address.destination_address)
                 .with_payload(payload)
-                .with_both_bytes_used(byte_1.is_some()),
+                .with_payload_used_index(byte_1.is_some() as u8),
         )
     }
 }
