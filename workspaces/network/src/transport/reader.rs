@@ -3,9 +3,15 @@ use crate::packet::PacketType;
 use crate::transport::window::Window;
 use crate::transport::TransportReceiver;
 use crate::Address;
+
 use codec::{Codec, CodecSize};
-use defmt::{error, trace};
 use physical_layer::BaseReader;
+
+#[cfg(not(test))]
+use defmt::{error, trace};
+
+#[cfg(test)]
+use log::{error, trace};
 
 pub struct TransportReader<'a, R, C, P> {
     address: Address,
@@ -121,17 +127,42 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fmt::Formatter;
 
     use crate::tests::init_logging_stdout;
     use codec::Identity;
     use physical_layer::error::ReadError;
+
+    use std::time::Duration;
     use std::vec::Vec;
+
+    use async_std::future::timeout;
+    use async_std_test::async_test;
+
+    #[derive(Debug)]
+    struct BaseError;
+
+    impl std::error::Error for BaseError {}
+
+    impl std::fmt::Display for BaseError {
+        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{:?}", self)
+        }
+    }
+
+    impl From<std::io::Error> for BaseError {
+        fn from(value: std::io::Error) -> Self {
+            BaseError
+        }
+    }
 
     struct DummyReader(Vec<u8>);
 
     impl BaseReader for DummyReader {
         async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
+            async_std::task::sleep(Duration::from_millis(500)).await;
             for (index, value) in buffer.iter_mut().enumerate() {
+                async_std::task::sleep(Duration::from_millis(10)).await;
                 if let Some(v) = self.0.get(index) {
                     *value = *v;
                 } else {
@@ -169,16 +200,22 @@ mod tests {
         }
     }
 
-    /// Not working, require fix to linking the app
-    #[test]
-    fn test_dummy_receive() {
+    #[async_test]
+    async fn test_dummy_receive() -> std::io::Result<()> {
         init_logging_stdout();
         let mut factory = DummyReceiver::new(vec![0xab, 0xcd]);
         let mut receiver = factory.create_receiver();
 
         let mut receive_buffer = [0u8; 8];
-        receiver.receive_bytes(&mut receive_buffer);
+
+        timeout(
+            Duration::from_secs(2),
+            receiver.receive_bytes(&mut receive_buffer),
+        )
+        .await
+        .unwrap();
 
         println!("{:?}", receive_buffer);
+        Ok(())
     }
 }
