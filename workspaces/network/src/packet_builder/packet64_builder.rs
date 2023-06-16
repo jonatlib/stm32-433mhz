@@ -1,5 +1,4 @@
 use core::borrow::Borrow;
-use std::borrow::ToOwned;
 
 use sequence_number::SequenceNumber;
 
@@ -50,7 +49,7 @@ where
         let was_previous_byte_set = self.last_byte.is_some();
         let first_payload_byte = self
             .last_byte
-            .or_else(|| self.payload.next().map(|v| v.borrow().to_owned()))?;
+            .or_else(|| self.payload.next().map(|v| v.borrow().clone()))?;
         self.last_byte = None;
 
         let packet = Packet64::new()
@@ -63,7 +62,7 @@ where
 
         for index in 1usize..5 {
             if let Some(byte) = self.payload.next() {
-                payload_buffer[index] = byte.borrow().to_owned();
+                payload_buffer[index] = byte.borrow().clone();
             } else {
                 return Some(
                     packet
@@ -79,7 +78,7 @@ where
             }
         }
 
-        let probably_last_byte = self.payload.next().map(|v| v.borrow().to_owned());
+        let probably_last_byte = self.payload.next().map(|v| v.borrow().clone());
         self.last_byte = probably_last_byte;
 
         Some(

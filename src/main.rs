@@ -46,6 +46,11 @@ async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
         info!("---------------------------------------------------");
 
         Timer::after(Duration::from_millis(500)).await;
+
+        if data.is_err() {
+            // If for example full windows, give it more time before start listening again.
+            Timer::after(Duration::from_secs(5)).await;
+        }
     }
 }
 

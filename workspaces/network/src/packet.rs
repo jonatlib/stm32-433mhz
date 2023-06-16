@@ -1,4 +1,5 @@
 use bitfield_struct::bitfield;
+use defmt::trace;
 
 use sequence_number::SequenceNumber;
 
@@ -83,6 +84,10 @@ impl Packet32 {
         Into::<u32>::into(self).to_le_bytes()
     }
 
+    pub fn to_be_bytes(self) -> [u8; 4] {
+        Into::<u32>::into(self).to_be_bytes()
+    }
+
     pub fn update_crc(&mut self) {}
 
     pub fn validate(&self) -> bool {
@@ -97,7 +102,7 @@ impl Packet32 {
 
 impl From<u64> for Packet32 {
     fn from(value: u64) -> Self {
-        ((value >> 32) as u32).into()
+        (value as u32).into()
     }
 }
 
