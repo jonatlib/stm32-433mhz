@@ -624,6 +624,7 @@ version = "0.1.0"
 dependencies = [
  "bitfield-struct",
  "codec",
+ "critical-section 1.1.1",
  "defmt",
  "defmt-serial",
  "embedded-hal 0.2.7",

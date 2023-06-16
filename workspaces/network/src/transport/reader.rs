@@ -169,9 +169,10 @@ mod tests {
         }
     }
 
+    /// Not working, require fix to linking the app
     #[test]
     fn test_dummy_receive() {
-        // init_logging_stdout();
+        init_logging_stdout();
         let mut factory = DummyReceiver::new(vec![0xab, 0xcd]);
         let mut receiver = factory.create_receiver();
 
