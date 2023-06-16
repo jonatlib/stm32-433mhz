@@ -21,10 +21,9 @@ pub fn init_logging_stdout() {
     // let serial = StdoutSerial;
     // defmt_serial::defmt_serial(serial);
 
-    // let _ = env_logger::builder().is_test(true).try_init();
-    env_logger::builder()
+    let _ = env_logger::builder()
         .filter_module("async_io", log::LevelFilter::Off)
         .filter_module("polling", log::LevelFilter::Off)
         .is_test(true)
-        .init();
+        .try_init();
 }

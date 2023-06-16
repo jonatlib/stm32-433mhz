@@ -127,7 +127,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::VecDeque;
     use std::fmt::Formatter;
+    use std::future::Future;
 
     use crate::tests::init_logging_stdout;
     use codec::Identity;
@@ -137,8 +139,10 @@ mod tests {
     use std::vec::Vec;
 
     use crate::packet::{Packet32, PacketKind};
+    use crate::simple::receiver::SimpleReceiver;
     use async_std::future::timeout;
     use async_std_test::async_test;
+    use sequence_number::SequenceNumber;
 
     #[derive(Debug)]
     struct BaseError;
@@ -157,20 +161,20 @@ mod tests {
         }
     }
 
-    struct DummyReader(Vec<u8>);
+    struct DummyReader(VecDeque<u8>, usize);
 
     impl BaseReader for DummyReader {
         async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
             async_std::task::sleep(Duration::from_millis(500)).await;
             for (index, value) in buffer.iter_mut().enumerate() {
                 async_std::task::sleep(Duration::from_millis(10)).await;
-                if let Some(v) = self.0.get(index) {
-                    *value = *v;
+                if let Some(v) = self.0.pop_front() {
+                    *value = v;
                 } else {
                     break;
                 }
             }
-            Ok(buffer.len().min(self.0.len()))
+            Ok(buffer.len().min(self.1))
         }
     }
 
@@ -182,16 +186,17 @@ mod tests {
     }
 
     impl DummyReceiver {
-        fn new(payload: Vec<u8>) -> Self {
+        fn new(payload: VecDeque<u8>) -> Self {
+            let len = payload.len();
             Self {
                 address: Address::new(0x01, 0x05),
                 codec: Identity::default(),
                 compression: Identity::default(),
-                reader: DummyReader(payload),
+                reader: DummyReader(payload, len),
             }
         }
 
-        fn create_receiver<'a>(&'a mut self) -> impl TransportReceiver + 'a {
+        fn create_receiver(&mut self) -> TransportReader<'_, DummyReader, Identity, Identity> {
             TransportReader::new(
                 self.address.clone(),
                 &self.codec,
@@ -201,8 +206,11 @@ mod tests {
         }
     }
 
-    #[async_test]
-    async fn test_dummy_receive() -> std::io::Result<()> {
+    async fn receiver_environment_single_packet_32<'a, C, F>(callback: C) -> std::io::Result<()>
+    where
+        C: FnOnce(Packet32, DummyReceiver) -> F,
+        F: Future<Output = std::io::Result<()>> + 'a,
+    {
         init_logging_stdout();
         let original_packet = Packet32::new()
             .with_kind(PacketKind::SelfContained)
@@ -210,30 +218,109 @@ mod tests {
             .with_destination_address(0x01)
             .with_payload(0xabcd)
             .with_payload_used_index(1);
+
         let mut factory = DummyReceiver::new(
             original_packet
+                .clone()
                 .to_be_bytes()
                 .into_iter()
-                .collect::<Vec<u8>>(),
+                .collect::<VecDeque<u8>>(),
         );
-        let mut receiver = factory.create_receiver();
-        ///////
 
-        let mut receive_buffer = [0u8; 8];
-        let read_size = timeout(
-            Duration::from_secs(2),
-            receiver.receive_bytes(&mut receive_buffer),
-        )
+        callback(original_packet, factory).await
+    }
+
+    async fn receiver_environment_three_packets_32<'a, C, F>(callback: C) -> std::io::Result<()>
+    where
+        C: FnOnce(Vec<Packet32>, DummyReceiver) -> F,
+        F: Future<Output = std::io::Result<()>> + 'a,
+    {
+        init_logging_stdout();
+        let original_packet = Packet32::new()
+            .with_kind(PacketKind::SelfContained)
+            .with_source_address(0x05)
+            .with_destination_address(0x01)
+            .with_payload(0x0000)
+            .with_payload_used_index(1);
+
+        let packets = vec![
+            original_packet
+                .with_kind(PacketKind::Start)
+                .with_sequence_number(SequenceNumber::new(0))
+                .with_payload(0x0102),
+            original_packet
+                .with_kind(PacketKind::Continue)
+                .with_sequence_number(SequenceNumber::new(1))
+                .with_payload(0x4567),
+            original_packet
+                .with_kind(PacketKind::End)
+                .with_sequence_number(SequenceNumber::new(2))
+                .with_payload(0xabcd),
+        ];
+
+        let mut factory = DummyReceiver::new(
+            packets
+                .clone()
+                .into_iter()
+                .map(|p| p.to_be_bytes())
+                .flatten()
+                .into_iter()
+                .collect::<VecDeque<u8>>(),
+        );
+
+        callback(packets, factory).await
+    }
+
+    #[async_test]
+    async fn test_receive_single_packet() -> std::io::Result<()> {
+        receiver_environment_single_packet_32(|_, mut factory| async move {
+            let mut receiver = factory.create_receiver();
+            let mut receive_buffer = [0u8; 8];
+            let read_size = timeout(
+                Duration::from_secs(2),
+                receiver.receive_bytes(&mut receive_buffer),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+
+            println!("{:#04x?}", receive_buffer);
+
+            assert_eq!(read_size, 2);
+            assert_eq!(receive_buffer[0], 0xab);
+            assert_eq!(receive_buffer[1], 0xcd);
+            assert_eq!(receive_buffer[2], 0x00);
+
+            Ok(())
+        })
         .await
-        .unwrap()
-        .unwrap();
+    }
 
-        println!("{:#04x?}", receive_buffer);
+    #[async_test]
+    async fn test_receive_multiple_packets() -> std::io::Result<()> {
+        receiver_environment_three_packets_32(|_, mut factory| async move {
+            let mut receiver = factory.create_receiver();
+            let mut receive_buffer = [0u8; 8];
+            let read_size = timeout(
+                Duration::from_secs(2),
+                receiver.receive_bytes(&mut receive_buffer),
+            )
+            .await
+            .unwrap()
+            .unwrap();
 
-        assert_eq!(read_size, 2);
-        assert_eq!(receive_buffer[0], 0xab);
-        assert_eq!(receive_buffer[1], 0xcd);
-        assert_eq!(receive_buffer[2], 0x00);
-        Ok(())
+            println!("{:#04x?}", receive_buffer);
+
+            assert_eq!(read_size, 6);
+            assert_eq!(receive_buffer[0], 0x01);
+            assert_eq!(receive_buffer[1], 0x02);
+            assert_eq!(receive_buffer[2], 0x45);
+            assert_eq!(receive_buffer[3], 0x67);
+            assert_eq!(receive_buffer[4], 0xab);
+            assert_eq!(receive_buffer[5], 0xcd);
+
+            Ok(())
+        })
+        .await
     }
 }
