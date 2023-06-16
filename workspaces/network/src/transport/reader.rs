@@ -78,7 +78,7 @@ where
             }
 
             // And here is our packet (comment for readability)
-            let packet = PacketType::from_be_bytes(&packet_buffer);
+            let packet: PacketType = u64::from_be_bytes(packet_buffer).into();
             trace!("Received packet = {:?}", packet);
             if packet.destination_address() != self.address.local_address {
                 trace!(
