@@ -83,14 +83,13 @@ impl<const SIZE: usize> Window<SIZE> {
             return Err(());
         }
 
-        for (index, packet) in self.buffer.iter().enumerate() {
+        let mut index = 0usize;
+        for packet in self.buffer.iter() {
             let bytes = packet.payload().to_be_bytes();
 
-            // FIXME solve this issue for arbitrary big packet
-            buffer[index * 2] = bytes[0];
-            // FIXME won't work for packet64
-            if packet.payload_used_index() > 0 {
-                buffer[(index * 2) + 1] = bytes[1];
+            for packet_index in 0..(packet.payload_used_index() + 1) {
+                buffer[index] = bytes[packet_index];
+                index += 1;
             }
         }
 
