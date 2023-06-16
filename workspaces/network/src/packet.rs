@@ -166,6 +166,12 @@ impl Packet64 {
         return crc;
     }
 
+    pub fn with_updated_crc(&self) -> Self {
+        let mut packet: Packet64 = self.clone();
+        packet.set_crc4(self.compute_crc4());
+        return packet;
+    }
+
     pub fn update_crc(&mut self) {
         self.set_crc4(self.compute_crc4());
     }

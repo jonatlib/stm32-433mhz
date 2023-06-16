@@ -71,7 +71,7 @@ where
         };
 
         let payload =
-            u16::from_be_bytes([byte_0, if let Some(byte) = byte_1 { byte } else { 0x00 }]);
+            u16::from_le_bytes([byte_0, if let Some(byte) = byte_1 { byte } else { 0x00 }]);
 
         Some(
             Packet32::new()
