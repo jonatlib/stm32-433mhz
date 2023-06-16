@@ -77,6 +77,12 @@ impl Packet32 {
     pub fn to_be_bytes(self) -> [u8; 4] {
         Into::<u32>::into(self).to_be_bytes()
     }
+
+    pub fn update_crc(&mut self) {}
+
+    pub fn validate(&self) -> bool {
+        true
+    }
 }
 
 impl From<u64> for Packet32 {
