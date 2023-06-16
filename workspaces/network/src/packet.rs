@@ -7,6 +7,11 @@ pub type PacketType = Packet32;
 #[cfg(feature = "packet-64")]
 pub type PacketType = Packet64;
 
+#[cfg(feature = "packet-32")]
+pub const PACKET_TYPE_SN_SIZE: u8 = 8;
+#[cfg(feature = "packet-64")]
+pub const PACKET_TYPE_SN_SIZE: u8 = 32;
+
 #[derive(Debug, Eq, PartialEq, Clone, defmt::Format)]
 #[repr(u8)]
 pub enum PacketKind {

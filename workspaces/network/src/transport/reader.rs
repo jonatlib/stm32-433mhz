@@ -215,12 +215,13 @@ mod tests {
         F: Future<Output = std::io::Result<()>> + 'a,
     {
         init_logging_stdout();
-        let original_packet = PacketType::new()
+        let mut original_packet = PacketType::new()
             .with_kind(PacketKind::SelfContained)
             .with_source_address(0x05)
             .with_destination_address(0x01)
             .with_payload(0xabcd)
             .with_payload_used_index(1);
+        original_packet.update_crc();
 
         let mut factory = DummyReceiver::new(
             original_packet
@@ -246,7 +247,7 @@ mod tests {
             .with_payload(0x0000)
             .with_payload_used_index(1);
 
-        let packets = vec![
+        let mut packets = vec![
             original_packet
                 .with_kind(PacketKind::Start)
                 .with_sequence_number(SequenceNumber::new(0))
@@ -260,6 +261,9 @@ mod tests {
                 .with_sequence_number(SequenceNumber::new(2))
                 .with_payload(0xabcd),
         ];
+        for packet in packets.iter_mut() {
+            packet.update_crc();
+        }
 
         let mut factory = DummyReceiver::new(
             packets

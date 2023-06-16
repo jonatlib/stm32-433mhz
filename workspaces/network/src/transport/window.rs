@@ -1,5 +1,5 @@
 use crate::error::{DataConstructionError, NetworkError};
-use crate::packet::{PacketKind, PacketType};
+use crate::packet::{PacketKind, PacketType, PACKET_TYPE_SN_SIZE};
 use sequence_number::SequenceNumber;
 
 pub struct Window<const SIZE: usize> {
@@ -85,9 +85,11 @@ impl<const SIZE: usize> Window<SIZE> {
 
         let mut index = 0usize;
         for packet in self.buffer.iter() {
-            let bytes = packet.payload().to_be_bytes();
+            let used_bytes_len = packet.payload_used_index() as usize + 1;
+            let all_bytes = packet.payload().to_be_bytes();
+            let bytes = &all_bytes[all_bytes.len() - used_bytes_len..];
 
-            for packet_index in 0usize..(packet.payload_used_index() as usize + 1) {
+            for packet_index in 0usize..used_bytes_len {
                 buffer[index] = bytes[packet_index];
                 index += 1;
             }
@@ -96,7 +98,7 @@ impl<const SIZE: usize> Window<SIZE> {
         Ok(())
     }
 
-    fn get_base_sequence_number(&self) -> Option<SequenceNumber<8>> {
+    fn get_base_sequence_number(&self) -> Option<SequenceNumber<PACKET_TYPE_SN_SIZE>> {
         if matches!(self.buffer[0].kind(), PacketKind::Start) {
             Some(self.buffer[0].sequence_number())
         } else {
@@ -140,7 +142,7 @@ impl<const SIZE: usize> Window<SIZE> {
 
             return sequence_numbers
                 .map(|v| v.sequence_number())
-                .map(|v: SequenceNumber<8>| -> u8 {
+                .map(|v| -> u8 {
                     let distance = prev_sequence_number.positive_distance(&v);
                     prev_sequence_number = v;
                     distance
