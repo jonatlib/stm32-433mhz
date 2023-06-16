@@ -57,6 +57,7 @@ impl<'a, P: Pin> BaseReader for ManchesterReader<'a, P> {
                 .map_err(|_| ReadError::TimeoutError)??;
             // trace!("Manchester reader received byte = {:#04x}", element);
         }
+        // FIXME this is wrong
         Ok(buffer.len())
     }
 }

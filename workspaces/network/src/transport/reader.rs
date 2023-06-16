@@ -60,8 +60,7 @@ where
             // Update: Abowe is correct for Packet32 but not Packet64 - changing to 8
             let mut reader_buffer = [0u8; C::get_encode_const_size(8)];
 
-            // FIXME what about packet size 32/64
-            let read_size = C::get_encode_size(4);
+            let read_size = C::get_encode_size(PacketType::size());
             let received_size = self
                 .reader
                 .read_bytes_buffer(&mut reader_buffer[..read_size])
@@ -92,6 +91,11 @@ where
                     packet.destination_address(),
                     self.address.local_address
                 );
+                continue;
+            }
+
+            if !packet.validate() {
+                error!("Received packet checksum does not match");
                 continue;
             }
 
@@ -130,16 +134,15 @@ mod tests {
     use std::collections::VecDeque;
     use std::fmt::Formatter;
     use std::future::Future;
+    use std::time::Duration;
+    use std::vec::Vec;
 
+    use crate::packet::{PacketKind, PacketType};
+    use crate::simple::receiver::SimpleReceiver;
     use crate::tests::init_logging_stdout;
     use codec::Identity;
     use physical_layer::error::ReadError;
 
-    use std::time::Duration;
-    use std::vec::Vec;
-
-    use crate::packet::{Packet32, PacketKind};
-    use crate::simple::receiver::SimpleReceiver;
     use async_std::future::timeout;
     use async_std_test::async_test;
     use sequence_number::SequenceNumber;
@@ -206,13 +209,13 @@ mod tests {
         }
     }
 
-    async fn receiver_environment_single_packet_32<'a, C, F>(callback: C) -> std::io::Result<()>
+    async fn receiver_environment_single_packet<'a, C, F>(callback: C) -> std::io::Result<()>
     where
-        C: FnOnce(Packet32, DummyReceiver) -> F,
+        C: FnOnce(PacketType, DummyReceiver) -> F,
         F: Future<Output = std::io::Result<()>> + 'a,
     {
         init_logging_stdout();
-        let original_packet = Packet32::new()
+        let original_packet = PacketType::new()
             .with_kind(PacketKind::SelfContained)
             .with_source_address(0x05)
             .with_destination_address(0x01)
@@ -230,13 +233,13 @@ mod tests {
         callback(original_packet, factory).await
     }
 
-    async fn receiver_environment_three_packets_32<'a, C, F>(callback: C) -> std::io::Result<()>
+    async fn receiver_environment_three_packets<'a, C, F>(callback: C) -> std::io::Result<()>
     where
-        C: FnOnce(Vec<Packet32>, DummyReceiver) -> F,
+        C: FnOnce(Vec<PacketType>, DummyReceiver) -> F,
         F: Future<Output = std::io::Result<()>> + 'a,
     {
         init_logging_stdout();
-        let original_packet = Packet32::new()
+        let original_packet = PacketType::new()
             .with_kind(PacketKind::SelfContained)
             .with_source_address(0x05)
             .with_destination_address(0x01)
@@ -273,7 +276,7 @@ mod tests {
 
     #[async_test]
     async fn test_receive_single_packet() -> std::io::Result<()> {
-        receiver_environment_single_packet_32(|_, mut factory| async move {
+        receiver_environment_single_packet(|_, mut factory| async move {
             let mut receiver = factory.create_receiver();
             let mut receive_buffer = [0u8; 8];
             let read_size = timeout(
@@ -298,7 +301,7 @@ mod tests {
 
     #[async_test]
     async fn test_receive_multiple_packets() -> std::io::Result<()> {
-        receiver_environment_three_packets_32(|_, mut factory| async move {
+        receiver_environment_three_packets(|_, mut factory| async move {
             let mut receiver = factory.create_receiver();
             let mut receive_buffer = [0u8; 8];
             let read_size = timeout(

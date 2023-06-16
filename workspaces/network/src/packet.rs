@@ -83,6 +83,11 @@ impl Packet32 {
     pub fn validate(&self) -> bool {
         true
     }
+
+    #[inline]
+    pub const fn size() -> usize {
+        4
+    }
 }
 
 impl From<u64> for Packet32 {
@@ -167,6 +172,11 @@ impl Packet64 {
 
     pub fn to_be_bytes(self) -> [u8; 8] {
         Into::<u64>::into(self).to_be_bytes()
+    }
+
+    #[inline]
+    pub const fn size() -> usize {
+        8
     }
 }
 
