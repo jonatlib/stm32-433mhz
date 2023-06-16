@@ -83,7 +83,7 @@ where
             }
 
             // And here is our packet (comment for readability)
-            let packet: PacketType = u64::from_be_bytes(packet_buffer).into();
+            let packet: PacketType = u64::from_le_bytes(packet_buffer).into();
             trace!("Received packet = {:?}", packet);
             if packet.destination_address() != self.address.local_address {
                 trace!(
@@ -226,7 +226,7 @@ mod tests {
         let mut factory = DummyReceiver::new(
             original_packet
                 .clone()
-                .to_be_bytes()
+                .to_le_bytes()
                 .into_iter()
                 .collect::<VecDeque<u8>>(),
         );
@@ -269,7 +269,7 @@ mod tests {
             packets
                 .clone()
                 .into_iter()
-                .map(|p| p.to_be_bytes())
+                .map(|p| p.to_le_bytes())
                 .flatten()
                 .into_iter()
                 .collect::<VecDeque<u8>>(),
@@ -294,8 +294,8 @@ mod tests {
             println!("{:#04x?}", receive_buffer);
 
             assert_eq!(read_size, 2);
-            assert_eq!(receive_buffer[0], 0xab);
-            assert_eq!(receive_buffer[1], 0xcd);
+            assert_eq!(receive_buffer[0], 0xcd);
+            assert_eq!(receive_buffer[1], 0xab);
             assert_eq!(receive_buffer[2], 0x00);
 
             Ok(())
@@ -319,12 +319,12 @@ mod tests {
             println!("{:#04x?}", receive_buffer);
 
             assert_eq!(read_size, 6);
-            assert_eq!(receive_buffer[0], 0x01);
-            assert_eq!(receive_buffer[1], 0x02);
-            assert_eq!(receive_buffer[2], 0x45);
-            assert_eq!(receive_buffer[3], 0x67);
-            assert_eq!(receive_buffer[4], 0xab);
-            assert_eq!(receive_buffer[5], 0xcd);
+            assert_eq!(receive_buffer[0], 0x02);
+            assert_eq!(receive_buffer[1], 0x01);
+            assert_eq!(receive_buffer[2], 0x67);
+            assert_eq!(receive_buffer[3], 0x45);
+            assert_eq!(receive_buffer[4], 0xcd);
+            assert_eq!(receive_buffer[5], 0xab);
 
             Ok(())
         })

@@ -79,8 +79,8 @@ pub struct Packet32 {
 }
 
 impl Packet32 {
-    pub fn to_be_bytes(self) -> [u8; 4] {
-        Into::<u32>::into(self).to_be_bytes()
+    pub fn to_le_bytes(self) -> [u8; 4] {
+        Into::<u32>::into(self).to_le_bytes()
     }
 
     pub fn update_crc(&mut self) {}
@@ -103,7 +103,7 @@ impl From<u64> for Packet32 {
 
 impl defmt::Format for Packet32 {
     fn format(&self, fmt: defmt::Formatter) {
-        let payload = self.payload().to_be_bytes();
+        let payload = self.payload().to_le_bytes();
         defmt::write!(
             fmt,
             "Packet32 {{ kind: {:?}, sequence_number: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}], payload_used_index: {} }}",
@@ -181,8 +181,8 @@ impl Packet64 {
         expected == self.crc4()
     }
 
-    pub fn to_be_bytes(self) -> [u8; 8] {
-        Into::<u64>::into(self).to_be_bytes()
+    pub fn to_le_bytes(self) -> [u8; 8] {
+        Into::<u64>::into(self).to_le_bytes()
     }
 
     #[inline]
@@ -193,7 +193,7 @@ impl Packet64 {
 
 impl defmt::Format for Packet64 {
     fn format(&self, fmt: defmt::Formatter) {
-        let payload = self.payload().to_be_bytes();
+        let payload = self.payload().to_le_bytes();
         defmt::write!(
             fmt,
             "Packet64 {{ kind: {:?}, sequence_number: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}, {:#04x}, {:#04x}, {:#04x}], payload_used_index: {}, crc4: {:#04x} }}",
