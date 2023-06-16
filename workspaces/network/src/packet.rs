@@ -54,6 +54,7 @@ impl From<u64> for PacketKind {
 }
 
 #[bitfield(u32)]
+#[derive(PartialEq)]
 pub struct Packet32 {
     #[bits(2)]
     pub kind: PacketKind,
@@ -102,6 +103,7 @@ impl defmt::Format for Packet32 {
 }
 
 #[bitfield(u64)]
+#[derive(PartialEq)]
 pub struct Packet64 {
     #[bits(2)]
     pub kind: PacketKind,
@@ -199,5 +201,18 @@ mod tests {
         let crc = packet64.crc4();
         packet64.update_crc();
         assert_eq!(crc, packet64.crc4());
+    }
+
+    #[test]
+    fn test_packet32_from_u64() {
+        let original_packet = Packet32::new()
+            .with_source_address(0x05)
+            .with_destination_address(0x08);
+
+        let packet_data_32: u32 = original_packet.into();
+        let packet_data_64: u64 = (packet_data_32 as u64) << 32;
+
+        let received_packet = Packet32::from(packet_data_64);
+        assert_eq!(received_packet, original_packet);
     }
 }
