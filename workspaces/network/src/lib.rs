@@ -12,6 +12,9 @@
 #[macro_use]
 extern crate std;
 
+#[cfg(test)]
+pub mod tests;
+
 mod packet;
 mod packet_builder;
 

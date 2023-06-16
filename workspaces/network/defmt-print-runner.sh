@@ -1,0 +1,1 @@
+../../defmt-print-runner.sh

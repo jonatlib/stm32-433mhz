@@ -117,3 +117,67 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::tests::init_logging_stdout;
+    use codec::Identity;
+    use physical_layer::error::ReadError;
+    use std::vec::Vec;
+
+    struct DummyReader(Vec<u8>);
+
+    impl BaseReader for DummyReader {
+        async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
+            for (index, value) in buffer.iter_mut().enumerate() {
+                if let Some(v) = self.0.get(index) {
+                    *value = *v;
+                } else {
+                    break;
+                }
+            }
+            Ok(buffer.len().min(self.0.len()))
+        }
+    }
+
+    struct DummyReceiver {
+        address: Address,
+        codec: Identity,
+        compression: Identity,
+        reader: DummyReader,
+    }
+
+    impl DummyReceiver {
+        fn new(payload: Vec<u8>) -> Self {
+            Self {
+                address: Address::new(0x01, 0x05),
+                codec: Identity::default(),
+                compression: Identity::default(),
+                reader: DummyReader(payload),
+            }
+        }
+
+        fn create_receiver<'a>(&'a mut self) -> impl TransportReceiver + 'a {
+            TransportReader::new(
+                self.address.clone(),
+                &self.codec,
+                &self.compression,
+                &mut self.reader,
+            )
+        }
+    }
+
+    #[test]
+    fn test_dummy_receive() {
+        // init_logging_stdout();
+        let mut factory = DummyReceiver::new(vec![0xab, 0xcd]);
+        let mut receiver = factory.create_receiver();
+
+        let mut receive_buffer = [0u8; 8];
+        receiver.receive_bytes(&mut receive_buffer);
+
+        println!("{:?}", receive_buffer);
+    }
+}

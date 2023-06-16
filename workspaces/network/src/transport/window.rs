@@ -87,7 +87,7 @@ impl<const SIZE: usize> Window<SIZE> {
         for packet in self.buffer.iter() {
             let bytes = packet.payload().to_be_bytes();
 
-            for packet_index in 0..(packet.payload_used_index() + 1) {
+            for packet_index in 0usize..(packet.payload_used_index() as usize + 1) {
                 buffer[index] = bytes[packet_index];
                 index += 1;
             }

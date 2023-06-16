@@ -15,10 +15,17 @@ codec = { path = "../codec" }
 physical_layer = { path = "../physical_layer", default-features = false }
 sequence_number = { path = "../sequence_number" }
 
-bitfield-struct = "~0.3.2"
-postcard = { version = "~1.0.2", default-features = false, features = ["use-defmt"] }
-serde = { version = "~1.0.152", default-features = false }
+bitfield-struct = "^0.3.2"
+postcard = { version = "^1.0.4", default-features = false, features = ["use-defmt"] }
+serde = { version = "^1.0.152", default-features = false }
 
 heapless = "0.7.16"
-
 defmt = "~0.3.2"
+
+
+[dev-dependencies]
+# A hacky way of getting logs from defmt in tests to stdout on terminal
+# Taken from here: https://github.com/gauteh/defmt-serial/blob/main/example-std/
+defmt-serial = "~0.6.0"
+embedded-hal = "~0.2.7"
+nb = "~1.1.0"

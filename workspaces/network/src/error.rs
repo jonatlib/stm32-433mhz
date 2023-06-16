@@ -1,7 +1,6 @@
 use codec::CodecError;
-use defmt::Format;
 
-#[derive(Format, Debug)]
+#[derive(Debug)]
 pub enum NetworkError {
     SenderEncodingError(postcard::Error),
     ReceiverEncodingError(postcard::Error),
@@ -13,7 +12,7 @@ pub enum NetworkError {
     CodecError(CodecError),
 }
 
-#[derive(Format, Debug)]
+#[derive(Debug)]
 pub enum DataConstructionError {
     FullWindow,
 }
