@@ -136,6 +136,7 @@ mod tests {
     use std::time::Duration;
     use std::vec::Vec;
 
+    use crate::packet::{Packet32, PacketKind};
     use async_std::future::timeout;
     use async_std_test::async_test;
 
@@ -203,19 +204,36 @@ mod tests {
     #[async_test]
     async fn test_dummy_receive() -> std::io::Result<()> {
         init_logging_stdout();
-        let mut factory = DummyReceiver::new(vec![0xab, 0xcd]);
+        let original_packet = Packet32::new()
+            .with_kind(PacketKind::SelfContained)
+            .with_source_address(0x05)
+            .with_destination_address(0x01)
+            .with_payload(0xabcd)
+            .with_payload_used_index(1);
+        let mut factory = DummyReceiver::new(
+            original_packet
+                .to_be_bytes()
+                .into_iter()
+                .collect::<Vec<u8>>(),
+        );
         let mut receiver = factory.create_receiver();
+        ///////
 
         let mut receive_buffer = [0u8; 8];
-
-        timeout(
+        let read_size = timeout(
             Duration::from_secs(2),
             receiver.receive_bytes(&mut receive_buffer),
         )
         .await
+        .unwrap()
         .unwrap();
 
-        println!("{:?}", receive_buffer);
+        println!("{:#04x?}", receive_buffer);
+
+        assert_eq!(read_size, 2);
+        assert_eq!(receive_buffer[0], 0xab);
+        assert_eq!(receive_buffer[1], 0xcd);
+        assert_eq!(receive_buffer[2], 0x00);
         Ok(())
     }
 }
