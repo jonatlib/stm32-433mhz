@@ -66,10 +66,12 @@ pub struct Packet32 {
     pub kind: PacketKind,
     #[bits(3)] // Up to 8 packets
     pub sequence_number: SequenceNumber<8>,
+    #[bits(2)] // Up to 4 streams
+    pub stream_id: SequenceNumber<8>,
 
-    #[bits(5)] // Up to 32 devices
+    #[bits(4)] // Up to 16 devices
     pub source_address: u8,
-    #[bits(5)]
+    #[bits(4)]
     pub destination_address: u8,
 
     #[bits(16)]
@@ -111,9 +113,10 @@ impl defmt::Format for Packet32 {
         let payload = self.payload().to_le_bytes();
         defmt::write!(
             fmt,
-            "Packet32 {{ kind: {:?}, sequence_number: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}], payload_used_index: {} }}",
+            "Packet32 {{ kind: {:?}, sequence_number: {}, stream_id: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}], payload_used_index: {} }}",
             self.kind(),
             self.sequence_number(),
+            self.stream_id(),
             self.source_address(),
             self.destination_address(),
             payload[0],
@@ -128,12 +131,14 @@ impl defmt::Format for Packet32 {
 pub struct Packet64 {
     #[bits(2)]
     pub kind: PacketKind,
-    #[bits(5)] // Up to 32 packets
-    pub sequence_number: SequenceNumber<32>,
+    #[bits(4)] // Up to 16 packets
+    pub sequence_number: SequenceNumber<16>,
+    #[bits(3)] // Stream identification
+    pub stream_id: SequenceNumber<8>,
 
-    #[bits(5)] // Up to 32 devices
+    #[bits(4)] // Up to 16 devices
     pub source_address: u8,
-    #[bits(5)]
+    #[bits(4)]
     pub destination_address: u8,
 
     #[bits(40)] // 5bytes
@@ -201,9 +206,10 @@ impl defmt::Format for Packet64 {
         let payload = self.payload().to_le_bytes();
         defmt::write!(
             fmt,
-            "Packet64 {{ kind: {:?}, sequence_number: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}, {:#04x}, {:#04x}, {:#04x}], payload_used_index: {}, crc4: {:#04x} }}",
+            "Packet64 {{ kind: {:?}, sequence_number: {}, stream_id: {}, source_address: {:#04x}, destination_address: {:#04x}, payload: [{:#04x}, {:#04x}, {:#04x}, {:#04x}, {:#04x}], payload_used_index: {}, crc4: {:#04x} }}",
             self.kind(),
             self.sequence_number(),
+            self.stream_id(),
             self.source_address(),
             self.destination_address(),
             payload[0],
