@@ -1,4 +1,5 @@
 use crate::hardware::{io, HardwareSetup};
+use codec::four_to_six::FourToSixBits;
 use codec::Identity;
 use core::cell::RefCell;
 use embassy_stm32::exti::ExtiInput;
@@ -47,13 +48,15 @@ fn get_reader_timing() -> ReaderTiming {
     )
 }
 
-// type CodecType = FourToSixBits<10>; // FIXME wtf this is not 4?
-// type CodecType = ReedSolomon<4, 4>;
+// FIXME wtf this is not 4?
+// type CodecType = FourToSixBits<18>;
+// type CodecType = ReedSolomon<4, 8>;
 type CodecType = Identity;
-// type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<20>, 4>; // FIXME FourToSixBits buffer weird
+// FIXME FourToSixBits buffer weird
+// type CodecType = Chain<ReedSolomon<4, 4>, FourToSixBits<20>, 4>;
 
-// type CompressionType = LzssCompression;
-type CompressionType = Identity;
+type CompressionType = LzssCompression;
+// type CompressionType = Identity;
 
 fn create_codec() -> CodecType {
     CodecType::default()
