@@ -118,8 +118,12 @@ mod tests {
         let paylaod = vec![0x01u8, 0x02, 0xab, 0xcd];
         let mut sequence_number = SequenceNumber::new(1);
         let address = Address::new(0x01, 0x02);
-        let builder =
-            PacketBuilder::new(&address, &mut sequence_number, paylaod.clone().into_iter());
+        let builder = PacketBuilder::new(
+            &address,
+            &mut sequence_number,
+            SequenceNumber::new(0),
+            paylaod.clone().into_iter(),
+        );
 
         let mut result: Vec<Packet64> = builder.collect();
         assert_eq!(result.len(), 1);
@@ -147,7 +151,12 @@ mod tests {
         ];
         let mut sequence_number = SequenceNumber::new(1);
         let address = Address::new(0x01, 0x02);
-        let builder = PacketBuilder::new(&address, &mut sequence_number, paylaod.into_iter());
+        let builder = PacketBuilder::new(
+            &address,
+            &mut sequence_number,
+            SequenceNumber::new(0),
+            paylaod.into_iter(),
+        );
 
         let result: Vec<Packet64> = builder.collect();
         println!("{:?}", result);

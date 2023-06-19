@@ -253,7 +253,7 @@ mod tests {
             .with_destination_address(0x08);
 
         let packet_data_32: u32 = original_packet.into();
-        let packet_data_64: u64 = (packet_data_32 as u64) << 32;
+        let packet_data_64: u64 = (packet_data_32 as u64);
 
         let received_packet = Packet32::from(packet_data_64);
         assert_eq!(received_packet, original_packet);

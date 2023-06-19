@@ -80,9 +80,10 @@ where
             let mut packet_buffer = [0u8; 8]; // One packet is 32bit = 4bytes// Update: Packet64 -> 8
             for (index, byte) in decoded_data.enumerate() {
                 // FIXME WTF how is the negation possible?
-                packet_buffer[index] = !byte;
+                // packet_buffer[index] = !byte;
+                packet_buffer[index] = byte;
             }
-            trace!("Received packet buffer = {:#04x}", packet_buffer);
+            trace!("Received packet buffer = {:#04x?}", packet_buffer);
 
             // And here is our packet (comment for readability)
             let packet: PacketType = u64::from_le_bytes(packet_buffer).into();
