@@ -16,4 +16,5 @@ pub enum NetworkError {
 #[derive(Debug, Format)]
 pub enum DataConstructionError {
     FullWindow,
+    WrongStreamId,
 }

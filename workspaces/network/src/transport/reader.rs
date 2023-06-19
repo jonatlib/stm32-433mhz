@@ -1,5 +1,5 @@
 use crate::error::NetworkError;
-use crate::packet::PacketType;
+use crate::packet::{PacketType, PACKET_TYPE_SN_SIZE};
 use crate::transport::window::Window;
 use crate::transport::TransportReceiver;
 use crate::Address;
@@ -15,7 +15,7 @@ use log::{error, trace};
 
 pub struct TransportReader<'a, R, C, P> {
     address: Address,
-    window: Window<8>,
+    window: Window<{ PACKET_TYPE_SN_SIZE as usize }>,
 
     codec: &'a C,
     compression: &'a P,

@@ -1,10 +1,12 @@
+use crate::error::NetworkError::DataConstructingError;
 use crate::error::{DataConstructionError, NetworkError};
-use crate::packet::{PacketKind, PacketType, PACKET_TYPE_SN_SIZE};
+use crate::packet::{PacketKind, PacketType, PACKET_TYPE_SN_SIZE, PACKET_TYPE_STREAM_ID_SIZE};
 use sequence_number::SequenceNumber;
 
 pub struct Window<const SIZE: usize> {
     buffer: heapless::Vec<PacketType, SIZE>,
     base_received: bool,
+    receiving_stream_id: Option<SequenceNumber<{ PACKET_TYPE_STREAM_ID_SIZE }>>,
 }
 
 impl<const SIZE: usize> Window<SIZE> {
@@ -12,15 +14,27 @@ impl<const SIZE: usize> Window<SIZE> {
         Self {
             buffer: heapless::Vec::new(),
             base_received: false,
+            receiving_stream_id: None,
         }
     }
 
     pub fn clear(&mut self) {
         self.buffer.clear();
+        self.base_received = false;
+        self.receiving_stream_id = None;
     }
 
     pub fn push_packet(&mut self, packet: PacketType) -> Result<Option<usize>, NetworkError> {
         // FIXME when to return Error earlier then when the buffer is full?
+
+        if let Some(ref v) = self.receiving_stream_id {
+            // TODO support comparing reference
+            if packet.stream_id() != v.clone() {
+                return Err(NetworkError::DataConstructingError(
+                    DataConstructionError::WrongStreamId,
+                ));
+            }
+        }
 
         if self.buffer.is_empty() {
             // TODO? || matches!(packet.kind(), PacketKind::End)
@@ -34,6 +48,11 @@ impl<const SIZE: usize> Window<SIZE> {
             //     })?;
         } else {
             let base = self.get_base_sequence_number();
+
+            // FIXME should ve set stream id here or on the first packet which might not be a start packet?
+            if base.is_some() {
+                self.receiving_stream_id = Some(packet.stream_id().clone());
+            }
 
             // Base received for the first time
             // Check if have packet sorted correctly
