@@ -2,7 +2,7 @@ use core::borrow::Borrow;
 
 use sequence_number::SequenceNumber;
 
-use crate::packet::{Packet32, PacketKind};
+use crate::packet::{Packet32, PacketKind, PACKET_TYPE_SN_SIZE, PACKET_TYPE_STREAM_ID_SIZE};
 use crate::Address;
 
 pub struct PacketBuilder<'a, P, I>
@@ -12,7 +12,8 @@ where
 {
     address: &'a Address,
 
-    sequence_number: &'a mut SequenceNumber<8>,
+    sequence_number: &'a mut SequenceNumber<PACKET_TYPE_SN_SIZE>,
+    stream_id: SequenceNumber<PACKET_TYPE_STREAM_ID_SIZE>,
 
     first_element: bool,
     self_contained: bool,
@@ -28,12 +29,14 @@ where
 {
     pub fn new(
         address: &'a Address,
-        start_sequence_number: &'a mut SequenceNumber<8>,
+        start_sequence_number: &'a mut SequenceNumber<PACKET_TYPE_SN_SIZE>,
+        stream_id: SequenceNumber<PACKET_TYPE_STREAM_ID_SIZE>,
         mut payload: P,
     ) -> Self {
         Self {
             address,
             sequence_number: start_sequence_number,
+            stream_id,
             first_element: true,
             self_contained: true,
             prev_element: payload.next(),
@@ -77,6 +80,7 @@ where
             Packet32::new()
                 .with_kind(kind)
                 .with_sequence_number(self.sequence_number.advance())
+                .with_stream_id(self.stream_id.clone())
                 .with_source_address(self.address.local_address)
                 .with_destination_address(self.address.destination_address)
                 .with_payload(payload)

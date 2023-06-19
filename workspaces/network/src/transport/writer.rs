@@ -1,6 +1,7 @@
 use defmt::trace;
 
 use crate::error::NetworkError;
+use crate::packet::{PACKET_TYPE_SN_SIZE, PACKET_TYPE_STREAM_ID_SIZE};
 use crate::packet_builder::PacketBuilder;
 use crate::transport::TransportSender;
 use crate::Address;
@@ -9,14 +10,10 @@ use codec::Codec;
 use physical_layer::BaseWriter;
 use sequence_number::SequenceNumber;
 
-#[cfg(feature = "packet-32")]
-const SEQUENCE_NUMBER_SIZE: u8 = 8;
-#[cfg(feature = "packet-64")]
-const SEQUENCE_NUMBER_SIZE: u8 = 32;
-
 pub struct TransportWriter<'a, W, C, P> {
     address: Address,
-    sequence_number: SequenceNumber<SEQUENCE_NUMBER_SIZE>,
+    sequence_number: SequenceNumber<PACKET_TYPE_SN_SIZE>,
+    stream_id: SequenceNumber<PACKET_TYPE_STREAM_ID_SIZE>,
     resend: u8,
 
     compression: &'a P,
@@ -40,6 +37,7 @@ where
         Self {
             address,
             sequence_number: SequenceNumber::new(0),
+            stream_id: SequenceNumber::new(0),
             resend,
             compression,
             codec,
@@ -60,6 +58,7 @@ where
         let packet_builder = PacketBuilder::new(
             &self.address,
             &mut self.sequence_number,
+            self.stream_id.advance(),
             self.compression
                 .encode(payload)
                 .map_err(NetworkError::CodecError)?,

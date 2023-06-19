@@ -10,8 +10,13 @@ pub type PacketType = Packet64;
 
 #[cfg(feature = "packet-32")]
 pub const PACKET_TYPE_SN_SIZE: u8 = 8;
+#[cfg(feature = "packet-32")]
+pub const PACKET_TYPE_STREAM_ID_SIZE: u8 = 4;
+
 #[cfg(feature = "packet-64")]
-pub const PACKET_TYPE_SN_SIZE: u8 = 32;
+pub const PACKET_TYPE_SN_SIZE: u8 = 16;
+#[cfg(feature = "packet-64")]
+pub const PACKET_TYPE_STREAM_ID_SIZE: u8 = 8;
 
 #[derive(Debug, Eq, PartialEq, Clone, defmt::Format)]
 #[repr(u8)]
@@ -67,7 +72,7 @@ pub struct Packet32 {
     #[bits(3)] // Up to 8 packets
     pub sequence_number: SequenceNumber<8>,
     #[bits(2)] // Up to 4 streams
-    pub stream_id: SequenceNumber<8>,
+    pub stream_id: SequenceNumber<4>,
 
     #[bits(4)] // Up to 16 devices
     pub source_address: u8,
