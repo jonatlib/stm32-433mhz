@@ -51,8 +51,8 @@ where
     Com: Codec + Default + 'a,
 {
     let (reader, writer) = io::prepare_io();
-    let transport_reader_factory = network::ReaderFactory::new();
-    let transport_writer_factory = network::WriterFactory::new();
+    let mut transport_reader_factory = network::ReaderFactory::new(reader);
+    let mut transport_writer_factory = network::WriterFactory::new(writer);
 
     let mut reader = transport_reader_factory.create_reader();
     let mut writer = transport_writer_factory.create_writer();
@@ -65,7 +65,22 @@ async fn test_full_receive_transmit() -> std::io::Result<()> {
         |reader: &mut TransportReader<'_, io::DummyManchesterReader, Identity, Identity>,
          writer| {
             async move {
-                todo!();
+                let payload = vec![0x01u8, 0x02, 0x03, 0x04, 0xff, 0xfe, 0xfd, 0xfc, 0xaa];
+
+                let wrote_bytes = writer
+                    .send_bytes(&payload[..])
+                    .await
+                    .expect("Can't send data");
+                // FIXME assert for writing won't work
+
+                let mut read_buffer = [0x00u8; 9];
+                let read_bytes = reader
+                    .receive_bytes(&mut read_buffer)
+                    .await
+                    .expect("Can't receive data");
+
+                //TODO read bytes assert
+                println!("Read = {:?}", read_buffer);
             }
         },
     )
