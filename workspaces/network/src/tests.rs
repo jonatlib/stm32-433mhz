@@ -1,7 +1,9 @@
 use crate::transport::reader::TransportReader;
 use crate::transport::writer::TransportWriter;
 use crate::transport::{TransportReceiver, TransportSender};
-use codec::Codec;
+use codec::{Codec, Identity};
+
+use async_std_test::async_test;
 use std::future::Future;
 
 pub mod io;
@@ -52,13 +54,21 @@ where
     let transport_reader_factory = network::ReaderFactory::new();
     let transport_writer_factory = network::WriterFactory::new();
 
-    async move {
-        let mut reader = transport_reader_factory.create_reader();
-        let mut writer = transport_writer_factory.create_writer();
-        callback(&mut reader, &mut writer).await
-    }
-    .await
+    let mut reader = transport_reader_factory.create_reader();
+    let mut writer = transport_writer_factory.create_writer();
+    callback(&mut reader, &mut writer).await
 }
 
-#[test]
-fn test_full_receive_transmit() {}
+#[async_test]
+async fn test_full_receive_transmit() -> std::io::Result<()> {
+    test_network(
+        |reader: &mut TransportReader<'_, io::DummyManchesterReader, Identity, Identity>,
+         writer| {
+            async move {
+                todo!();
+            }
+        },
+    )
+    .await;
+    Ok(())
+}
