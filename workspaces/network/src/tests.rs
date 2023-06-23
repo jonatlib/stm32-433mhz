@@ -39,10 +39,11 @@ pub fn init_logging_stdout() {
 
 pub async fn test_network<'a, Result, Callback, Fut, Cod, Com>(callback: Callback) -> Result
 where
-    Callback: FnOnce(
-        &mut TransportReader<'a, io::DummyManchesterReader, Cod, Com>,
-        &mut TransportWriter<'a, io::DummyManchesterWriter, Cod, Com>,
-    ) -> Fut,
+    for<'b> Callback: FnOnce(
+            &mut TransportReader<'b, io::DummyManchesterReader, Cod, Com>,
+            &mut TransportWriter<'b, io::DummyManchesterWriter, Cod, Com>,
+        ) -> Fut
+        + 'b,
     Fut: Future<Output = Result> + 'a,
     Cod: Codec + Default + 'a,
     Com: Codec + Default + 'a,
