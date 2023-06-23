@@ -52,6 +52,7 @@ impl<'a, P: Pin> BaseReader for ManchesterReader<'a, P> {
     async fn read_bytes_buffer(&mut self, buffer: &mut [u8]) -> Result<usize, ReadError> {
         let mut decoder = DecoderBool::new(BitOrder::LittleEndian);
         for element in buffer.iter_mut() {
+            // FIXME should ve return error or just success with less bytes?
             *element = with_timeout(self.timing.decoding_timeout, self.read_byte(&mut decoder))
                 .await
                 .map_err(|_| ReadError::TimeoutError)??;

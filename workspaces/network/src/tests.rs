@@ -1,3 +1,12 @@
+use crate::transport::reader::TransportReader;
+use crate::transport::writer::TransportWriter;
+use crate::transport::{TransportReceiver, TransportSender};
+use codec::Codec;
+use std::future::Future;
+
+pub mod io;
+pub mod network;
+
 // use embedded_hal::serial::Write;
 // use std::io::{self, Write as _};
 //
@@ -27,3 +36,28 @@ pub fn init_logging_stdout() {
         .is_test(true)
         .try_init();
 }
+
+pub async fn test_network<'a, Result, Callback, Fut, Cod, Com>(callback: Callback) -> Result
+where
+    Callback: FnOnce(
+        &mut TransportReader<'a, io::DummyManchesterReader, Cod, Com>,
+        &mut TransportWriter<'a, io::DummyManchesterWriter, Cod, Com>,
+    ) -> Fut,
+    Fut: Future<Output = Result> + 'a,
+    Cod: Codec + Default + 'a,
+    Com: Codec + Default + 'a,
+{
+    let (reader, writer) = io::prepare_io();
+    let transport_reader_factory = network::ReaderFactory::new();
+    let transport_writer_factory = network::WriterFactory::new();
+
+    async move {
+        let mut reader = transport_reader_factory.create_reader();
+        let mut writer = transport_writer_factory.create_writer();
+        callback(&mut reader, &mut writer).await
+    }
+    .await
+}
+
+#[test]
+fn test_full_receive_transmit() {}
