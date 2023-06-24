@@ -41,7 +41,7 @@ async fn read_task(mut simple_receiver: transport::ReceiverFactory<'static>) {
         //             continue;
         //         }
         //     };
-        let data = transport.receive_struct().await;
+        let data: Result<payload::SensorPayload, _> = transport.receive_struct().await;
         info!("---------------------------------------------------");
         info!("Read data = {:?}", data);
         info!("---------------------------------------------------");

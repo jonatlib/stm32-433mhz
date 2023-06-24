@@ -45,12 +45,16 @@ impl<'a, P: Pin> BaseWriter for ManchesterWriter<'a, P> {
         let data = tmp_buffer[..elements].into_iter().copied();
 
         let mut encoder = EncoderBoolIterator::new(data, BitOrder::LittleEndian);
-        // FIXME use DMA instead and implement different encoder
+        // TODO use DMA instead and implement different encoder
+        // FIXME WTF how is the negation possible?
+        // FIXME moved from transport reader where we received negated data
         for bit in encoder {
             if bit {
-                self.pin.set_high();
-            } else {
+                // self.pin.set_high(); // original before fixme
                 self.pin.set_low();
+            } else {
+                // self.pin.set_low(); // original before fixme
+                self.pin.set_high();
             }
             Timer::after(self.timing.encoding_between_half_bits).await;
         }
