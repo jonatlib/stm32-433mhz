@@ -938,6 +938,7 @@ dependencies = [
  "env_logger",
  "heapless",
  "log",
+ "manchester",
  "physical_layer",
  "postcard",
  "sequence_number",

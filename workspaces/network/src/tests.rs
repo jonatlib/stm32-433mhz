@@ -3,8 +3,11 @@ use crate::transport::writer::TransportWriter;
 use crate::transport::{TransportReceiver, TransportSender};
 use codec::{Codec, Identity};
 
+use crate::tests::network::{ReaderFactory, WriterFactory};
+use async_std::task::block_on;
 use async_std_test::async_test;
 use std::future::Future;
+use std::vec::Vec;
 
 pub mod io;
 pub mod network;
@@ -39,13 +42,14 @@ pub fn init_logging_stdout() {
         .try_init();
 }
 
-pub async fn test_network<'a, Result, Callback, Fut, Cod, Com>(callback: Callback) -> Result
+pub fn test_network<'a, Result, Callback, Fut, Cod, Com>(callback: Callback) -> Result
 where
     for<'b> Callback: FnOnce(
-            &mut TransportReader<'b, io::DummyManchesterReader, Cod, Com>,
-            &mut TransportWriter<'b, io::DummyManchesterWriter, Cod, Com>,
-        ) -> Fut
-        + 'b,
+        // &mut TransportReader<'b, io::DummyManchesterReader, Cod, Com>,
+        // &mut TransportWriter<'b, io::DummyManchesterWriter, Cod, Com>,
+        ReaderFactory<Cod, Com>,
+        WriterFactory<Cod, Com>,
+    ) -> Fut,
     Fut: Future<Output = Result> + 'a,
     Cod: Codec + Default + 'a,
     Com: Codec + Default + 'a,
@@ -54,17 +58,16 @@ where
     let mut transport_reader_factory = network::ReaderFactory::new(reader);
     let mut transport_writer_factory = network::WriterFactory::new(writer);
 
-    let mut reader = transport_reader_factory.create_reader();
-    let mut writer = transport_writer_factory.create_writer();
-    callback(&mut reader, &mut writer).await
+    block_on(callback(transport_reader_factory, transport_writer_factory))
 }
 
-#[async_test]
-async fn test_full_receive_transmit() -> std::io::Result<()> {
+#[test]
+fn test_full_receive_transmit() {
     test_network(
-        |reader: &mut TransportReader<'_, io::DummyManchesterReader, Identity, Identity>,
-         writer| {
+        |mut reader_factory: ReaderFactory<Identity, Identity>, mut writer_factory| {
             async move {
+                let mut reader = reader_factory.create_reader();
+                let mut writer = writer_factory.create_writer();
                 let payload = vec![0x01u8, 0x02, 0x03, 0x04, 0xff, 0xfe, 0xfd, 0xfc, 0xaa];
 
                 let wrote_bytes = writer
@@ -81,9 +84,8 @@ async fn test_full_receive_transmit() -> std::io::Result<()> {
 
                 //TODO read bytes assert
                 println!("Read = {:?}", read_buffer);
+                assert_eq!(payload, Vec::from(read_buffer));
             }
         },
-    )
-    .await;
-    Ok(())
+    );
 }

@@ -1,4 +1,8 @@
-use defmt::trace;
+#[cfg(not(test))]
+use defmt::{error, trace};
+
+#[cfg(test)]
+use log::{error, trace};
 
 use crate::error::NetworkError;
 use crate::packet::{PACKET_TYPE_SN_SIZE, PACKET_TYPE_STREAM_ID_SIZE};
@@ -67,7 +71,7 @@ where
         for packet in packet_builder {
             trace!("Sending packet = {:?}", packet);
             let data = packet.to_le_bytes();
-            trace!("Writing buffer = {:#04x}", data);
+            // trace!("Writing buffer = {:#04x}", data);
             for _ in 0..self.resend {
                 // TODO don't re-encode the same data multiple times
                 // When encoder raise an error we should just stop, as the same data won't be sent at all
