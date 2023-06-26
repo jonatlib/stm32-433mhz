@@ -63,6 +63,7 @@ where
     Com: Codec + Default,
 {
     test_network(
+        // FIXME how to use `Cod` here?
         |mut reader_factory: ReaderFactory<Identity, Com>, mut writer_factory| async move {
             let mut reader = reader_factory.create_reader();
             let mut writer = writer_factory.create_writer();
