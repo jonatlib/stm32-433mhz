@@ -1,11 +1,12 @@
 use crate::transport::reader::TransportReader;
 use crate::transport::writer::TransportWriter;
 use crate::transport::{TransportReceiver, TransportSender};
-use codec::{Codec, Identity};
+use codec::{Codec, CodecSize, Identity};
 
 use crate::tests::network::{ReaderFactory, WriterFactory};
 use async_std::task::block_on;
 use async_std_test::async_test;
+use codec::lzss::LzssCompression;
 use std::future::Future;
 use std::vec::Vec;
 
@@ -44,12 +45,7 @@ pub fn init_logging_stdout() {
 
 pub fn test_network<'a, Result, Callback, Fut, Cod, Com>(callback: Callback) -> Result
 where
-    for<'b> Callback: FnOnce(
-        // &mut TransportReader<'b, io::DummyManchesterReader, Cod, Com>,
-        // &mut TransportWriter<'b, io::DummyManchesterWriter, Cod, Com>,
-        ReaderFactory<Cod, Com>,
-        WriterFactory<Cod, Com>,
-    ) -> Fut,
+    for<'b> Callback: FnOnce(ReaderFactory<Cod, Com>, WriterFactory<Cod, Com>) -> Fut,
     Fut: Future<Output = Result> + 'a,
     Cod: Codec + Default + 'a,
     Com: Codec + Default + 'a,
@@ -61,31 +57,42 @@ where
     block_on(callback(transport_reader_factory, transport_writer_factory))
 }
 
-#[test]
-fn test_full_receive_transmit() {
+pub fn test_configuration<Cod, Com>()
+where
+    Cod: Codec + Default,
+    Com: Codec + Default,
+{
     test_network(
-        |mut reader_factory: ReaderFactory<Identity, Identity>, mut writer_factory| {
-            async move {
-                let mut reader = reader_factory.create_reader();
-                let mut writer = writer_factory.create_writer();
-                let payload = vec![0x01u8, 0x02, 0x03, 0x04, 0xff, 0xfe, 0xfd, 0xfc, 0xaa];
+        |mut reader_factory: ReaderFactory<Identity, Com>, mut writer_factory| async move {
+            let mut reader = reader_factory.create_reader();
+            let mut writer = writer_factory.create_writer();
+            let payload = vec![0x01u8, 0x02, 0x03, 0x04, 0xff, 0xfe, 0xfd, 0xfc, 0xaa];
 
-                let wrote_bytes = writer
-                    .send_bytes(&payload[..])
-                    .await
-                    .expect("Can't send data");
-                // FIXME assert for writing won't work
+            let wrote_bytes = writer
+                .send_bytes(&payload[..])
+                .await
+                .expect("Can't send data");
+            // FIXME assert for writing won't work
 
-                let mut read_buffer = [0x00u8; 9];
-                let read_bytes = reader
-                    .receive_bytes(&mut read_buffer)
-                    .await
-                    .expect("Can't receive data");
+            let mut read_buffer = [0x00u8; 9];
+            let read_bytes = reader
+                .receive_bytes(&mut read_buffer)
+                .await
+                .expect("Can't receive data");
 
-                //TODO read bytes assert
-                println!("Read = {:?}", read_buffer);
-                assert_eq!(payload, Vec::from(read_buffer));
-            }
+            //TODO read bytes assert
+            println!("Read = {:?}", read_buffer);
+            assert_eq!(payload, Vec::from(read_buffer));
         },
     );
+}
+
+#[test]
+fn test_full_receive_transmit_identity() {
+    test_configuration::<Identity, Identity>();
+}
+
+#[test]
+fn test_full_receive_transmit_lzmo_compression() {
+    test_configuration::<Identity, LzssCompression>();
 }
