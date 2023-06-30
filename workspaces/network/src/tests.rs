@@ -75,15 +75,16 @@ macro_rules! test_configuration {
                     .expect("Can't send data");
                 // FIXME assert for writing won't work
 
-                let mut read_buffer = [0x00u8; 9];
+                // TODO why more then 9 what is on the input? With packet 64 it is writing behind this size
+                let mut read_buffer = [0x00u8; 32];
                 let read_bytes = reader
                     .receive_bytes(&mut read_buffer)
                     .await
                     .expect("Can't receive data");
 
                 //TODO read bytes assert
-                println!("Read = {:?}", read_buffer);
-                assert_eq!(payload, Vec::from(read_buffer));
+                println!("Read size {} = {:?}", read_bytes, read_buffer);
+                assert_eq!(payload, Vec::from(&read_buffer[..read_bytes]));
             },
         );
     };
